@@ -1,0 +1,66 @@
+#pragma once
+
+#include <units/base.h>
+#include <units/velocity.h>
+#include <frc/system/plant/DCMotor.h>
+
+namespace consts {
+namespace swerve {
+namespace can_ids {
+inline constexpr int FL_STEER = 2;
+inline constexpr int FL_DRIVE = 3;
+inline constexpr int FL_ENC = 4;
+
+inline constexpr int FR_STEER = 5;
+inline constexpr int FR_DRIVE = 6;
+inline constexpr int FR_ENC = 7;
+
+inline constexpr int BL_STEER = 8;
+inline constexpr int BL_DRIVE = 9;
+inline constexpr int BL_ENC = 10;
+
+inline constexpr int BR_STEER = 11;
+inline constexpr int BR_DRIVE = 12;
+inline constexpr int BR_ENC = 13;
+}
+
+namespace current_limits {
+inline constexpr units::ampere_t SUPPLY_CURRENT_LIMIT = 60_A;
+}
+
+namespace physical {
+
+inline constexpr units::scalar_t FL_ENC_OFFSET = 0.0;
+inline constexpr units::scalar_t FR_ENC_OFFSET = 0.0;
+inline constexpr units::scalar_t BL_ENC_OFFSET = 0.0;
+inline constexpr units::scalar_t BR_ENC_OFFSET = 0.0;
+
+inline constexpr bool FL_STEER_INVERT = false;
+inline constexpr bool FR_STEER_INVERT = false;
+inline constexpr bool BL_STEER_INVERT = false;
+inline constexpr bool BR_STEER_INVERT = false;
+
+inline constexpr bool FL_DRIVE_INVERT = false;
+inline constexpr bool FR_DRIVE_INVERT = false;
+inline constexpr bool BL_DRIVE_INVERT = false;
+inline constexpr bool BR_DRIVE_INVERT = false;
+
+//SDS MK4i
+inline constexpr units::scalar_t STEER_GEARING = (50.0 / 14.0) * (60.0 / 10.0);
+//L2 with 16T pinion
+inline constexpr units::scalar_t DRIVE_GEARING = (50.0 / 16.0) * (17.0 / 27.0) * (45.0 / 15.0);
+}
+
+namespace gains {
+inline constexpr units::turns_per_second_t STEER_CRUISE_VEL = frc::DCMotor::Falcon500FOC().freeSpeed / physical::STEER_GEARING;
+inline constexpr str::gains::radial::turn_volt_ka_unit_t STEER_MOTION_MAGIC_KA{0};
+inline constexpr str::gains::radial::turn_volt_kv_unit_t STEER_MOTION_MAGIC_KV{0};
+inline constexpr str::gains::radial::turn_amp_ka_unit_t STEER_KA{0};
+inline constexpr str::gains::radial::turn_amp_kv_unit_t STEER_KV{0};
+inline constexpr units::ampere_t STEER_KS{0};
+inline constexpr str::gains::radial::turn_amp_kp_unit_t STEER_KP{0};
+inline constexpr str::gains::radial::turn_amp_ki_unit_t STEER_KI{0};
+inline constexpr str::gains::radial::turn_amp_kd_unit_t STEER_KD{0};
+}
+}
+}
