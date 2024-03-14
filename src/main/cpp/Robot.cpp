@@ -34,11 +34,13 @@ void Robot::TeleopInit() {
   if (m_autonomousCommand) {
     m_autonomousCommand->Cancel();
   }
-
-  
 }
 
-void Robot::TeleopPeriodic() {}
+void Robot::TeleopPeriodic() {
+  desiredState.angle = desiredState.angle + frc::Rotation2d{1_deg};
+  desiredState.speed = desiredState.speed + .1_fps;
+  testModule.GoToState(desiredState);
+}
 
 void Robot::TeleopExit() {}
 

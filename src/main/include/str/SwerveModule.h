@@ -3,43 +3,22 @@
 #include <ctre/phoenix6/TalonFX.hpp>
 #include <ctre/phoenix6/CANcoder.hpp>
 #include "str/Gains.h"
+#include <frc/kinematics/SwerveModuleState.h>
+#include <networktables/StructTopic.h>
+#include <frc/system/plant/DCMotor.h>
+#include "str/SwerveModuleSim.h"
+#include "str/SwerveModuleHelpers.h"
 
 namespace str {
 
-struct SwerveModuleConstants {
-  const std::string moduleName;
-  const int steerId;
-  const int driveId;
-  const int encoderId;
-  const double steerEncoderOffset;
-  const bool invertDrive;
-  const bool invertSteer;
-};
-
-struct SwerveModulePhysical {
-  const units::scalar_t steerGearing;
-  const units::scalar_t driveGearing;
-  const units::ampere_t supplySideLimit;
-};
-
-struct SwerveModuleSteerGains {
-  units::turns_per_second_t motionMagicCruiseVel;
-  str::gains::radial::turn_volt_ka_unit_t motionMagicExpoKa;
-  str::gains::radial::turn_volt_kv_unit_t motionMagicExpoKv;
-  str::gains::radial::turn_amp_ka_unit_t kA;
-  str::gains::radial::turn_amp_kv_unit_t kV;
-  units::ampere_t kS;
-  str::gains::radial::turn_amp_kp_unit_t kP;  
-  str::gains::radial::turn_amp_ki_unit_t kI;
-  str::gains::radial::turn_amp_kd_unit_t kD;
-};
-
 class SwerveModule {
 public:
-  explicit SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical physicalAttrib, SwerveModuleSteerGains steerGains);
+  explicit SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical physicalAttrib, SwerveModuleSteerGains steerGains, SwerveModuleDriveGains driveGains);
+  void GoToState(frc::SwerveModuleState desiredState);
+  frc::SwerveModuleState GetCurrentState() const;
 private:
   bool ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit);
-  bool ConfigureDriveMotor(bool invertDrive);
+  bool ConfigureDriveMotor(bool invertDrive, units::ampere_t supplyCurrentLimit, units::ampere_t slipCurrentLimit );
   bool ConfigureSteerEncoder(double encoderOffset);
 
   ctre::phoenix6::hardware::TalonFX steerMotor;
@@ -49,5 +28,12 @@ private:
   std::string moduleName;
 
   SwerveModuleSteerGains steerGains;
+  SwerveModuleDriveGains driveGains;
+
+  SwerveModuleSim moduleSim;
+
+  std::shared_ptr<nt::NetworkTable> nt;
+  nt::StructTopic<frc::SwerveModuleState> desiredStateTopic;
+  nt::StructPublisher<frc::SwerveModuleState> desiredStatePub;
 };
 }

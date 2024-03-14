@@ -26,6 +26,7 @@ inline constexpr int BR_ENC = 13;
 
 namespace current_limits {
 inline constexpr units::ampere_t SUPPLY_CURRENT_LIMIT = 60_A;
+inline constexpr units::ampere_t SLIP_CURRENT_LIMIT = 100_A;
 }
 
 namespace physical {
@@ -49,18 +50,30 @@ inline constexpr bool BR_DRIVE_INVERT = false;
 inline constexpr units::scalar_t STEER_GEARING = (50.0 / 14.0) * (60.0 / 10.0);
 //L2 with 16T pinion
 inline constexpr units::scalar_t DRIVE_GEARING = (50.0 / 16.0) * (17.0 / 27.0) * (45.0 / 15.0);
+
+inline constexpr frc::DCMotor DRIVE_MOTOR = frc::DCMotor::Falcon500FOC(1);
+inline constexpr frc::DCMotor STEER_MOTOR = frc::DCMotor::Falcon500FOC(1);
 }
 
 namespace gains {
-inline constexpr units::turns_per_second_t STEER_CRUISE_VEL = frc::DCMotor::Falcon500FOC().freeSpeed / physical::STEER_GEARING;
+inline constexpr units::turns_per_second_t STEER_CRUISE_VEL = physical::STEER_MOTOR.freeSpeed / physical::STEER_GEARING;
 inline constexpr str::gains::radial::turn_volt_ka_unit_t STEER_MOTION_MAGIC_KA{0};
 inline constexpr str::gains::radial::turn_volt_kv_unit_t STEER_MOTION_MAGIC_KV{0};
 inline constexpr str::gains::radial::turn_amp_ka_unit_t STEER_KA{0};
 inline constexpr str::gains::radial::turn_amp_kv_unit_t STEER_KV{0};
 inline constexpr units::ampere_t STEER_KS{0};
+inline constexpr units::volt_t STEER_KS_V{0};
 inline constexpr str::gains::radial::turn_amp_kp_unit_t STEER_KP{0};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t STEER_KI{0};
 inline constexpr str::gains::radial::turn_amp_kd_unit_t STEER_KD{0};
+
+inline constexpr str::gains::radial::turn_amp_ka_unit_t DRIVE_KA{0};
+inline constexpr str::gains::radial::turn_amp_kv_unit_t DRIVE_KV{0};
+inline constexpr units::ampere_t DRIVE_KS{0};
+inline constexpr units::volt_t DRIVE_KS_V{0};
+inline constexpr str::gains::radial::turn_amp_kp_unit_t DRIVE_KP{0};
+inline constexpr str::gains::radial::turn_amp_ki_unit_t DRIVE_KI{0};
+inline constexpr str::gains::radial::turn_amp_kd_unit_t DRIVE_KD{0};
 }
 }
 }

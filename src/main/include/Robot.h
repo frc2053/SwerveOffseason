@@ -11,7 +11,7 @@
 
 #include "RobotContainer.h"
 #include "str/SwerveModule.h"
-#include "Constants.h"
+#include "constants/SwerveConstants.h"
 
 class Robot : public frc::TimedRobot {
  public:
@@ -48,7 +48,10 @@ class Robot : public frc::TimedRobot {
     str::SwerveModulePhysical{
       consts::swerve::physical::STEER_GEARING,
       consts::swerve::physical::DRIVE_GEARING,
-      consts::swerve::current_limits::SUPPLY_CURRENT_LIMIT
+      consts::swerve::current_limits::SUPPLY_CURRENT_LIMIT,
+      consts::swerve::current_limits::SLIP_CURRENT_LIMIT,
+      consts::swerve::physical::DRIVE_MOTOR,
+      consts::swerve::physical::STEER_MOTOR
     },
     str::SwerveModuleSteerGains{
       consts::swerve::gains::STEER_CRUISE_VEL,
@@ -60,6 +63,16 @@ class Robot : public frc::TimedRobot {
       consts::swerve::gains::STEER_KP,
       consts::swerve::gains::STEER_KI,
       consts::swerve::gains::STEER_KD,
+    },
+    str::SwerveModuleDriveGains{
+      consts::swerve::gains::DRIVE_KA,
+      consts::swerve::gains::DRIVE_KV,
+      consts::swerve::gains::DRIVE_KS,
+      consts::swerve::gains::DRIVE_KP,
+      consts::swerve::gains::DRIVE_KI,
+      consts::swerve::gains::DRIVE_KD,
     }
   };
+
+  frc::SwerveModuleState desiredState;
 };
