@@ -1,5 +1,5 @@
 #include "str/SwerveModule.h"
-#include <ctre/phoenix/export.h>
+#include <frc/MathUtil.h>
 
 using namespace str;
 
@@ -84,7 +84,7 @@ frc::SwerveModulePosition SwerveModule::GetCurrentPosition(bool refresh) {
     ConvertWheelRotationsToWheelDistance(
       ConvertDriveMotorRotationsToWheelRotations(latencyCompDrivePos)
     ),
-    frc::Rotation2d{latencyCompSteerPos}
+    frc::Rotation2d{frc::AngleModulus(latencyCompSteerPos)}
   };
 
   currentPositionPub.Set(position);
@@ -97,7 +97,7 @@ frc::SwerveModuleState SwerveModule::GetCurrentState() {
     ConvertWheelVelToLinearVel(
       ConvertDriveMotorVelToWheelVel(driveVelocitySig.GetValue())
     ),
-    frc::Rotation2d{steerPositionSig.GetValue()}
+    frc::Rotation2d{frc::AngleModulus(steerPositionSig.GetValue())}
   };
 
   currentStatePub.Set(currentState);

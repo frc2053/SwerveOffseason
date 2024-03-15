@@ -12,6 +12,7 @@
 #include "RobotContainer.h"
 #include "str/SwerveModule.h"
 #include "constants/SwerveConstants.h"
+#include <frc/XboxController.h>
 
 class Robot : public frc::TimedRobot {
  public:
@@ -84,4 +85,6 @@ class Robot : public frc::TimedRobot {
 
   void UpdateModule();
   std::array<ctre::phoenix6::BaseStatusSignal*, 4> allSignals;
+
+  frc::XboxController controller{0};
 };

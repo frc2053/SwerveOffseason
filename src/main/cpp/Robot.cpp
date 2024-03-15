@@ -52,8 +52,8 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
-  desiredState.angle = 45_deg;
-  desiredState.speed = 0_fps;
+  desiredState.angle = units::radian_t{std::atan2(-controller.GetLeftY(), -controller.GetLeftX())};
+  desiredState.speed = units::feet_per_second_t{std::hypot(-controller.GetLeftY(), -controller.GetLeftX())} * 15;
   testModule.GoToState(desiredState);
   testModule.GetCurrentState();
   testModule.GetCurrentPosition(false);
