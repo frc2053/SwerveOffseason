@@ -29,6 +29,8 @@ class Robot : public frc::TimedRobot {
   void TestInit() override;
   void TestPeriodic() override;
   void TestExit() override;
+  void SimulationInit() override;
+  void SimulationPeriodic() override;
 
  private:
   std::optional<frc2::CommandPtr> m_autonomousCommand;
@@ -51,7 +53,11 @@ class Robot : public frc::TimedRobot {
       consts::swerve::current_limits::SUPPLY_CURRENT_LIMIT,
       consts::swerve::current_limits::SLIP_CURRENT_LIMIT,
       consts::swerve::physical::DRIVE_MOTOR,
-      consts::swerve::physical::STEER_MOTOR
+      consts::swerve::physical::STEER_MOTOR,
+      consts::swerve::physical::COUPLING_RATIO,
+      consts::swerve::physical::WHEEL_RADIUS,
+      consts::swerve::gains::DRIVE_KS_V,
+      consts::swerve::gains::STEER_KS_V,
     },
     str::SwerveModuleSteerGains{
       consts::swerve::gains::STEER_CRUISE_VEL,
@@ -75,4 +81,7 @@ class Robot : public frc::TimedRobot {
   };
 
   frc::SwerveModuleState desiredState;
+
+  void UpdateModule();
+  std::array<ctre::phoenix6::BaseStatusSignal*, 4> allSignals;
 };

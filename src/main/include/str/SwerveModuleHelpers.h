@@ -22,6 +22,8 @@ struct SwerveModulePhysical {
   const units::ampere_t slipCurrent;
   const frc::DCMotor driveMotor;
   const frc::DCMotor steerMotor;
+  const units::scalar_t couplingRatio;
+  const units::meter_t wheelRadius;
   //Used for sim only
   const units::volt_t driveFrictionVoltage;
   const units::volt_t steerFrictionVoltage;

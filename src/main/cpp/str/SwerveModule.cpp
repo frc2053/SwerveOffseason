@@ -7,7 +7,16 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
 : steerMotor(constants.steerId, "*"), 
   driveMotor(constants.driveId, "*"), 
   steerEncoder(constants.encoderId, "*"),
+  drivePositionSig(driveMotor.GetPosition()),
+  driveVelocitySig(driveMotor.GetVelocity()),
+  steerPositionSig(steerMotor.GetPosition()),
+  steerVelocitySig(steerMotor.GetVelocity()),
+  steerAngleSetter(0_rad),
+  driveVelocitySetter(0_rad_per_s),
   moduleName(constants.moduleName),
+  couplingRatio(physicalAttrib.couplingRatio),
+  wheelRadius(physicalAttrib.wheelRadius),
+  driveGearing(physicalAttrib.driveGearing),
   steerGains(steerGains),
   driveGains(driveGains),
   moduleSim(
@@ -19,19 +28,96 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
   ),
   nt(nt::NetworkTableInstance::GetDefault().GetTable(moduleName + "_SwerveModule")),
   desiredStateTopic(nt->GetStructTopic<frc::SwerveModuleState>("DesiredState")),
-  desiredStatePub(desiredStateTopic.Publish())
+  desiredStatePub(desiredStateTopic.Publish()),
+  currentStateTopic(nt->GetStructTopic<frc::SwerveModuleState>("CurrentState")),
+  currentStatePub(currentStateTopic.Publish()),
+  currentPositionTopic(nt->GetStructTopic<frc::SwerveModulePosition>("CurrentPosition")),
+  currentPositionPub(currentPositionTopic.Publish())
 {
   ConfigureSteerMotor(constants.invertSteer, physicalAttrib.steerGearing, physicalAttrib.supplySideLimit);
   ConfigureDriveMotor(constants.invertDrive, physicalAttrib.supplySideLimit, physicalAttrib.slipCurrent);
   ConfigureSteerEncoder(constants.steerEncoderOffset);
+  ConfigureControlSignals();
 }
 
 void SwerveModule::GoToState(frc::SwerveModuleState desiredState) {
+  frc::SwerveModuleState currentState = GetCurrentState();
+  desiredState = frc::SwerveModuleState::Optimize(desiredState, currentState.angle);
   desiredStatePub.Set(desiredState);
+
+  steerMotor.SetControl(steerAngleSetter.WithPosition(desiredState.angle.Radians()));
+
+  units::turns_per_second_t motorSpeed = ConvertWheelVelToMotorVel(ConvertLinearVelToWheelVel(desiredState.speed));
+
+  //The drive motors will start turning before the module reaches the desired angle, 
+  //so scale down the speed if we are far away from our setpoint
+  //Based of FRC 900 ZebROS 2023 Whitepaper
+  units::radian_t steerError = desiredState.angle.Radians() - currentState.angle.Radians();
+  units::scalar_t errorMulti = units::math::cos(steerError);
+  if(errorMulti < 0.0) {
+    errorMulti = 0.0;
+  }
+  motorSpeed *= errorMulti;
+
+  //Reverse the modules expected backout because of coupling
+  units::turns_per_second_t driveBackout = steerVelocitySig.GetValue() * couplingRatio;
+  motorSpeed += driveBackout;
+
+  driveMotor.SetControl(driveVelocitySetter.WithVelocity(motorSpeed));
 }
 
-frc::SwerveModuleState SwerveModule::GetCurrentState() const {
+frc::SwerveModulePosition SwerveModule::GetCurrentPosition(bool refresh) {
+  if(refresh) {
+    ctre::phoenix::StatusCode moduleSignalStatus = ctre::phoenix6::BaseStatusSignal::WaitForAll(
+      0_s,
+      drivePositionSig,
+      driveVelocitySig,
+      steerPositionSig,
+      steerVelocitySig 
+    );
 
+    if(!moduleSignalStatus.IsOK()) {
+      fmt::print("Error refreshing {} module signal in GetCurrentPosition()! Error was: {}\n", moduleName, moduleSignalStatus.GetName());
+    }
+  }
+
+  units::radian_t latencyCompSteerPos = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(steerPositionSig, steerVelocitySig);
+  units::radian_t latencyCompDrivePos = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(steerPositionSig, steerVelocitySig);
+
+  //The drive and steer run on the same gear train, rotating the module will slightly move the drive wheel. We account for this here.
+  latencyCompDrivePos -= latencyCompSteerPos * couplingRatio;
+
+  frc::SwerveModulePosition position{
+    ConvertWheelRotationsToWheelDistance(
+      ConvertDriveMotorRotationsToWheelRotations(latencyCompDrivePos)
+    ),
+    frc::Rotation2d{latencyCompSteerPos}
+  };
+
+  currentPositionPub.Set(position);
+
+  return position;
+}
+
+frc::SwerveModuleState SwerveModule::GetCurrentState() {
+  frc::SwerveModuleState currentState{
+    ConvertWheelVelToLinearVel(
+      ConvertDriveMotorVelToWheelVel(driveVelocitySig.GetValue())
+    ),
+    frc::Rotation2d{steerPositionSig.GetValue()}
+  };
+
+  currentStatePub.Set(currentState);
+
+  return currentState;
+}
+
+void SwerveModule::UpdateSimulation(units::second_t deltaTime, units::volt_t supplyVoltage) {
+  moduleSim.Update(deltaTime, supplyVoltage);
+}
+
+std::array<ctre::phoenix6::BaseStatusSignal*, 4> SwerveModule::GetSignals() {
+  return {&drivePositionSig, &driveVelocitySig, &steerPositionSig, &steerVelocitySig};
 }
 
 bool SwerveModule::ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit) {
@@ -115,4 +201,42 @@ bool SwerveModule::ConfigureSteerEncoder(double encoderOffset) {
   fmt::print("Configured steer encoder on module {}. Result was: {}\n", moduleName, configResult.GetName());
   
   return configResult.IsOK();
+}
+
+void SwerveModule::ConfigureControlSignals() {
+  steerAngleSetter.UpdateFreqHz = 0_Hz;
+  driveVelocitySetter.UpdateFreqHz = 0_Hz;  
+  // Velocity Torque current neutral should always be coast, as neutral corresponds to 0-current or maintain velocity, not 0-velocity
+  driveVelocitySetter.OverrideCoastDurNeutral = true;
+}
+
+void SwerveModule::OptimizeBusSignals() {
+  ctre::phoenix::StatusCode optimizeResult = driveMotor.OptimizeBusUtilizationForAll(steerMotor, driveMotor);
+  if(!optimizeResult.IsOK()) {
+    fmt::print("Unable to disable unused signals on {} swerve module! Error: {}\n", moduleName, optimizeResult.GetName());
+  }
+}
+
+units::turn_t SwerveModule::ConvertDriveMotorRotationsToWheelRotations(units::turn_t motorRotations) const {
+  return motorRotations / driveGearing;
+}
+
+units::turns_per_second_t SwerveModule::ConvertDriveMotorVelToWheelVel(units::turns_per_second_t motorVel) const {
+  return motorVel / driveGearing;
+}
+
+units::meter_t SwerveModule::ConvertWheelRotationsToWheelDistance(units::turn_t wheelRotations) const {
+  return (wheelRotations / 1_tr) * wheelRadius;
+}
+
+units::meters_per_second_t SwerveModule::ConvertWheelVelToLinearVel(units::turns_per_second_t wheelVel) const {
+  return (wheelVel / 1_tr) * wheelRadius;
+}
+
+units::turns_per_second_t SwerveModule::ConvertLinearVelToWheelVel(units::meters_per_second_t linVel) const {
+  return (linVel / wheelRadius) * 1_tr;
+}
+
+units::turns_per_second_t SwerveModule::ConvertWheelVelToMotorVel(units::turns_per_second_t wheelVel) const {
+  return wheelVel * driveGearing;
 }
