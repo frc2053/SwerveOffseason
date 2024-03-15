@@ -7,12 +7,6 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
 : steerMotor(constants.steerId, "*"), 
   driveMotor(constants.driveId, "*"), 
   steerEncoder(constants.encoderId, "*"),
-  drivePositionSig(driveMotor.GetPosition()),
-  driveVelocitySig(driveMotor.GetVelocity()),
-  steerPositionSig(steerMotor.GetPosition()),
-  steerVelocitySig(steerMotor.GetVelocity()),
-  steerAngleSetter(0_rad),
-  driveVelocitySetter(0_rad_per_s),
   moduleName(constants.moduleName),
   couplingRatio(physicalAttrib.couplingRatio),
   wheelRadius(physicalAttrib.wheelRadius),
@@ -25,18 +19,17 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
     driveMotor.GetSimState(),
     steerMotor.GetSimState(),
     steerEncoder.GetSimState()
-  ),
-  nt(nt::NetworkTableInstance::GetDefault().GetTable(moduleName + "_SwerveModule")),
-  desiredStateTopic(nt->GetStructTopic<frc::SwerveModuleState>("DesiredState")),
-  desiredStatePub(desiredStateTopic.Publish()),
-  currentStateTopic(nt->GetStructTopic<frc::SwerveModuleState>("CurrentState")),
-  currentStatePub(currentStateTopic.Publish()),
-  currentPositionTopic(nt->GetStructTopic<frc::SwerveModulePosition>("CurrentPosition")),
-  currentPositionPub(currentPositionTopic.Publish())
+  )
 {
-  ConfigureSteerMotor(constants.invertSteer, physicalAttrib.steerGearing, physicalAttrib.supplySideLimit);
-  ConfigureDriveMotor(constants.invertDrive, physicalAttrib.supplySideLimit, physicalAttrib.slipCurrent);
-  ConfigureSteerEncoder(constants.steerEncoderOffset);
+  if(!ConfigureSteerMotor(constants.invertSteer, physicalAttrib.steerGearing, physicalAttrib.supplySideLimit)) {
+    fmt::print("ERROR: Failed to configure steer motor!");
+  }
+  if(!ConfigureDriveMotor(constants.invertDrive, physicalAttrib.supplySideLimit, physicalAttrib.slipCurrent)) {
+      fmt::print("ERROR: Failed to configure drive motor!");
+  }
+  if(!ConfigureSteerEncoder(constants.steerEncoderOffset)) {
+    fmt::print("ERROR: Failed to configure steer encoder!");
+  }
   ConfigureControlSignals();
 }
 
@@ -82,7 +75,7 @@ frc::SwerveModulePosition SwerveModule::GetCurrentPosition(bool refresh) {
   }
 
   units::radian_t latencyCompSteerPos = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(steerPositionSig, steerVelocitySig);
-  units::radian_t latencyCompDrivePos = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(steerPositionSig, steerVelocitySig);
+  units::radian_t latencyCompDrivePos = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(drivePositionSig, driveVelocitySig);
 
   //The drive and steer run on the same gear train, rotating the module will slightly move the drive wheel. We account for this here.
   latencyCompDrivePos -= latencyCompSteerPos * couplingRatio;
@@ -210,11 +203,20 @@ void SwerveModule::ConfigureControlSignals() {
   driveVelocitySetter.OverrideCoastDurNeutral = true;
 }
 
-void SwerveModule::OptimizeBusSignals() {
-  ctre::phoenix::StatusCode optimizeResult = driveMotor.OptimizeBusUtilizationForAll(steerMotor, driveMotor);
-  if(!optimizeResult.IsOK()) {
-    fmt::print("Unable to disable unused signals on {} swerve module! Error: {}\n", moduleName, optimizeResult.GetName());
+bool SwerveModule::OptimizeBusSignals() {
+  ctre::phoenix::StatusCode optimizeDriveResult = driveMotor.OptimizeBusUtilization();
+  if(optimizeDriveResult.IsOK()) {
+    fmt::print("Optimized bus signals for {} drive motor\n", moduleName);
   }
+  ctre::phoenix::StatusCode optimizeSteerResult = steerMotor.OptimizeBusUtilization();
+  if(optimizeSteerResult.IsOK()) {
+    fmt::print("Optimized bus signals for {} steer motor\n", moduleName);
+  }
+  return optimizeDriveResult.IsOK() && optimizeSteerResult.IsOK();
+}
+
+std::string SwerveModule::GetName() const {
+  return moduleName;
 }
 
 units::turn_t SwerveModule::ConvertDriveMotorRotationsToWheelRotations(units::turn_t motorRotations) const {

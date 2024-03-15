@@ -33,8 +33,8 @@ void SwerveModuleSim::Update(units::second_t deltaTime, units::volt_t supplyVolt
   steerSimState.SetSupplyVoltage(supplyVoltage);
   steerEncoderSimState.SetSupplyVoltage(supplyVoltage);
 
-  driveSim.SetInputVoltage(AddFrictionVoltage(steerSimState.GetMotorVoltage(), driveFrictionVoltage));
-  steerSim.SetInputVoltage(AddFrictionVoltage(driveSimState.GetMotorVoltage(), steerFrictionVoltage));
+  driveSim.SetInputVoltage(AddFrictionVoltage(driveSimState.GetMotorVoltage(), driveFrictionVoltage));
+  steerSim.SetInputVoltage(AddFrictionVoltage(steerSimState.GetMotorVoltage(), steerFrictionVoltage));
 
   driveSim.Update(deltaTime);
   steerSim.Update(deltaTime);

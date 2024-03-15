@@ -12,10 +12,13 @@ void Robot::UpdateModule() {
 
 void Robot::RobotInit() {
   allSignals = testModule.GetSignals();
-  for(const ctre::phoenix6::BaseStatusSignal* sig : allSignals) {
-    sig->SetUpdateFrequencyForAll(250_Hz);
+
+  for(const auto& sig : allSignals) {
+    sig->SetUpdateFrequency(250_Hz);
   }
-  testModule.OptimizeBusSignals();
+  if(!testModule.OptimizeBusSignals()) {
+    fmt::print("Failed to optimize bus signals for {}\n", testModule.GetName());
+  }
 
   AddPeriodic([this] { UpdateModule(); }, 1 / 250_Hz);
 }
@@ -49,10 +52,11 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
-  desiredState.angle = desiredState.angle + frc::Rotation2d{1_deg};
-  desiredState.speed = 3_fps;
+  desiredState.angle = 45_deg;
+  desiredState.speed = 0_fps;
   testModule.GoToState(desiredState);
   testModule.GetCurrentState();
+  testModule.GetCurrentPosition(false);
 }
 
 void Robot::TeleopExit() {}

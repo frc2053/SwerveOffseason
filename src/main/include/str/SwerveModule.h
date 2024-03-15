@@ -20,10 +20,11 @@ public:
   frc::SwerveModuleState GetCurrentState();
   void UpdateSimulation(units::second_t deltaTime, units::volt_t supplyVoltage);
   std::array<ctre::phoenix6::BaseStatusSignal*, 4> GetSignals();
-  void OptimizeBusSignals();
+  bool OptimizeBusSignals();
+  std::string GetName() const;
 private:
   bool ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit);
-  bool ConfigureDriveMotor(bool invertDrive, units::ampere_t supplyCurrentLimit, units::ampere_t slipCurrentLimit );
+  bool ConfigureDriveMotor(bool invertDrive, units::ampere_t supplyCurrentLimit, units::ampere_t slipCurrentLimit);
   bool ConfigureSteerEncoder(double encoderOffset);
   void ConfigureControlSignals();
   units::turn_t ConvertDriveMotorRotationsToWheelRotations(units::turn_t motorRotations) const;
@@ -37,13 +38,13 @@ private:
   ctre::phoenix6::hardware::TalonFX driveMotor;
   ctre::phoenix6::hardware::CANcoder steerEncoder;
 
-  ctre::phoenix6::StatusSignal<units::turn_t> drivePositionSig;
-  ctre::phoenix6::StatusSignal<units::turns_per_second_t> driveVelocitySig;
-  ctre::phoenix6::StatusSignal<units::turn_t> steerPositionSig;
-  ctre::phoenix6::StatusSignal<units::turns_per_second_t> steerVelocitySig;
+  ctre::phoenix6::StatusSignal<units::turn_t> drivePositionSig = driveMotor.GetPosition();
+  ctre::phoenix6::StatusSignal<units::turns_per_second_t> driveVelocitySig = driveMotor.GetVelocity();
+  ctre::phoenix6::StatusSignal<units::turn_t> steerPositionSig = steerMotor.GetPosition();
+  ctre::phoenix6::StatusSignal<units::turns_per_second_t> steerVelocitySig = steerMotor.GetVelocity();
 
-  ctre::phoenix6::controls::MotionMagicExpoTorqueCurrentFOC steerAngleSetter;
-  ctre::phoenix6::controls::VelocityTorqueCurrentFOC driveVelocitySetter;
+  ctre::phoenix6::controls::MotionMagicExpoTorqueCurrentFOC steerAngleSetter{0_rad};
+  ctre::phoenix6::controls::VelocityTorqueCurrentFOC driveVelocitySetter{0_rad_per_s};
 
   std::string moduleName;
 
@@ -56,14 +57,14 @@ private:
 
   SwerveModuleSim moduleSim;
 
-  std::shared_ptr<nt::NetworkTable> nt;
-  nt::StructTopic<frc::SwerveModuleState> desiredStateTopic;
-  nt::StructPublisher<frc::SwerveModuleState> desiredStatePub;
+  std::shared_ptr<nt::NetworkTable> nt{nt::NetworkTableInstance::GetDefault().GetTable(moduleName + "_SwerveModule")};
+  nt::StructTopic<frc::SwerveModuleState> desiredStateTopic{nt->GetStructTopic<frc::SwerveModuleState>("DesiredState")};
+  nt::StructPublisher<frc::SwerveModuleState> desiredStatePub{desiredStateTopic.Publish()};
   
-  nt::StructTopic<frc::SwerveModuleState> currentStateTopic;
-  nt::StructPublisher<frc::SwerveModuleState> currentStatePub;
+  nt::StructTopic<frc::SwerveModuleState> currentStateTopic{nt->GetStructTopic<frc::SwerveModuleState>("CurrentState")};
+  nt::StructPublisher<frc::SwerveModuleState> currentStatePub{currentStateTopic.Publish()};
 
-  nt::StructTopic<frc::SwerveModulePosition> currentPositionTopic;
-  nt::StructPublisher<frc::SwerveModulePosition> currentPositionPub;
+  nt::StructTopic<frc::SwerveModulePosition> currentPositionTopic{nt->GetStructTopic<frc::SwerveModulePosition>("CurrentPosition")};
+  nt::StructPublisher<frc::SwerveModulePosition> currentPositionPub{currentPositionTopic.Publish()};
 };
 }
