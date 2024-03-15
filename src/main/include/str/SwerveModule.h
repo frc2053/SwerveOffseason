@@ -22,6 +22,7 @@ public:
   std::array<ctre::phoenix6::BaseStatusSignal*, 4> GetSignals();
   bool OptimizeBusSignals();
   std::string GetName() const;
+  units::ampere_t GetSimulatedCurrentDraw() const;
 private:
   bool ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit);
   bool ConfigureDriveMotor(bool invertDrive, units::ampere_t supplyCurrentLimit, units::ampere_t slipCurrentLimit);

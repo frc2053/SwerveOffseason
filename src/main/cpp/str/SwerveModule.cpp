@@ -219,6 +219,10 @@ std::string SwerveModule::GetName() const {
   return moduleName;
 }
 
+units::ampere_t SwerveModule::GetSimulatedCurrentDraw() const {
+  return moduleSim.GetDriveCurrentDraw() + moduleSim.GetSteerCurrentDraw();
+}
+
 units::turn_t SwerveModule::ConvertDriveMotorRotationsToWheelRotations(units::turn_t motorRotations) const {
   return motorRotations / driveGearing;
 }

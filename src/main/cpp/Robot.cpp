@@ -5,6 +5,7 @@
 #include "Robot.h"
 
 #include <frc2/command/CommandScheduler.h>
+#include <frc/simulation/RoboRioSim.h>
 
 void Robot::UpdateModule() {
   ctre::phoenix::StatusCode status = ctre::phoenix6::BaseStatusSignal::WaitForAll(2.0 / 250_Hz, allSignals);
@@ -74,7 +75,9 @@ void Robot::SimulationInit() {
 }
 
 void Robot::SimulationPeriodic() {
-  testModule.UpdateSimulation(GetPeriod(), 12_V);
+  testModule.UpdateSimulation(GetPeriod(), frc::RobotController::GetBatteryVoltage());
+  units::volt_t battVoltage = frc::sim::BatterySim::Calculate({testModule.GetSimulatedCurrentDraw()});
+  frc::sim::RoboRioSim::SetVInVoltage(battVoltage);
 }
 
 #ifndef RUNNING_FRC_TESTS

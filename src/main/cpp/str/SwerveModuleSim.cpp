@@ -59,3 +59,11 @@ units::volt_t SwerveModuleSim::AddFrictionVoltage(units::volt_t outputVoltage, u
   }
   return outputVoltage;
 }
+
+units::ampere_t SwerveModuleSim::GetSteerCurrentDraw() const {
+  return steerSim.GetCurrentDraw();
+}
+
+units::ampere_t SwerveModuleSim::GetDriveCurrentDraw() const {
+  return driveSim.GetCurrentDraw();
+}

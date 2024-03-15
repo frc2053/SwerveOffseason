@@ -13,6 +13,7 @@
 #include "str/SwerveModule.h"
 #include "constants/SwerveConstants.h"
 #include <frc/XboxController.h>
+#include <frc/simulation/BatterySim.h>
 
 class Robot : public frc::TimedRobot {
  public:

@@ -18,6 +18,8 @@ public:
   );
 
   void Update(units::second_t deltaTime, units::volt_t supplyVoltage);
+  units::ampere_t GetSteerCurrentDraw() const;
+  units::ampere_t GetDriveCurrentDraw() const;
 private:
   units::volt_t AddFrictionVoltage(units::volt_t outputVoltage, units::volt_t frictionVoltage);
 
