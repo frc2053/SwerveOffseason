@@ -5,6 +5,8 @@
 #pragma once
 
 #include <frc2/command/CommandPtr.h>
+#include "subsystems/SwerveSubsystem.h"
+#include <frc2/command/button/CommandXboxController.h>
 
 class RobotContainer {
  public:
@@ -12,6 +14,11 @@ class RobotContainer {
 
   frc2::CommandPtr GetAutonomousCommand();
 
+  SwerveSubsystem& GetSwerveSubsystem();
+
  private:
   void ConfigureBindings();
+  frc2::CommandXboxController controller{0};
+  
+  SwerveSubsystem swerveSubsystem;
 };

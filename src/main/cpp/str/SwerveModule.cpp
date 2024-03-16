@@ -8,11 +8,11 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
   driveMotor(constants.driveId, "*"), 
   steerEncoder(constants.encoderId, "*"),
   moduleName(constants.moduleName),
-  couplingRatio(physicalAttrib.couplingRatio),
-  wheelRadius(physicalAttrib.wheelRadius),
-  driveGearing(physicalAttrib.driveGearing),
   steerGains(steerGains),
   driveGains(driveGains),
+  couplingRatio(physicalAttrib.couplingRatio),
+  driveGearing(physicalAttrib.driveGearing),
+  wheelRadius(physicalAttrib.wheelRadius),
   moduleSim(
     constants,
     physicalAttrib,
@@ -25,7 +25,7 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
     fmt::print("ERROR: Failed to configure steer motor!");
   }
   if(!ConfigureDriveMotor(constants.invertDrive, physicalAttrib.supplySideLimit, physicalAttrib.slipCurrent)) {
-      fmt::print("ERROR: Failed to configure drive motor!");
+    fmt::print("ERROR: Failed to configure drive motor!");
   }
   if(!ConfigureSteerEncoder(constants.steerEncoderOffset)) {
     fmt::print("ERROR: Failed to configure steer encoder!");
@@ -109,8 +109,8 @@ void SwerveModule::UpdateSimulation(units::second_t deltaTime, units::volt_t sup
   moduleSim.Update(deltaTime, supplyVoltage);
 }
 
-std::array<ctre::phoenix6::BaseStatusSignal*, 4> SwerveModule::GetSignals() {
-  return {&drivePositionSig, &driveVelocitySig, &steerPositionSig, &steerVelocitySig};
+std::array<ctre::phoenix6::BaseStatusSignal*, 6> SwerveModule::GetSignals() {
+  return {&drivePositionSig, &driveVelocitySig, &steerPositionSig, &steerVelocitySig, &driveTorqueCurrentSig, &steerTorqueCurrentSig};
 }
 
 bool SwerveModule::ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit) {
@@ -199,8 +199,12 @@ bool SwerveModule::ConfigureSteerEncoder(double encoderOffset) {
 void SwerveModule::ConfigureControlSignals() {
   steerAngleSetter.UpdateFreqHz = 0_Hz;
   driveVelocitySetter.UpdateFreqHz = 0_Hz;  
+  steerTorqueSetter.UpdateFreqHz = 0_Hz;
+  driveTorqueSetter.UpdateFreqHz = 0_Hz;
   // Velocity Torque current neutral should always be coast, as neutral corresponds to 0-current or maintain velocity, not 0-velocity
   driveVelocitySetter.OverrideCoastDurNeutral = true;
+  steerTorqueSetter.OverrideCoastDurNeutral = true;
+  driveTorqueSetter.OverrideCoastDurNeutral = true;
 }
 
 bool SwerveModule::OptimizeBusSignals() {
@@ -221,6 +225,17 @@ std::string SwerveModule::GetName() const {
 
 units::ampere_t SwerveModule::GetSimulatedCurrentDraw() const {
   return moduleSim.GetDriveCurrentDraw() + moduleSim.GetSteerCurrentDraw();
+}
+
+void SwerveModule::SetSteerToTorque(units::volt_t voltsToSend) {
+  steerMotor.SetControl(steerTorqueSetter.WithOutput(units::ampere_t{voltsToSend.value()}));
+}
+
+void SwerveModule::LogSteerTorqueSysId(frc::sysid::SysIdRoutineLog* log) {
+  log->Motor("swerve-steer")
+    .voltage(units::volt_t{steerTorqueCurrentSig.GetValueAsDouble()})
+    .position(steerPositionSig.GetValue())
+    .velocity(steerVelocitySig.GetValue());
 }
 
 units::turn_t SwerveModule::ConvertDriveMotorRotationsToWheelRotations(units::turn_t motorRotations) const {

@@ -7,21 +7,8 @@
 #include <frc2/command/CommandScheduler.h>
 #include <frc/simulation/RoboRioSim.h>
 
-void Robot::UpdateModule() {
-  ctre::phoenix::StatusCode status = ctre::phoenix6::BaseStatusSignal::WaitForAll(2.0 / 250_Hz, allSignals);
-}
-
 void Robot::RobotInit() {
-  allSignals = testModule.GetSignals();
-
-  for(const auto& sig : allSignals) {
-    sig->SetUpdateFrequency(250_Hz);
-  }
-  if(!testModule.OptimizeBusSignals()) {
-    fmt::print("Failed to optimize bus signals for {}\n", testModule.GetName());
-  }
-
-  AddPeriodic([this] { UpdateModule(); }, 1 / 250_Hz);
+  AddPeriodic([this] { m_container.GetSwerveSubsystem().UpdateSwerveOdom(); }, 1 / 250_Hz);
 }
 
 void Robot::RobotPeriodic() {
@@ -52,13 +39,7 @@ void Robot::TeleopInit() {
   }
 }
 
-void Robot::TeleopPeriodic() {
-  desiredState.angle = units::radian_t{std::atan2(-controller.GetLeftY(), -controller.GetLeftX())};
-  desiredState.speed = units::feet_per_second_t{std::hypot(-controller.GetLeftY(), -controller.GetLeftX())} * 15;
-  testModule.GoToState(desiredState);
-  testModule.GetCurrentState();
-  testModule.GetCurrentPosition(false);
-}
+void Robot::TeleopPeriodic() {}
 
 void Robot::TeleopExit() {}
 
@@ -75,8 +56,7 @@ void Robot::SimulationInit() {
 }
 
 void Robot::SimulationPeriodic() {
-  testModule.UpdateSimulation(GetPeriod(), frc::RobotController::GetBatteryVoltage());
-  units::volt_t battVoltage = frc::sim::BatterySim::Calculate({testModule.GetSimulatedCurrentDraw()});
+  units::volt_t battVoltage = frc::sim::BatterySim::Calculate({m_container.GetSwerveSubsystem().GetCurrentDraw()});
   frc::sim::RoboRioSim::SetVInVoltage(battVoltage);
 }
 

@@ -9,6 +9,8 @@
 #include "str/SwerveModuleSim.h"
 #include "str/SwerveModuleHelpers.h"
 #include <frc/kinematics/SwerveModulePosition.h>
+#include <frc2/command/sysid/SysIdRoutine.h>
+#include <ctre/phoenix6/SignalLogger.hpp>
 
 namespace str {
 
@@ -19,10 +21,12 @@ public:
   frc::SwerveModulePosition GetCurrentPosition(bool refresh);
   frc::SwerveModuleState GetCurrentState();
   void UpdateSimulation(units::second_t deltaTime, units::volt_t supplyVoltage);
-  std::array<ctre::phoenix6::BaseStatusSignal*, 4> GetSignals();
+  std::array<ctre::phoenix6::BaseStatusSignal*, 6> GetSignals();
   bool OptimizeBusSignals();
   std::string GetName() const;
   units::ampere_t GetSimulatedCurrentDraw() const;
+  void SetSteerToTorque(units::volt_t voltsToSend);
+  void LogSteerTorqueSysId(frc::sysid::SysIdRoutineLog* log);
 private:
   bool ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit);
   bool ConfigureDriveMotor(bool invertDrive, units::ampere_t supplyCurrentLimit, units::ampere_t slipCurrentLimit);
@@ -44,8 +48,16 @@ private:
   ctre::phoenix6::StatusSignal<units::turn_t> steerPositionSig = steerMotor.GetPosition();
   ctre::phoenix6::StatusSignal<units::turns_per_second_t> steerVelocitySig = steerMotor.GetVelocity();
 
+  //For characterization
+  ctre::phoenix6::StatusSignal<units::ampere_t> driveTorqueCurrentSig = driveMotor.GetTorqueCurrent();
+  ctre::phoenix6::StatusSignal<units::ampere_t> steerTorqueCurrentSig = steerMotor.GetTorqueCurrent();
+
   ctre::phoenix6::controls::MotionMagicExpoTorqueCurrentFOC steerAngleSetter{0_rad};
   ctre::phoenix6::controls::VelocityTorqueCurrentFOC driveVelocitySetter{0_rad_per_s};
+
+  //For characterization
+  ctre::phoenix6::controls::TorqueCurrentFOC steerTorqueSetter{0_A};
+  ctre::phoenix6::controls::TorqueCurrentFOC driveTorqueSetter{0_A};
 
   std::string moduleName;
 
