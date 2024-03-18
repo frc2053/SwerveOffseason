@@ -1,4 +1,5 @@
 #include "str/SwerveModuleSim.h"
+#include "frc/MathUtil.h"
 
 using namespace str;
 
@@ -49,7 +50,8 @@ frc::SwerveModuleState SwerveModuleSim::Update(units::second_t deltaTime, units:
   steerEncoderSimState.SetRawPosition(steerSim.GetAngularPosition());
   steerEncoderSimState.SetVelocity(steerSim.GetAngularVelocity());
 
-  return frc::SwerveModuleState{(driveSim.GetAngularVelocity() / 1_rad) * wheelRadius, frc::Rotation2d{steerSim.GetAngularPosition()}};
+  //TODO: Not sure why I have to add 90 here
+  return frc::SwerveModuleState{(driveSim.GetAngularVelocity() / 1_rad) * wheelRadius, frc::Rotation2d{frc::AngleModulus(steerSim.GetAngularPosition())} + frc::Rotation2d{90_deg}};
 }
 
 units::volt_t SwerveModuleSim::AddFrictionVoltage(units::volt_t outputVoltage, units::volt_t frictionVoltage) {

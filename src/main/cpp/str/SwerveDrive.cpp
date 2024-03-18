@@ -117,7 +117,11 @@ void SwerveDrive::SimulationPeriodic() {
     i++;
   }
 
-  units::radian_t angleChange = consts::swerve::physical::KINEMATICS.ToChassisSpeeds(simState).omega * loopTime;
+  simStatesPub.Set(simState);
+
+  units::radians_per_second_t omega = consts::swerve::physical::KINEMATICS.ToChassisSpeeds(simState).omega;
+  units::radian_t angleChange = omega * loopTime;
+
   lastSimAngle = lastSimAngle + frc::Rotation2d{angleChange};
   imuSimState.SetRawYaw(lastSimAngle.Degrees());
 

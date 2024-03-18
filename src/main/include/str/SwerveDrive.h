@@ -146,6 +146,9 @@ private:
   nt::StructArrayTopic<frc::SwerveModuleState> currentStatesTopic{nt->GetStructArrayTopic<frc::SwerveModuleState>("CurrentStates")};
   nt::StructArrayPublisher<frc::SwerveModuleState> currentStatesPub{currentStatesTopic.Publish()};
 
+  nt::StructArrayTopic<frc::SwerveModuleState> simStatesTopic{nt->GetStructArrayTopic<frc::SwerveModuleState>("SimStates")};
+  nt::StructArrayPublisher<frc::SwerveModuleState> simStatesPub{simStatesTopic.Publish()};
+
   nt::StructArrayTopic<frc::SwerveModulePosition> currentPositionsTopic{nt->GetStructArrayTopic<frc::SwerveModulePosition>("CurrentPositions")};
   nt::StructArrayPublisher<frc::SwerveModulePosition> currentPositionsPub{currentPositionsTopic.Publish()};
 
