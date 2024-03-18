@@ -24,7 +24,7 @@ public:
   void UpdateNTEntries();
   frc::Pose2d GetOdomPose() const;
   frc::Pose2d GetPose() const;
-  frc::Rotation3d GetRotationFromImu();
+  units::radian_t GetYawFromImu();
   void SimulationPeriodic();
   void SetCharacterizationTorqueSteer(units::volt_t torqueAmps);
   void SetCharacterizationTorqueDrive(units::volt_t torqueAmps);
@@ -139,6 +139,7 @@ private:
   frc::SwerveDriveOdometry<4> odom{consts::swerve::physical::KINEMATICS, frc::Rotation2d{0_deg}, modulePositions};
   frc::SwerveDrivePoseEstimator<4> poseEstimator{consts::swerve::physical::KINEMATICS, frc::Rotation2d{0_deg}, modulePositions, frc::Pose2d{}};
 
+  units::radian_t yawLatencyComped;
   units::second_t lastDriveLoopTime;
   units::second_t lastSimLoopTime;
   frc::Rotation2d lastSimAngle;

@@ -44,7 +44,7 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_secon
 
   frc::ChassisSpeeds speedsToSend;
   if(fieldRelative) {
-    speedsToSend = frc::ChassisSpeeds::FromFieldRelativeSpeeds(xVel, yVel, omega, GetRotationFromImu().Z());
+    speedsToSend = frc::ChassisSpeeds::FromFieldRelativeSpeeds(xVel, yVel, omega, frc::Rotation2d{GetYawFromImu()});
   }
   else {
     speedsToSend.vx = xVel;
@@ -67,8 +67,8 @@ frc::Pose2d SwerveDrive::GetPose() const {
   return poseEstimator.GetEstimatedPosition();
 }
 
-frc::Rotation3d SwerveDrive::GetRotationFromImu() {
-  return imu.GetRotation3d();
+units::radian_t SwerveDrive::GetYawFromImu() {
+  return yawLatencyComped;
 }
 
 void SwerveDrive::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates) {
@@ -96,7 +96,7 @@ void SwerveDrive::UpdateSwerveOdom() {
     i++;
   }
 
-  units::radian_t yawLatencyComped = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(imu.GetYaw(), imu.GetAngularVelocityZWorld());
+  yawLatencyComped = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(imu.GetYaw(), imu.GetAngularVelocityZWorld());
   poseEstimator.Update(frc::Rotation2d{yawLatencyComped}, modulePositions);
   odom.Update(frc::Rotation2d{yawLatencyComped}, modulePositions);
 }
