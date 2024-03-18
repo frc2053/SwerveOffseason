@@ -40,7 +40,6 @@ void SwerveModule::GoToState(frc::SwerveModuleState desiredState) {
   steerMotor.SetControl(steerAngleSetter.WithPosition(desiredState.angle.Radians()));
 
   units::radians_per_second_t motorSpeed = ConvertWheelVelToMotorVel(ConvertLinearVelToWheelVel(desiredState.speed));
-  fmt::print("Motor applied speed: {}\n", motorSpeed.convert<units::revolutions_per_minute>().value());
 
   //The drive motors will start turning before the module reaches the desired angle, 
   //so scale down the speed if we are far away from our setpoint

@@ -37,7 +37,7 @@ SwerveDrive::SwerveDrive() {
 
 void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radians_per_second_t omega, bool fieldRelative) {
 
-  units::second_t now = units::microsecond_t{static_cast<double>(WPI_Now())};
+  units::second_t now = frc::Timer::GetFPGATimestamp();
   units::second_t loopTime = now - lastDriveLoopTime;
 
   frc::ChassisSpeeds speedsToSend;
@@ -54,7 +54,7 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_secon
 
   SetModuleStates(consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend));
 
-  lastDriveLoopTime = loopTime;
+  lastDriveLoopTime = now;
 }
 
 frc::Pose2d SwerveDrive::GetOdomPose() const {
@@ -107,7 +107,7 @@ void SwerveDrive::UpdateNTEntries() {
 }
 
 void SwerveDrive::SimulationPeriodic() {
-  units::second_t now = units::microsecond_t{static_cast<double>(WPI_Now())};
+  units::second_t now = frc::Timer::GetFPGATimestamp();
   units::second_t loopTime = now - lastSimLoopTime;
 
   std::array<frc::SwerveModuleState, 4> simState;
@@ -119,8 +119,7 @@ void SwerveDrive::SimulationPeriodic() {
 
   units::radian_t angleChange = consts::swerve::physical::KINEMATICS.ToChassisSpeeds(simState).omega * loopTime;
   lastSimAngle = lastSimAngle + frc::Rotation2d{angleChange};
-  imuSimState.SetRawYaw(lastSimAngle.Radians());
-
+  imuSimState.SetRawYaw(lastSimAngle.Degrees());
 
   lastSimLoopTime = now;
 }

@@ -83,7 +83,7 @@ inline constexpr str::gains::radial::turn_volt_ka_unit_t STEER_MOTION_MAGIC_KA{0
 inline constexpr str::gains::radial::turn_volt_kv_unit_t STEER_MOTION_MAGIC_KV{0};
 inline constexpr str::gains::radial::turn_amp_ka_unit_t STEER_KA{0};
 inline constexpr str::gains::radial::turn_amp_kv_unit_t STEER_KV{0};
-inline constexpr units::ampere_t STEER_KS{0};
+inline constexpr units::ampere_t STEER_KS{2};
 inline constexpr units::volt_t STEER_KS_V{1};
 inline constexpr str::gains::radial::turn_amp_kp_unit_t STEER_KP{500};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t STEER_KI{0};
