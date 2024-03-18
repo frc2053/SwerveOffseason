@@ -45,18 +45,34 @@ frc2::CommandPtr SwerveSubsystem::Drive(std::function<units::meters_per_second_t
   }, {this});
 }
 
-frc2::CommandPtr SwerveSubsystem::SysIdSteerQuasistatic(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerQuasistaticTorque(frc2::sysid::Direction dir) {
   return steerTorqueSysid.Quasistatic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } );
 }
 
-frc2::CommandPtr SwerveSubsystem::SysIdSteerDynamic(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerDynamicTorque(frc2::sysid::Direction dir) {
   return steerTorqueSysid.Dynamic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } );
 }
 
-frc2::CommandPtr SwerveSubsystem::SysIdDriveQuasistatic(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdDriveQuasistaticTorque(frc2::sysid::Direction dir) {
   return driveTorqueSysid.Quasistatic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } );
 }
 
-frc2::CommandPtr SwerveSubsystem::SysIdDriveDynamic(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdDriveDynamicTorque(frc2::sysid::Direction dir) {
   return driveTorqueSysid.Dynamic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } ).BeforeStarting(PointWheelsToZero());
+}
+
+frc2::CommandPtr SwerveSubsystem::SysIdSteerQuasistaticVoltage(frc2::sysid::Direction dir) {
+  return steerVoltageSysid.Quasistatic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } );
+}
+
+frc2::CommandPtr SwerveSubsystem::SysIdSteerDynamicVoltage(frc2::sysid::Direction dir) {
+  return steerVoltageSysid.Dynamic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } );
+}
+
+frc2::CommandPtr SwerveSubsystem::SysIdDriveQuasistaticVoltage(frc2::sysid::Direction dir) {
+  return driveVoltageSysid.Quasistatic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } );
+}
+
+frc2::CommandPtr SwerveSubsystem::SysIdDriveDynamicVoltage(frc2::sysid::Direction dir) {
+  return driveVoltageSysid.Dynamic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } ).BeforeStarting(PointWheelsToZero());
 }

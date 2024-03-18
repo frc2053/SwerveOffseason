@@ -20,12 +20,14 @@ public:
   frc::SwerveModulePosition GetCurrentPosition(bool refresh);
   frc::SwerveModuleState GetCurrentState();
   frc::SwerveModuleState UpdateSimulation(units::second_t deltaTime, units::volt_t supplyVoltage);
-  std::array<ctre::phoenix6::BaseStatusSignal*, 6> GetSignals();
+  std::array<ctre::phoenix6::BaseStatusSignal*, 8> GetSignals();
   bool OptimizeBusSignals();
   std::string GetName() const;
   units::ampere_t GetSimulatedCurrentDraw() const;
   void SetSteerToTorque(units::volt_t voltsToSend);
   void SetDriveToTorque(units::volt_t voltsToSend);
+  void SetSteerToVoltage(units::volt_t voltsToSend);
+  void SetDriveToVoltage(units::volt_t voltsToSend);
 private:
   bool ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit);
   bool ConfigureDriveMotor(bool invertDrive, units::ampere_t supplyCurrentLimit, units::ampere_t slipCurrentLimit);
@@ -50,6 +52,8 @@ private:
   //For characterization
   ctre::phoenix6::StatusSignal<units::ampere_t> driveTorqueCurrentSig = driveMotor.GetTorqueCurrent();
   ctre::phoenix6::StatusSignal<units::ampere_t> steerTorqueCurrentSig = steerMotor.GetTorqueCurrent();
+  ctre::phoenix6::StatusSignal<units::volt_t> driveVoltageSig = driveMotor.GetMotorVoltage();
+  ctre::phoenix6::StatusSignal<units::volt_t> steerVoltageSig = steerMotor.GetMotorVoltage();
 
   ctre::phoenix6::controls::MotionMagicExpoTorqueCurrentFOC steerAngleSetter{0_rad};
   ctre::phoenix6::controls::VelocityTorqueCurrentFOC driveVelocitySetter{0_rad_per_s};
@@ -57,6 +61,8 @@ private:
   //For characterization
   ctre::phoenix6::controls::TorqueCurrentFOC steerTorqueSetter{0_A};
   ctre::phoenix6::controls::TorqueCurrentFOC driveTorqueSetter{0_A};
+  ctre::phoenix6::controls::VoltageOut steerVoltageSetter{0_V};
+  ctre::phoenix6::controls::VoltageOut driveVoltageSetter{0_V};
 
   std::string moduleName;
 

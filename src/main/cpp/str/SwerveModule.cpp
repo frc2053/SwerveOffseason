@@ -64,8 +64,10 @@ frc::SwerveModulePosition SwerveModule::GetCurrentPosition(bool refresh) {
       0_s,
       drivePositionSig,
       driveVelocitySig,
+      driveVoltageSig,
       steerPositionSig,
-      steerVelocitySig 
+      steerVelocitySig,
+      steerVoltageSig
     );
 
     if(!moduleSignalStatus.IsOK()) {
@@ -104,8 +106,8 @@ frc::SwerveModuleState SwerveModule::UpdateSimulation(units::second_t deltaTime,
   return moduleSim.Update(deltaTime, supplyVoltage);
 }
 
-std::array<ctre::phoenix6::BaseStatusSignal*, 6> SwerveModule::GetSignals() {
-  return {&drivePositionSig, &driveVelocitySig, &steerPositionSig, &steerVelocitySig, &driveTorqueCurrentSig, &steerTorqueCurrentSig};
+std::array<ctre::phoenix6::BaseStatusSignal*, 8> SwerveModule::GetSignals() {
+  return {&drivePositionSig, &driveVelocitySig, &steerPositionSig, &steerVelocitySig, &driveTorqueCurrentSig, &steerTorqueCurrentSig, &driveVoltageSig, &steerVoltageSig};
 }
 
 bool SwerveModule::ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit) {
@@ -196,6 +198,8 @@ void SwerveModule::ConfigureControlSignals() {
   driveVelocitySetter.UpdateFreqHz = 0_Hz;  
   steerTorqueSetter.UpdateFreqHz = 0_Hz;
   driveTorqueSetter.UpdateFreqHz = 0_Hz;
+  steerVoltageSetter.UpdateFreqHz = 0_Hz;
+  driveVoltageSetter.UpdateFreqHz = 0_Hz;
   // Velocity Torque current neutral should always be coast, as neutral corresponds to 0-current or maintain velocity, not 0-velocity
   driveVelocitySetter.OverrideCoastDurNeutral = true;
   steerTorqueSetter.OverrideCoastDurNeutral = true;
@@ -228,6 +232,14 @@ void SwerveModule::SetSteerToTorque(units::volt_t voltsToSend) {
 
 void SwerveModule::SetDriveToTorque(units::volt_t voltsToSend) {
   driveMotor.SetControl(driveTorqueSetter.WithOutput(units::ampere_t{voltsToSend.value()}));
+}
+
+void SwerveModule::SetSteerToVoltage(units::volt_t voltsToSend) {
+  steerMotor.SetControl(steerVoltageSetter.WithOutput(voltsToSend));
+}
+
+void SwerveModule::SetDriveToVoltage(units::volt_t voltsToSend) {
+  driveMotor.SetControl(driveVoltageSetter.WithOutput(voltsToSend));
 }
 
 units::radian_t SwerveModule::ConvertDriveMotorRotationsToWheelRotations(units::radian_t motorRotations) const {

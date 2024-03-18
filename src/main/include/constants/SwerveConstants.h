@@ -79,12 +79,12 @@ inline constexpr units::radians_per_second_t DRIVE_MAX_ROT_SPEED = 720_deg_per_s
 
 namespace gains {
 inline constexpr units::radians_per_second_t STEER_CRUISE_VEL = physical::STEER_MOTOR.freeSpeed / physical::STEER_GEARING;
-inline constexpr str::gains::radial::turn_volt_ka_unit_t STEER_MOTION_MAGIC_KA{0};
-inline constexpr str::gains::radial::turn_volt_kv_unit_t STEER_MOTION_MAGIC_KV{0};
-inline constexpr str::gains::radial::turn_amp_ka_unit_t STEER_KA{0};
+inline constexpr str::gains::radial::turn_volt_ka_unit_t STEER_MOTION_MAGIC_KA{0.069763};
+inline constexpr str::gains::radial::turn_volt_kv_unit_t STEER_MOTION_MAGIC_KV{2.5209};
+inline constexpr str::gains::radial::turn_amp_ka_unit_t STEER_KA{3.0245};
 inline constexpr str::gains::radial::turn_amp_kv_unit_t STEER_KV{0};
-inline constexpr units::ampere_t STEER_KS{2};
-inline constexpr units::volt_t STEER_KS_V{1};
+inline constexpr units::ampere_t STEER_KS{25.248};
+inline constexpr units::volt_t STEER_KS_V{1.0186};
 inline constexpr str::gains::radial::turn_amp_kp_unit_t STEER_KP{500};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t STEER_KI{0};
 inline constexpr str::gains::radial::turn_amp_kd_unit_t STEER_KD{0};

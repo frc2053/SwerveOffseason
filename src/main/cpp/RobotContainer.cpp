@@ -25,15 +25,25 @@ void RobotContainer::ConfigureBindings() {
   true
   ));
 
-  controller.A().WhileTrue(swerveSubsystem.SysIdDriveQuasistatic(frc2::sysid::Direction::kForward));
-  controller.B().WhileTrue(swerveSubsystem.SysIdDriveQuasistatic(frc2::sysid::Direction::kReverse));
-  controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamic(frc2::sysid::Direction::kForward));
-  controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamic(frc2::sysid::Direction::kReverse));
+  // controller.A().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticTorque(frc2::sysid::Direction::kForward));
+  // controller.B().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticTorque(frc2::sysid::Direction::kReverse));
+  // controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kForward));
+  // controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kReverse));
 
-  // controller.A().WhileTrue(swerveSubsystem.SysIdSteerQuasistatic(frc2::sysid::Direction::kForward));
-  // controller.B().WhileTrue(swerveSubsystem.SysIdSteerQuasistatic(frc2::sysid::Direction::kReverse));
-  // controller.X().WhileTrue(swerveSubsystem.SysIdSteerDynamic(frc2::sysid::Direction::kForward));
-  // controller.Y().WhileTrue(swerveSubsystem.SysIdSteerDynamic(frc2::sysid::Direction::kReverse));
+  // controller.A().WhileTrue(swerveSubsystem.SysIdSteerQuasistaticTorque(frc2::sysid::Direction::kForward));
+  // controller.B().WhileTrue(swerveSubsystem.SysIdSteerQuasistaticTorque(frc2::sysid::Direction::kReverse));
+  // controller.X().WhileTrue(swerveSubsystem.SysIdSteerDynamicTorque(frc2::sysid::Direction::kForward));
+  // controller.Y().WhileTrue(swerveSubsystem.SysIdSteerDynamicTorque(frc2::sysid::Direction::kReverse));
+
+  // controller.A().WhileTrue(swerveSubsystem.SysIdSteerQuasistaticVoltage(frc2::sysid::Direction::kForward));
+  // controller.B().WhileTrue(swerveSubsystem.SysIdSteerQuasistaticVoltage(frc2::sysid::Direction::kReverse));
+  // controller.X().WhileTrue(swerveSubsystem.SysIdSteerDynamicVoltage(frc2::sysid::Direction::kForward));
+  // controller.Y().WhileTrue(swerveSubsystem.SysIdSteerDynamicVoltage(frc2::sysid::Direction::kReverse));
+
+  controller.A().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticVoltage(frc2::sysid::Direction::kForward));
+  controller.B().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticVoltage(frc2::sysid::Direction::kReverse));
+  controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicVoltage(frc2::sysid::Direction::kForward));
+  controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamicVoltage(frc2::sysid::Direction::kReverse));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

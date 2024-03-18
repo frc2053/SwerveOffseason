@@ -9,12 +9,14 @@ using namespace str;
 SwerveDrive::SwerveDrive() {
   for(std::size_t i = 0; i < modules.size(); i++) {
     const auto& modSigs = modules[i].GetSignals();
-    allSignals[(i * 6) + 0] = modSigs[0];
-    allSignals[(i * 6) + 1] = modSigs[1];
-    allSignals[(i * 6) + 2] = modSigs[2];
-    allSignals[(i * 6) + 3] = modSigs[3];
-    allSignals[(i * 6) + 4] = modSigs[4];
-    allSignals[(i * 6) + 5] = modSigs[5];
+    allSignals[(i * 8) + 0] = modSigs[0];
+    allSignals[(i * 8) + 1] = modSigs[1];
+    allSignals[(i * 8) + 2] = modSigs[2];
+    allSignals[(i * 8) + 3] = modSigs[3];
+    allSignals[(i * 8) + 4] = modSigs[4];
+    allSignals[(i * 8) + 5] = modSigs[5];
+    allSignals[(i * 8) + 6] = modSigs[6];
+    allSignals[(i * 8) + 7] = modSigs[7];
   }
 
   allSignals[allSignals.size() - 2] = &imu.GetYaw();
@@ -147,6 +149,17 @@ void SwerveDrive::SetCharacterizationTorqueDrive(units::volt_t torqueAmps) {
   modules[3].SetDriveToTorque(torqueAmps);
 }
 
+void SwerveDrive::SetCharacterizationVoltageSteer(units::volt_t volts) {
+  modules[0].SetSteerToVoltage(volts);
+}
+
+void SwerveDrive::SetCharacterizationVoltageDrive(units::volt_t volts) {
+  modules[0].SetDriveToVoltage(volts);
+  modules[1].SetDriveToVoltage(volts);
+  modules[2].SetDriveToVoltage(volts);
+  modules[3].SetDriveToVoltage(volts);
+}
+
 void SwerveDrive::LogSteerTorque(frc::sysid::SysIdRoutineLog* log) {
   log->Motor("swerve-steer")
     .voltage(units::volt_t{allSignals[5]->GetValueAsDouble()})
@@ -161,3 +174,16 @@ void SwerveDrive::LogDriveTorque(frc::sysid::SysIdRoutineLog* log) {
     .velocity(units::turns_per_second_t{allSignals[1]->GetValueAsDouble()});
 }
 
+void SwerveDrive::LogSteerVoltage(frc::sysid::SysIdRoutineLog* log) {
+  log->Motor("swerve-steer")
+    .voltage(units::volt_t{allSignals[7]->GetValueAsDouble()})
+    .position(units::turn_t{allSignals[2]->GetValueAsDouble()})
+    .velocity(units::turns_per_second_t{allSignals[3]->GetValueAsDouble()});
+}
+
+void SwerveDrive::LogDriveVoltage(frc::sysid::SysIdRoutineLog* log) {
+  log->Motor("swerve-drive")
+    .voltage(units::volt_t{allSignals[6]->GetValueAsDouble()})
+    .position(units::turn_t{allSignals[0]->GetValueAsDouble()})
+    .velocity(units::turns_per_second_t{allSignals[1]->GetValueAsDouble()});
+}

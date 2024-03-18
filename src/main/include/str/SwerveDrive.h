@@ -28,8 +28,12 @@ public:
   void SimulationPeriodic();
   void SetCharacterizationTorqueSteer(units::volt_t torqueAmps);
   void SetCharacterizationTorqueDrive(units::volt_t torqueAmps);
+  void SetCharacterizationVoltageSteer(units::volt_t volts);
+  void SetCharacterizationVoltageDrive(units::volt_t volts);
   void LogSteerTorque(frc::sysid::SysIdRoutineLog* log);
   void LogDriveTorque(frc::sysid::SysIdRoutineLog* log);
+  void LogSteerVoltage(frc::sysid::SysIdRoutineLog* log);
+  void LogDriveVoltage(frc::sysid::SysIdRoutineLog* log);
 private:
   SwerveModulePhysical swervePhysical{
     consts::swerve::physical::STEER_GEARING,
@@ -127,7 +131,7 @@ private:
   ctre::phoenix6::hardware::Pigeon2 imu{consts::swerve::can_ids::IMU, "*"};
   ctre::phoenix6::sim::Pigeon2SimState& imuSimState = imu.GetSimState();
 
-  std::array<ctre::phoenix6::BaseStatusSignal*, 26> allSignals;
+  std::array<ctre::phoenix6::BaseStatusSignal*, 34> allSignals;
 
   std::array<frc::SwerveModulePosition, 4> modulePositions;
   std::array<frc::SwerveModuleState, 4> moduleStates;
