@@ -4,6 +4,7 @@
 #include <ctre/phoenix6/sim/CANcoderSimState.hpp>
 #include <ctre/phoenix6/sim/TalonFXSimState.hpp>
 #include "str/SwerveModuleHelpers.h"
+#include <frc/kinematics/SwerveModuleState.h>
 
 namespace str {
 
@@ -17,7 +18,7 @@ public:
     ctre::phoenix6::sim::CANcoderSimState& steerEncoderSimState
   );
 
-  void Update(units::second_t deltaTime, units::volt_t supplyVoltage);
+  frc::SwerveModuleState Update(units::second_t deltaTime, units::volt_t supplyVoltage);
   units::ampere_t GetSteerCurrentDraw() const;
   units::ampere_t GetDriveCurrentDraw() const;
 private:
@@ -38,6 +39,8 @@ private:
 
   units::scalar_t driveGearing;
   units::scalar_t steerGearing;
+
+  units::meter_t wheelRadius;
 };
 
 }

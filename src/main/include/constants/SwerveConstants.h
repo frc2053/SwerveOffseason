@@ -72,24 +72,27 @@ inline constexpr std::array<frc::Translation2d, 4> MODULE_LOCATIONS{
 inline frc::SwerveDriveKinematics<4> KINEMATICS{
     MODULE_LOCATIONS[0], MODULE_LOCATIONS[1], MODULE_LOCATIONS[2],
     MODULE_LOCATIONS[3]};
+
+inline constexpr units::meters_per_second_t DRIVE_MAX_SPEED = ((DRIVE_MOTOR.freeSpeed / 1_rad) / DRIVE_GEARING) * WHEEL_RADIUS;
+inline constexpr units::radians_per_second_t DRIVE_MAX_ROT_SPEED = 720_deg_per_s;
 }
 
 namespace gains {
-inline constexpr units::turns_per_second_t STEER_CRUISE_VEL = physical::STEER_MOTOR.freeSpeed / physical::STEER_GEARING;
+inline constexpr units::radians_per_second_t STEER_CRUISE_VEL = physical::STEER_MOTOR.freeSpeed / physical::STEER_GEARING;
 inline constexpr str::gains::radial::turn_volt_ka_unit_t STEER_MOTION_MAGIC_KA{0};
 inline constexpr str::gains::radial::turn_volt_kv_unit_t STEER_MOTION_MAGIC_KV{0};
 inline constexpr str::gains::radial::turn_amp_ka_unit_t STEER_KA{0};
 inline constexpr str::gains::radial::turn_amp_kv_unit_t STEER_KV{0};
 inline constexpr units::ampere_t STEER_KS{0};
-inline constexpr units::volt_t STEER_KS_V{0};
-inline constexpr str::gains::radial::turn_amp_kp_unit_t STEER_KP{3.596};
+inline constexpr units::volt_t STEER_KS_V{1};
+inline constexpr str::gains::radial::turn_amp_kp_unit_t STEER_KP{500};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t STEER_KI{0};
 inline constexpr str::gains::radial::turn_amp_kd_unit_t STEER_KD{0};
 
 inline constexpr str::gains::radial::turn_amp_ka_unit_t DRIVE_KA{0};
 inline constexpr str::gains::radial::turn_amp_kv_unit_t DRIVE_KV{0};
 inline constexpr units::ampere_t DRIVE_KS{0};
-inline constexpr units::volt_t DRIVE_KS_V{0};
+inline constexpr units::volt_t DRIVE_KS_V{1};
 inline constexpr str::gains::radial::turn_amp_kp_unit_t DRIVE_KP{1};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t DRIVE_KI{0};
 inline constexpr str::gains::radial::turn_amp_kd_unit_t DRIVE_KD{0};

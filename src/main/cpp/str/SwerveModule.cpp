@@ -36,11 +36,11 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
 void SwerveModule::GoToState(frc::SwerveModuleState desiredState) {
   frc::SwerveModuleState currentState = GetCurrentState();
   desiredState = frc::SwerveModuleState::Optimize(desiredState, currentState.angle);
-  desiredStatePub.Set(desiredState);
 
   steerMotor.SetControl(steerAngleSetter.WithPosition(desiredState.angle.Radians()));
 
-  units::turns_per_second_t motorSpeed = ConvertWheelVelToMotorVel(ConvertLinearVelToWheelVel(desiredState.speed));
+  units::radians_per_second_t motorSpeed = ConvertWheelVelToMotorVel(ConvertLinearVelToWheelVel(desiredState.speed));
+  fmt::print("Motor applied speed: {}\n", motorSpeed.convert<units::revolutions_per_minute>().value());
 
   //The drive motors will start turning before the module reaches the desired angle, 
   //so scale down the speed if we are far away from our setpoint
@@ -53,7 +53,7 @@ void SwerveModule::GoToState(frc::SwerveModuleState desiredState) {
   motorSpeed *= errorMulti;
 
   //Reverse the modules expected backout because of coupling
-  units::turns_per_second_t driveBackout = steerVelocitySig.GetValue() * couplingRatio;
+  units::radians_per_second_t driveBackout = steerVelocitySig.GetValue() * couplingRatio;
   motorSpeed += driveBackout;
 
   driveMotor.SetControl(driveVelocitySetter.WithVelocity(motorSpeed));
@@ -87,8 +87,6 @@ frc::SwerveModulePosition SwerveModule::GetCurrentPosition(bool refresh) {
     frc::Rotation2d{frc::AngleModulus(latencyCompSteerPos)}
   };
 
-  currentPositionPub.Set(position);
-
   return position;
 }
 
@@ -100,13 +98,11 @@ frc::SwerveModuleState SwerveModule::GetCurrentState() {
     frc::Rotation2d{frc::AngleModulus(steerPositionSig.GetValue())}
   };
 
-  currentStatePub.Set(currentState);
-
   return currentState;
 }
 
-void SwerveModule::UpdateSimulation(units::second_t deltaTime, units::volt_t supplyVoltage) {
-  moduleSim.Update(deltaTime, supplyVoltage);
+frc::SwerveModuleState SwerveModule::UpdateSimulation(units::second_t deltaTime, units::volt_t supplyVoltage) {
+  return moduleSim.Update(deltaTime, supplyVoltage);
 }
 
 std::array<ctre::phoenix6::BaseStatusSignal*, 6> SwerveModule::GetSignals() {
@@ -231,33 +227,30 @@ void SwerveModule::SetSteerToTorque(units::volt_t voltsToSend) {
   steerMotor.SetControl(steerTorqueSetter.WithOutput(units::ampere_t{voltsToSend.value()}));
 }
 
-void SwerveModule::LogSteerTorqueSysId(frc::sysid::SysIdRoutineLog* log) {
-  log->Motor("swerve-steer")
-    .voltage(units::volt_t{steerTorqueCurrentSig.GetValueAsDouble()})
-    .position(steerPositionSig.GetValue())
-    .velocity(steerVelocitySig.GetValue());
+void SwerveModule::SetDriveToTorque(units::volt_t voltsToSend) {
+  driveMotor.SetControl(driveTorqueSetter.WithOutput(units::ampere_t{voltsToSend.value()}));
 }
 
-units::turn_t SwerveModule::ConvertDriveMotorRotationsToWheelRotations(units::turn_t motorRotations) const {
+units::radian_t SwerveModule::ConvertDriveMotorRotationsToWheelRotations(units::radian_t motorRotations) const {
   return motorRotations / driveGearing;
 }
 
-units::turns_per_second_t SwerveModule::ConvertDriveMotorVelToWheelVel(units::turns_per_second_t motorVel) const {
+units::radians_per_second_t SwerveModule::ConvertDriveMotorVelToWheelVel(units::radians_per_second_t motorVel) const {
   return motorVel / driveGearing;
 }
 
-units::meter_t SwerveModule::ConvertWheelRotationsToWheelDistance(units::turn_t wheelRotations) const {
-  return (wheelRotations / 1_tr) * wheelRadius;
+units::meter_t SwerveModule::ConvertWheelRotationsToWheelDistance(units::radian_t wheelRotations) const {
+  return (wheelRotations / 1_rad) * wheelRadius;
 }
 
-units::meters_per_second_t SwerveModule::ConvertWheelVelToLinearVel(units::turns_per_second_t wheelVel) const {
-  return (wheelVel / 1_tr) * wheelRadius;
+units::meters_per_second_t SwerveModule::ConvertWheelVelToLinearVel(units::radians_per_second_t wheelVel) const {
+  return (wheelVel / 1_rad) * wheelRadius;
 }
 
-units::turns_per_second_t SwerveModule::ConvertLinearVelToWheelVel(units::meters_per_second_t linVel) const {
-  return (linVel / wheelRadius) * 1_tr;
+units::radians_per_second_t SwerveModule::ConvertLinearVelToWheelVel(units::meters_per_second_t linVel) const {
+  return (linVel / wheelRadius) * 1_rad;
 }
 
-units::turns_per_second_t SwerveModule::ConvertWheelVelToMotorVel(units::turns_per_second_t wheelVel) const {
+units::radians_per_second_t SwerveModule::ConvertWheelVelToMotorVel(units::radians_per_second_t wheelVel) const {
   return wheelVel * driveGearing;
 }

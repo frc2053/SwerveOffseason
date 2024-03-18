@@ -5,6 +5,7 @@
 #include "RobotContainer.h"
 
 #include <frc2/command/Commands.h>
+#include <frc/MathUtil.h>
 
 RobotContainer::RobotContainer() {
   ConfigureBindings();
@@ -12,18 +13,27 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureBindings() {
 
-  swerveSubsystem.SetDefaultCommand(swerveSubsystem.DriveModule(
+  swerveSubsystem.SetDefaultCommand(swerveSubsystem.Drive([this] {
+    return frc::ApplyDeadband<double>(-controller.GetLeftY(), .1) * consts::swerve::physical::DRIVE_MAX_SPEED;
+  },
   [this] {
-    return units::radian_t{std::atan2(-controller.GetLeftY(), -controller.GetLeftX())};
-  }, 
+    return frc::ApplyDeadband<double>(-controller.GetLeftX(), .1) * consts::swerve::physical::DRIVE_MAX_SPEED;
+  },
   [this] {
-    return units::feet_per_second_t{std::hypot(-controller.GetLeftY(), -controller.GetLeftX())} * 12;
-  }));
+    return frc::ApplyDeadband<double>(-controller.GetRightX(), .1) * consts::swerve::physical::DRIVE_MAX_ROT_SPEED;
+  },
+  true
+  ));
 
-  controller.A().WhileTrue(swerveSubsystem.SysIdSteerQuasistatic(frc2::sysid::Direction::kForward));
-  controller.B().WhileTrue(swerveSubsystem.SysIdSteerQuasistatic(frc2::sysid::Direction::kReverse));
-  controller.X().WhileTrue(swerveSubsystem.SysIdSteerDynamic(frc2::sysid::Direction::kForward));
-  controller.Y().WhileTrue(swerveSubsystem.SysIdSteerDynamic(frc2::sysid::Direction::kReverse));
+  controller.A().WhileTrue(swerveSubsystem.SysIdDriveQuasistatic(frc2::sysid::Direction::kForward));
+  controller.B().WhileTrue(swerveSubsystem.SysIdDriveQuasistatic(frc2::sysid::Direction::kReverse));
+  controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamic(frc2::sysid::Direction::kForward));
+  controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamic(frc2::sysid::Direction::kReverse));
+
+  // controller.A().WhileTrue(swerveSubsystem.SysIdSteerQuasistatic(frc2::sysid::Direction::kForward));
+  // controller.B().WhileTrue(swerveSubsystem.SysIdSteerQuasistatic(frc2::sysid::Direction::kReverse));
+  // controller.X().WhileTrue(swerveSubsystem.SysIdSteerDynamic(frc2::sysid::Direction::kForward));
+  // controller.Y().WhileTrue(swerveSubsystem.SysIdSteerDynamic(frc2::sysid::Direction::kReverse));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

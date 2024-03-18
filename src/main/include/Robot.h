@@ -11,7 +11,6 @@
 
 #include "RobotContainer.h"
 #include "str/SwerveModule.h"
-#include "constants/SwerveConstants.h"
 #include <frc/simulation/BatterySim.h>
 
 class Robot : public frc::TimedRobot {

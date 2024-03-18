@@ -9,14 +9,27 @@
 #include <frc2/command/sysid/SysIdRoutine.h>
 #include <ctre/phoenix6/Pigeon2.hpp>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
+#include <networktables/StructArrayTopic.h>
+#include <networktables/StructTopic.h>
+#include <frc/geometry/Pose2d.h>
 
 namespace str {
 class SwerveDrive {
 public:
   explicit SwerveDrive();
+  void Drive(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radians_per_second_t omega, bool fieldRelative);
+  void SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates);
   units::ampere_t GetSimulatedCurrentDraw() const;
   void UpdateSwerveOdom();
+  void UpdateNTEntries();
+  frc::Pose2d GetOdomPose() const;
+  frc::Pose2d GetPose() const;
+  frc::Rotation3d GetRotationFromImu();
   void SimulationPeriodic();
+  void SetCharacterizationTorqueSteer(units::volt_t torqueAmps);
+  void SetCharacterizationTorqueDrive(units::volt_t torqueAmps);
+  void LogSteerTorque(frc::sysid::SysIdRoutineLog* log);
+  void LogDriveTorque(frc::sysid::SysIdRoutineLog* log);
 private:
   SwerveModulePhysical swervePhysical{
     consts::swerve::physical::STEER_GEARING,
@@ -112,6 +125,7 @@ private:
   };
 
   ctre::phoenix6::hardware::Pigeon2 imu{consts::swerve::can_ids::IMU, "*"};
+  ctre::phoenix6::sim::Pigeon2SimState& imuSimState = imu.GetSimState();
 
   std::array<ctre::phoenix6::BaseStatusSignal*, 26> allSignals;
 
@@ -119,8 +133,26 @@ private:
   std::array<frc::SwerveModuleState, 4> moduleStates;
 
   frc::SwerveDriveOdometry<4> odom{consts::swerve::physical::KINEMATICS, frc::Rotation2d{0_deg}, modulePositions};
-  frc::SwerveDrivePoseEstimator<4> poseEstimator;
+  frc::SwerveDrivePoseEstimator<4> poseEstimator{consts::swerve::physical::KINEMATICS, frc::Rotation2d{0_deg}, modulePositions, frc::Pose2d{}};
 
-  units::second_t lastLoopTime;
+  units::second_t lastDriveLoopTime;
+  units::second_t lastSimLoopTime;
+  frc::Rotation2d lastSimAngle;
+
+  std::shared_ptr<nt::NetworkTable> nt{nt::NetworkTableInstance::GetDefault().GetTable("SwerveDrive")};
+  nt::StructArrayTopic<frc::SwerveModuleState> desiredStatesTopic{nt->GetStructArrayTopic<frc::SwerveModuleState>("DesiredStates")};
+  nt::StructArrayPublisher<frc::SwerveModuleState> desiredStatesPub{desiredStatesTopic.Publish()};
+  
+  nt::StructArrayTopic<frc::SwerveModuleState> currentStatesTopic{nt->GetStructArrayTopic<frc::SwerveModuleState>("CurrentStates")};
+  nt::StructArrayPublisher<frc::SwerveModuleState> currentStatesPub{currentStatesTopic.Publish()};
+
+  nt::StructArrayTopic<frc::SwerveModulePosition> currentPositionsTopic{nt->GetStructArrayTopic<frc::SwerveModulePosition>("CurrentPositions")};
+  nt::StructArrayPublisher<frc::SwerveModulePosition> currentPositionsPub{currentPositionsTopic.Publish()};
+
+  nt::StructTopic<frc::Pose2d> odomPoseTopic{nt->GetStructTopic<frc::Pose2d>("OdometryPose")};
+  nt::StructPublisher<frc::Pose2d> odomPosePub{odomPoseTopic.Publish()};
+
+  nt::StructTopic<frc::Pose2d> estimatorTopic{nt->GetStructTopic<frc::Pose2d>("PoseEstimatorPose")};
+  nt::StructPublisher<frc::Pose2d> estimatorPub{estimatorTopic.Publish()};
 };
 }

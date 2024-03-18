@@ -18,9 +18,12 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   void SimulationPeriodic() override;
   units::ampere_t GetSimulatedCurrentDraw() const;
   void UpdateSwerveOdom();
+  frc2::CommandPtr PointWheelsToZero();
+  frc2::CommandPtr Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative); 
   frc2::CommandPtr SysIdSteerQuasistatic(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdSteerDynamic(frc2::sysid::Direction dir);
-
+  frc2::CommandPtr SysIdDriveQuasistatic(frc2::sysid::Direction dir);
+  frc2::CommandPtr SysIdDriveDynamic(frc2::sysid::Direction dir);
  private:
 
   str::SwerveDrive swerveDrive;
@@ -38,13 +41,36 @@ class SwerveSubsystem : public frc2::SubsystemBase {
     },
     frc2::sysid::Mechanism{
       [this](units::volt_t voltsToSend) {
-        modules[0].SetSteerToTorque(voltsToSend);
+        swerveDrive.SetCharacterizationTorqueSteer(voltsToSend);
       },
       [this](frc::sysid::SysIdRoutineLog* log) {
-        modules[0].LogSteerTorqueSysId(log);
+        swerveDrive.LogSteerTorque(log);
       },
       this,
       "swerve-steer"
+    }
+  };
+
+  //It says volts, because sysid only supports volts for now. But we are using current anyway
+  frc2::sysid::SysIdRoutine driveTorqueSysid{
+    frc2::sysid::Config{
+      10_V / 1_s,
+      30_V,
+      10_s,
+      [this](frc::sysid::State state) {
+        ctre::phoenix6::SignalLogger().WriteString(
+            "state", frc::sysid::SysIdRoutineLog::StateEnumToString(state));
+      }
+    },
+    frc2::sysid::Mechanism{
+      [this](units::volt_t voltsToSend) {
+        swerveDrive.SetCharacterizationTorqueDrive(voltsToSend);
+      },
+      [this](frc::sysid::SysIdRoutineLog* log) {
+        swerveDrive.LogDriveTorque(log);
+      },
+      this,
+      "swerve-drive"
     }
   };
 };

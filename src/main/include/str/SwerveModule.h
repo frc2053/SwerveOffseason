@@ -4,7 +4,6 @@
 #include <ctre/phoenix6/CANcoder.hpp>
 #include "str/Gains.h"
 #include <frc/kinematics/SwerveModuleState.h>
-#include <networktables/StructTopic.h>
 #include <frc/system/plant/DCMotor.h>
 #include "str/SwerveModuleSim.h"
 #include "str/SwerveModuleHelpers.h"
@@ -20,24 +19,24 @@ public:
   void GoToState(frc::SwerveModuleState desiredState);
   frc::SwerveModulePosition GetCurrentPosition(bool refresh);
   frc::SwerveModuleState GetCurrentState();
-  void UpdateSimulation(units::second_t deltaTime, units::volt_t supplyVoltage);
+  frc::SwerveModuleState UpdateSimulation(units::second_t deltaTime, units::volt_t supplyVoltage);
   std::array<ctre::phoenix6::BaseStatusSignal*, 6> GetSignals();
   bool OptimizeBusSignals();
   std::string GetName() const;
   units::ampere_t GetSimulatedCurrentDraw() const;
   void SetSteerToTorque(units::volt_t voltsToSend);
-  void LogSteerTorqueSysId(frc::sysid::SysIdRoutineLog* log);
+  void SetDriveToTorque(units::volt_t voltsToSend);
 private:
   bool ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit);
   bool ConfigureDriveMotor(bool invertDrive, units::ampere_t supplyCurrentLimit, units::ampere_t slipCurrentLimit);
   bool ConfigureSteerEncoder(double encoderOffset);
   void ConfigureControlSignals();
-  units::turn_t ConvertDriveMotorRotationsToWheelRotations(units::turn_t motorRotations) const;
-  units::turns_per_second_t ConvertDriveMotorVelToWheelVel(units::turns_per_second_t motorVel) const;
-  units::meter_t ConvertWheelRotationsToWheelDistance(units::turn_t wheelRotations) const;
-  units::meters_per_second_t ConvertWheelVelToLinearVel(units::turns_per_second_t wheelVel) const;
-  units::turns_per_second_t ConvertLinearVelToWheelVel(units::meters_per_second_t linVel) const;
-  units::turns_per_second_t ConvertWheelVelToMotorVel(units::turns_per_second_t wheelVel) const;
+  units::radian_t ConvertDriveMotorRotationsToWheelRotations(units::radian_t motorRotations) const;
+  units::radians_per_second_t ConvertDriveMotorVelToWheelVel(units::radians_per_second_t motorVel) const;
+  units::meter_t ConvertWheelRotationsToWheelDistance(units::radian_t wheelRotations) const;
+  units::meters_per_second_t ConvertWheelVelToLinearVel(units::radians_per_second_t wheelVel) const;
+  units::radians_per_second_t ConvertLinearVelToWheelVel(units::meters_per_second_t linVel) const;
+  units::radians_per_second_t ConvertWheelVelToMotorVel(units::radians_per_second_t wheelVel) const;
 
   ctre::phoenix6::hardware::TalonFX steerMotor;
   ctre::phoenix6::hardware::TalonFX driveMotor;
@@ -69,15 +68,5 @@ private:
   units::meter_t wheelRadius;
 
   SwerveModuleSim moduleSim;
-
-  std::shared_ptr<nt::NetworkTable> nt{nt::NetworkTableInstance::GetDefault().GetTable(moduleName + "_SwerveModule")};
-  nt::StructTopic<frc::SwerveModuleState> desiredStateTopic{nt->GetStructTopic<frc::SwerveModuleState>("DesiredState")};
-  nt::StructPublisher<frc::SwerveModuleState> desiredStatePub{desiredStateTopic.Publish()};
-  
-  nt::StructTopic<frc::SwerveModuleState> currentStateTopic{nt->GetStructTopic<frc::SwerveModuleState>("CurrentState")};
-  nt::StructPublisher<frc::SwerveModuleState> currentStatePub{currentStateTopic.Publish()};
-
-  nt::StructTopic<frc::SwerveModulePosition> currentPositionTopic{nt->GetStructTopic<frc::SwerveModulePosition>("CurrentPosition")};
-  nt::StructPublisher<frc::SwerveModulePosition> currentPositionPub{currentPositionTopic.Publish()};
 };
 }

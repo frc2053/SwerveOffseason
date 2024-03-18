@@ -56,8 +56,8 @@ void Robot::SimulationInit() {
 }
 
 void Robot::SimulationPeriodic() {
-  units::volt_t battVoltage = frc::sim::BatterySim::Calculate({m_container.GetSwerveSubsystem().GetCurrentDraw()});
-  frc::sim::RoboRioSim::SetVInVoltage(battVoltage);
+  // units::volt_t battVoltage = frc::sim::BatterySim::Calculate({m_container.GetSwerveSubsystem().GetSimulatedCurrentDraw()});
+  // frc::sim::RoboRioSim::SetVInVoltage(battVoltage);
 }
 
 #ifndef RUNNING_FRC_TESTS
