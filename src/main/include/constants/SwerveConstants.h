@@ -3,6 +3,7 @@
 #include <units/base.h>
 #include <units/velocity.h>
 #include <frc/system/plant/DCMotor.h>
+#include <frc/kinematics/SwerveDriveKinematics.h>
 
 namespace consts {
 namespace swerve {
@@ -22,6 +23,8 @@ inline constexpr int BL_ENC = 10;
 inline constexpr int BR_STEER = 11;
 inline constexpr int BR_DRIVE = 12;
 inline constexpr int BR_ENC = 13;
+
+inline constexpr int IMU = 14;
 }
 
 namespace current_limits {
@@ -56,6 +59,19 @@ inline constexpr frc::DCMotor DRIVE_MOTOR = frc::DCMotor::Falcon500FOC(1);
 inline constexpr frc::DCMotor STEER_MOTOR = frc::DCMotor::Falcon500FOC(1);
 
 inline constexpr units::meter_t WHEEL_RADIUS = 2_in;
+
+inline constexpr units::meter_t WHEELBASE_WIDTH = 26_in;
+inline constexpr units::meter_t WHEELBASE_LENGTH = 26_in;
+
+inline constexpr std::array<frc::Translation2d, 4> MODULE_LOCATIONS{
+    frc::Translation2d{WHEELBASE_LENGTH / 2, WHEELBASE_WIDTH / 2},
+    frc::Translation2d{WHEELBASE_LENGTH / 2, -WHEELBASE_WIDTH / 2},
+    frc::Translation2d{-WHEELBASE_LENGTH / 2, WHEELBASE_WIDTH / 2},
+    frc::Translation2d{-WHEELBASE_LENGTH / 2, -WHEELBASE_WIDTH / 2}};
+
+inline frc::SwerveDriveKinematics<4> KINEMATICS{
+    MODULE_LOCATIONS[0], MODULE_LOCATIONS[1], MODULE_LOCATIONS[2],
+    MODULE_LOCATIONS[3]};
 }
 
 namespace gains {
@@ -66,9 +82,9 @@ inline constexpr str::gains::radial::turn_amp_ka_unit_t STEER_KA{0};
 inline constexpr str::gains::radial::turn_amp_kv_unit_t STEER_KV{0};
 inline constexpr units::ampere_t STEER_KS{0};
 inline constexpr units::volt_t STEER_KS_V{0};
-inline constexpr str::gains::radial::turn_amp_kp_unit_t STEER_KP{500};
+inline constexpr str::gains::radial::turn_amp_kp_unit_t STEER_KP{3.596};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t STEER_KI{0};
-inline constexpr str::gains::radial::turn_amp_kd_unit_t STEER_KD{10};
+inline constexpr str::gains::radial::turn_amp_kd_unit_t STEER_KD{0};
 
 inline constexpr str::gains::radial::turn_amp_ka_unit_t DRIVE_KA{0};
 inline constexpr str::gains::radial::turn_amp_kv_unit_t DRIVE_KV{0};
