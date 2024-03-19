@@ -18,7 +18,7 @@ class SwerveDrive {
 public:
   explicit SwerveDrive();
   void Drive(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radians_per_second_t omega, bool fieldRelative);
-  void SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates);
+  void SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize=true);
   units::ampere_t GetSimulatedCurrentDraw() const;
   void UpdateSwerveOdom();
   void UpdateNTEntries();

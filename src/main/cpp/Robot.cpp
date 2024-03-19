@@ -56,6 +56,7 @@ void Robot::SimulationInit() {
 }
 
 void Robot::SimulationPeriodic() {
+  // FIXME: Current simulation is VERY wrong
   // units::volt_t battVoltage = frc::sim::BatterySim::Calculate({m_container.GetSwerveSubsystem().GetSimulatedCurrentDraw()});
   // frc::sim::RoboRioSim::SetVInVoltage(battVoltage);
 }

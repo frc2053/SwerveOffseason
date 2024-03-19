@@ -33,9 +33,11 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
   ConfigureControlSignals();
 }
 
-void SwerveModule::GoToState(frc::SwerveModuleState desiredState) {
+frc::SwerveModuleState SwerveModule::GoToState(frc::SwerveModuleState desiredState, bool optimize) {
   frc::SwerveModuleState currentState = GetCurrentState();
-  desiredState = frc::SwerveModuleState::Optimize(desiredState, currentState.angle);
+  if(optimize) {
+    desiredState = frc::SwerveModuleState::Optimize(desiredState, currentState.angle);
+  }
 
   steerMotor.SetControl(steerAngleSetter.WithPosition(desiredState.angle.Radians()));
 
@@ -56,6 +58,8 @@ void SwerveModule::GoToState(frc::SwerveModuleState desiredState) {
   motorSpeed += driveBackout;
 
   driveMotor.SetControl(driveVelocitySetter.WithVelocity(motorSpeed));
+
+  return desiredState;
 }
 
 frc::SwerveModulePosition SwerveModule::GetCurrentPosition(bool refresh) {
@@ -85,7 +89,7 @@ frc::SwerveModulePosition SwerveModule::GetCurrentPosition(bool refresh) {
     ConvertWheelRotationsToWheelDistance(
       ConvertDriveMotorRotationsToWheelRotations(latencyCompDrivePos)
     ),
-    frc::Rotation2d{frc::AngleModulus(latencyCompSteerPos)}
+    frc::Rotation2d{latencyCompSteerPos}
   };
 
   return position;
@@ -96,7 +100,7 @@ frc::SwerveModuleState SwerveModule::GetCurrentState() {
     ConvertWheelVelToLinearVel(
       ConvertDriveMotorVelToWheelVel(driveVelocitySig.GetValue())
     ),
-    frc::Rotation2d{frc::AngleModulus(steerPositionSig.GetValue())}
+    frc::Rotation2d{steerPositionSig.GetValue()}
   };
 
   return currentState;

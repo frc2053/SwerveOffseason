@@ -71,15 +71,15 @@ units::radian_t SwerveDrive::GetYawFromImu() {
   return yawLatencyComped;
 }
 
-void SwerveDrive::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates) {
-  wpi::array<frc::SwerveModuleState, 4> desaturatedStates = desiredStates;
-  frc::SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&desaturatedStates, consts::swerve::physical::DRIVE_MAX_SPEED);
+void SwerveDrive::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize) {
+  wpi::array<frc::SwerveModuleState, 4> finalState = desiredStates;
+  frc::SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&finalState, consts::swerve::physical::DRIVE_MAX_SPEED);
   int i = 0;
   for(auto& mod : modules) {
-    mod.GoToState(desaturatedStates[i]);
+    finalState[i] = mod.GoToState(finalState[i], optimize);
     i++;
   }
-  desiredStatesPub.Set(desaturatedStates);
+  desiredStatesPub.Set(finalState);
 }
 
 void SwerveDrive::UpdateSwerveOdom() {
