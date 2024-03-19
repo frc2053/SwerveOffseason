@@ -32,7 +32,7 @@ public:
 private:
   bool ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit);
   bool ConfigureDriveMotor(bool invertDrive, units::ampere_t supplyCurrentLimit, units::ampere_t slipCurrentLimit);
-  bool ConfigureSteerEncoder(double encoderOffset);
+  bool ConfigureSteerEncoder(units::turn_t encoderOffset);
   void ConfigureControlSignals();
   units::radian_t ConvertDriveMotorRotationsToWheelRotations(units::radian_t motorRotations) const;
   units::radians_per_second_t ConvertDriveMotorVelToWheelVel(units::radians_per_second_t motorVel) const;

@@ -187,9 +187,9 @@ bool SwerveModule::ConfigureDriveMotor(bool invertDrive, units::ampere_t supplyC
   return configResult.IsOK();
 }
 
-bool SwerveModule::ConfigureSteerEncoder(double encoderOffset) {
+bool SwerveModule::ConfigureSteerEncoder(units::turn_t encoderOffset) {
   ctre::phoenix6::configs::CANcoderConfiguration encoderConfig{};
-  encoderConfig.MagnetSensor.MagnetOffset = encoderOffset;
+  encoderConfig.MagnetSensor.MagnetOffset = encoderOffset.value();
   ctre::phoenix::StatusCode configResult = steerEncoder.GetConfigurator().Apply(encoderConfig);
 
   fmt::print("Configured steer encoder on module {}. Result was: {}\n", moduleName, configResult.GetName());

@@ -24,7 +24,14 @@ SwerveModuleSim::SwerveModuleSim(
   steerGearing(physicalAttrib.steerGearing),
   wheelRadius(physicalAttrib.wheelRadius)
 {
-
+  driveSimState.SetRawRotorPosition(0_rad);
+  driveSimState.SetRotorVelocity(0_rad_per_s);
+  steerSimState.SetRawRotorPosition(0_rad);
+  steerSimState.SetRotorVelocity(0_rad_per_s);
+  steerEncoderSimState.SetRawPosition(0_rad);
+  steerEncoderSimState.SetVelocity(0_rad_per_s);
+  driveSim.SetState(0_rad, 0_rad_per_s);
+  steerSim.SetState(0_rad, 0_rad_per_s);
 }
 
 frc::SwerveModuleState SwerveModuleSim::Update(units::second_t deltaTime, units::volt_t supplyVoltage) {
@@ -50,8 +57,7 @@ frc::SwerveModuleState SwerveModuleSim::Update(units::second_t deltaTime, units:
   steerEncoderSimState.SetRawPosition(steerSim.GetAngularPosition());
   steerEncoderSimState.SetVelocity(steerSim.GetAngularVelocity());
 
-  //TODO: Not sure why I have to add 90 here
-  return frc::SwerveModuleState{(driveSim.GetAngularVelocity() / 1_rad) * wheelRadius, frc::Rotation2d{frc::AngleModulus(steerSim.GetAngularPosition())} + frc::Rotation2d{90_deg}};
+  return frc::SwerveModuleState{(driveSim.GetAngularVelocity() / 1_rad) * wheelRadius, frc::Rotation2d{steerSim.GetAngularPosition()}};
 }
 
 units::volt_t SwerveModuleSim::AddFrictionVoltage(units::volt_t outputVoltage, units::volt_t frictionVoltage) {

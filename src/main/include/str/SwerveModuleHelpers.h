@@ -10,7 +10,7 @@ struct SwerveModuleConstants {
   const int steerId;
   const int driveId;
   const int encoderId;
-  const double steerEncoderOffset;
+  const units::turn_t steerEncoderOffset;
   const bool invertDrive;
   const bool invertSteer;
 };

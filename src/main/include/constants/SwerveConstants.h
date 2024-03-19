@@ -34,10 +34,10 @@ inline constexpr units::ampere_t SLIP_CURRENT_LIMIT = 100_A;
 
 namespace physical {
 
-inline constexpr units::scalar_t FL_ENC_OFFSET = 0.0;
-inline constexpr units::scalar_t FR_ENC_OFFSET = 0.0;
-inline constexpr units::scalar_t BL_ENC_OFFSET = 0.0;
-inline constexpr units::scalar_t BR_ENC_OFFSET = 0.0;
+inline constexpr units::turn_t FL_ENC_OFFSET = 0.25_tr;
+inline constexpr units::turn_t FR_ENC_OFFSET = 0.25_tr;
+inline constexpr units::turn_t BL_ENC_OFFSET = 0.25_tr;
+inline constexpr units::turn_t BR_ENC_OFFSET = 0.25_tr;
 
 inline constexpr bool FL_STEER_INVERT = false;
 inline constexpr bool FR_STEER_INVERT = false;
