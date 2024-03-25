@@ -38,7 +38,7 @@ frc2::CommandPtr SwerveSubsystem::PointWheelsToAngle(std::function<units::radian
     }
 
     swerveDrive.SetModuleStates(states, false);
-  }, {this}).Repeatedly().WithName("Point Wheels At Angle");
+  }, {this}).WithName("Point Wheels At Angle");
 }
 
 frc2::CommandPtr SwerveSubsystem::Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative) {
@@ -48,33 +48,90 @@ frc2::CommandPtr SwerveSubsystem::Drive(std::function<units::meters_per_second_t
 }
 
 frc2::CommandPtr SwerveSubsystem::SysIdSteerQuasistaticTorque(frc2::sysid::Direction dir) {
-  return steerTorqueSysid.Quasistatic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } ).WithName("Steer Quasistatic Torque");
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] { 
+      ctre::phoenix6::SignalLogger::Start();
+    }),
+    steerTorqueSysid.Quasistatic(dir)
+  ).WithName("Steer Quasistatic Torque");
 }
 
 frc2::CommandPtr SwerveSubsystem::SysIdSteerDynamicTorque(frc2::sysid::Direction dir) {
-  return steerTorqueSysid.Dynamic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } ).WithName("Steer Dynamic Torque");
-}
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] { 
+      ctre::phoenix6::SignalLogger::Start();
+    }),
+    steerTorqueSysid.Dynamic(dir)
+  ).WithName("Steer Dynamic Torque");}
 
 frc2::CommandPtr SwerveSubsystem::SysIdDriveQuasistaticTorque(frc2::sysid::Direction dir) {
-  return driveTorqueSysid.Quasistatic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } ).BeforeStarting(PointWheelsToAngle([] { return 0_rad;}).AndThen(frc2::cmd::Wait(1_s))).WithName("Drive Quasistatic Torque");
-}
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] { 
+      ctre::phoenix6::SignalLogger::Start();
+    }, {this}),
+    frc2::cmd::Parallel(
+      PointWheelsToAngle([] { return 0_rad; }),
+      frc2::cmd::Wait(1_s)
+    ),
+    driveTorqueSysid.Quasistatic(dir),
+    PointWheelsToAngle([] { return 0_rad; })
+  ).WithName("Drive Quasistatic Torque");}
 
 frc2::CommandPtr SwerveSubsystem::SysIdDriveDynamicTorque(frc2::sysid::Direction dir) {
-  return driveTorqueSysid.Dynamic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } ).BeforeStarting(PointWheelsToAngle([] { return 0_rad;}).AndThen(frc2::cmd::Wait(1_s))).WithName("Drive Dynamic Torque");
-}
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] { 
+      ctre::phoenix6::SignalLogger::Start();
+    }, {this}),
+    frc2::cmd::Parallel(
+      PointWheelsToAngle([] { return 0_rad; }),
+      frc2::cmd::Wait(1_s)
+    ),
+    driveTorqueSysid.Dynamic(dir),
+    PointWheelsToAngle([] { return 0_rad; })
+  ).WithName("Drive Dynamic Torque");}
 
 frc2::CommandPtr SwerveSubsystem::SysIdSteerQuasistaticVoltage(frc2::sysid::Direction dir) {
-  return steerVoltageSysid.Quasistatic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } ).WithName("Steer Quasistatic Voltage");
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] {
+      ctre::phoenix6::SignalLogger::Start();
+    }, {this}),
+    steerVoltageSysid.Quasistatic(dir)
+  ).WithName("Steer Quasistatic Voltage");
 }
 
 frc2::CommandPtr SwerveSubsystem::SysIdSteerDynamicVoltage(frc2::sysid::Direction dir) {
-  return steerVoltageSysid.Dynamic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } ).WithName("Steer Dynamic Voltage");
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] {
+      ctre::phoenix6::SignalLogger::Start();
+    }, {this}),
+    steerVoltageSysid.Dynamic(dir)
+  ).WithName("Steer Quasistatic Voltage");
 }
 
 frc2::CommandPtr SwerveSubsystem::SysIdDriveQuasistaticVoltage(frc2::sysid::Direction dir) {
-  return driveVoltageSysid.Quasistatic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } ).BeforeStarting(PointWheelsToAngle([] { return 0_rad;}).AndThen(frc2::cmd::Wait(1_s))).WithName("Drive Quasistatic Voltage");
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] { 
+      ctre::phoenix6::SignalLogger::Start();
+    }, {this}),
+    frc2::cmd::Parallel(
+      PointWheelsToAngle([] { return 0_rad; }),
+      frc2::cmd::Wait(1_s)
+    ),
+    driveVoltageSysid.Quasistatic(dir),
+    PointWheelsToAngle([] { return 0_rad; })
+  ).WithName("Drive Quasistatic Voltage");
 }
 
 frc2::CommandPtr SwerveSubsystem::SysIdDriveDynamicVoltage(frc2::sysid::Direction dir) {
-  return driveVoltageSysid.Dynamic(dir).BeforeStarting([] { ctre::phoenix6::SignalLogger::Start(); } ).BeforeStarting(PointWheelsToAngle([] { return 0_rad;}).AndThen(frc2::cmd::Wait(1_s))).WithName("Drive Dynamic Voltage");
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] { 
+      ctre::phoenix6::SignalLogger::Start();
+    }, {this}),
+    frc2::cmd::Parallel(
+      PointWheelsToAngle([] { return 0_rad; }),
+      frc2::cmd::Wait(1_s)
+    ),
+    driveVoltageSysid.Dynamic(dir),
+    PointWheelsToAngle([] { return 0_rad; })
+  ).WithName("Drive Dynamic Voltage");
 }
