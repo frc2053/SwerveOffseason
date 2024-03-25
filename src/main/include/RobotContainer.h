@@ -7,12 +7,13 @@
 #include <frc2/command/CommandPtr.h>
 #include "subsystems/SwerveSubsystem.h"
 #include <frc2/command/button/CommandXboxController.h>
+#include "Autos.h"
 
 class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  frc2::Command* GetAutonomousCommand();
 
   SwerveSubsystem& GetSwerveSubsystem();
 
@@ -21,4 +22,6 @@ class RobotContainer {
   frc2::CommandXboxController controller{0};
   
   SwerveSubsystem swerveSubsystem;
+
+  Autos autos;
 };

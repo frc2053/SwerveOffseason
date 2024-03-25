@@ -37,6 +37,15 @@ SwerveDrive::SwerveDrive() {
   }
 }
 
+void SwerveDrive::ResetPose(const frc::Pose2d& resetPose) {
+  odom.ResetPosition(frc::Rotation2d{GetYawFromImu()}, modulePositions, resetPose);
+  poseEstimator.ResetPosition(frc::Rotation2d{GetYawFromImu()}, modulePositions, resetPose);
+}
+
+void SwerveDrive::DriveRobotRelative(const frc::ChassisSpeeds& robotRelativeSpeeds) {
+  Drive(robotRelativeSpeeds.vx, robotRelativeSpeeds.vy, robotRelativeSpeeds.omega, false);
+}
+
 void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radians_per_second_t omega, bool fieldRelative) {
 
   units::second_t now = frc::Timer::GetFPGATimestamp();
@@ -57,6 +66,10 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_secon
   SetModuleStates(consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend));
 
   lastDriveLoopTime = now;
+}
+
+frc::ChassisSpeeds SwerveDrive::GetRobotRelativeSpeeds() const {
+  return consts::swerve::physical::KINEMATICS.ToChassisSpeeds(moduleStates);
 }
 
 frc::Pose2d SwerveDrive::GetOdomPose() const {

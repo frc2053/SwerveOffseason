@@ -5,9 +5,12 @@
 #include "subsystems/SwerveSubsystem.h"
 #include <frc2/command/Commands.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <pathplanner/lib/auto/AutoBuilder.h>
+#include <str/DriverstationUtils.h>
 
 SwerveSubsystem::SwerveSubsystem() {
   frc::SmartDashboard::PutData(this);
+  SetupPathplanner();
 }
 
 void SwerveSubsystem::UpdateSwerveOdom()
@@ -39,6 +42,26 @@ frc2::CommandPtr SwerveSubsystem::PointWheelsToAngle(std::function<units::radian
 
     swerveDrive.SetModuleStates(states, false);
   }, {this}).WithName("Point Wheels At Angle");
+}
+
+void SwerveSubsystem::SetupPathplanner() {
+  pathplanner::AutoBuilder::configureHolonomic(
+    [this] {
+      return swerveDrive.GetPose();
+    },
+    [this](frc::Pose2d resetPose) {
+      return swerveDrive.ResetPose(resetPose);
+    },
+    [this] {
+      return swerveDrive.GetRobotRelativeSpeeds();
+    },
+    [this](frc::ChassisSpeeds robotRelativeOutput) {
+      swerveDrive.DriveRobotRelative(robotRelativeOutput);
+    },
+    consts::swerve::pathplanning::PATH_CONFIG,
+    [] { return str::IsOnRed(); },
+    this
+  );
 }
 
 frc2::CommandPtr SwerveSubsystem::Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative) {

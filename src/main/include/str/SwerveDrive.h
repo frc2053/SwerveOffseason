@@ -17,11 +17,14 @@ namespace str {
 class SwerveDrive {
 public:
   explicit SwerveDrive();
+  void ResetPose(const frc::Pose2d& resetPose);
+  void DriveRobotRelative(const frc::ChassisSpeeds& robotRelativeSpeeds);
   void Drive(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radians_per_second_t omega, bool fieldRelative);
   void SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize=true);
   units::ampere_t GetSimulatedCurrentDraw() const;
   void UpdateSwerveOdom();
   void UpdateNTEntries();
+  frc::ChassisSpeeds GetRobotRelativeSpeeds() const;
   frc::Pose2d GetOdomPose() const;
   frc::Pose2d GetPose() const;
   units::radian_t GetYawFromImu();

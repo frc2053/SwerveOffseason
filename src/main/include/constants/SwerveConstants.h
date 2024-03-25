@@ -4,6 +4,7 @@
 #include <units/velocity.h>
 #include <frc/system/plant/DCMotor.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
+#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
 
 namespace consts {
 namespace swerve {
@@ -60,8 +61,10 @@ inline constexpr frc::DCMotor STEER_MOTOR = frc::DCMotor::Falcon500FOC(1);
 
 inline constexpr units::meter_t WHEEL_RADIUS = 2_in;
 
-inline constexpr units::meter_t WHEELBASE_WIDTH = 26_in;
-inline constexpr units::meter_t WHEELBASE_LENGTH = 26_in;
+inline constexpr units::meter_t WHEELBASE_WIDTH = 22.75_in;
+inline constexpr units::meter_t WHEELBASE_LENGTH = 22.75_in;
+
+inline const units::meter_t DRIVEBASE_RADIUS{units::math::hypot(WHEELBASE_WIDTH / 2, WHEELBASE_LENGTH / 2)};
 
 inline constexpr std::array<frc::Translation2d, 4> MODULE_LOCATIONS{
     frc::Translation2d{WHEELBASE_LENGTH / 2, WHEELBASE_WIDTH / 2},
@@ -96,6 +99,43 @@ inline constexpr units::volt_t DRIVE_KS_V{1};
 inline constexpr str::gains::radial::turn_amp_kp_unit_t DRIVE_KP{3.596};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t DRIVE_KI{0};
 inline constexpr str::gains::radial::turn_amp_kd_unit_t DRIVE_KD{0};
+}
+
+namespace pathplanning {
+
+inline constexpr units::scalar_t POSE_P = 5;
+inline constexpr units::scalar_t POSE_I = 0;
+inline constexpr units::scalar_t POSE_D = 0;
+
+inline constexpr units::scalar_t ROTATION_P = 5;
+inline constexpr units::scalar_t ROTATION_I = 0;
+inline constexpr units::scalar_t ROTATION_D = 0;
+
+inline constexpr bool INITIAL_REPLAN = true;
+inline constexpr bool DYNAMIC_REPLAN = false;
+inline constexpr units::meter_t DYNAMIC_REPLAN_THRESHOLD_TOTAL = 3_ft;
+inline constexpr units::meter_t DYNAMIC_REPLAN_THRESHOLD_SPIKE = 1_ft; 
+
+inline const pathplanner::HolonomicPathFollowerConfig PATH_CONFIG{
+    pathplanner::PIDConstants{
+        POSE_P,
+        POSE_I,
+        POSE_D
+    },
+    pathplanner::PIDConstants{
+        ROTATION_P,
+        ROTATION_I,
+        ROTATION_D
+    },
+    physical::DRIVE_MAX_SPEED,
+    physical::DRIVEBASE_RADIUS,
+    pathplanner::ReplanningConfig{
+        INITIAL_REPLAN,
+        DYNAMIC_REPLAN,
+        DYNAMIC_REPLAN_THRESHOLD_TOTAL,
+        DYNAMIC_REPLAN_THRESHOLD_SPIKE
+    }
+};
 }
 }
 }

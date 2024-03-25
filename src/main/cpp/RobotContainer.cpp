@@ -40,10 +40,10 @@ void RobotContainer::ConfigureBindings() {
   // controller.X().WhileTrue(swerveSubsystem.SysIdSteerDynamicVoltage(frc2::sysid::Direction::kForward));
   // controller.Y().WhileTrue(swerveSubsystem.SysIdSteerDynamicVoltage(frc2::sysid::Direction::kReverse));
 
-  controller.A().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticVoltage(frc2::sysid::Direction::kForward));
-  controller.B().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticVoltage(frc2::sysid::Direction::kReverse));
-  controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicVoltage(frc2::sysid::Direction::kForward));
-  controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamicVoltage(frc2::sysid::Direction::kReverse));
+  // controller.A().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticVoltage(frc2::sysid::Direction::kForward));
+  // controller.B().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticVoltage(frc2::sysid::Direction::kReverse));
+  // controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicVoltage(frc2::sysid::Direction::kForward));
+  // controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamicVoltage(frc2::sysid::Direction::kReverse));
 
   // controller.A().WhileTrue(swerveSubsystem.PointWheelsToAngle([] { return 0_deg; }));
   // controller.B().WhileTrue(swerveSubsystem.PointWheelsToAngle([] { return 45_deg; }));
@@ -51,8 +51,8 @@ void RobotContainer::ConfigureBindings() {
   // controller.Y().WhileTrue(swerveSubsystem.PointWheelsToAngle([] { return 180_deg; }));
 }
 
-frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return frc2::cmd::Print("No autonomous command configured");
+frc2::Command* RobotContainer::GetAutonomousCommand() {
+  return autos.GetSelectedCommand();
 }
 
 SwerveSubsystem& RobotContainer::GetSwerveSubsystem() {

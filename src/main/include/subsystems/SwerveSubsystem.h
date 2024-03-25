@@ -29,6 +29,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   frc2::CommandPtr SysIdDriveQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdDriveDynamicVoltage(frc2::sysid::Direction dir);
  private:
+  void SetupPathplanner();
 
   str::SwerveDrive swerveDrive;
 
