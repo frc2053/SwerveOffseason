@@ -18,7 +18,6 @@ public:
       std::pair{AMP_SIDE_FIVE, pathplanner::PathPlannerAuto("AmpSideFive").ToPtr()}
     );
 
-
     autoChooser.SetDefaultOption("Drive Forward", AutoSelector::DRIVE_FORWARD);
     autoChooser.AddOption("Amp Side Five", AutoSelector::AMP_SIDE_FIVE);
 
