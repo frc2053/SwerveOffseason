@@ -103,7 +103,7 @@ inline constexpr str::gains::radial::turn_amp_kd_unit_t DRIVE_KD{0};
 
 namespace pathplanning {
 
-inline constexpr units::scalar_t POSE_P = 10;
+inline constexpr units::scalar_t POSE_P = 1;
 inline constexpr units::scalar_t POSE_I = 0;
 inline constexpr units::scalar_t POSE_D = 0;
 
