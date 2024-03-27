@@ -6,7 +6,6 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <str/SwerveDrive.h>
-#include <frc/filter/SlewRateLimiter.h>
 
 class SwerveSubsystem : public frc2::SubsystemBase {
  public:
@@ -20,6 +19,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   units::ampere_t GetSimulatedCurrentDraw() const;
   void UpdateSwerveOdom();
   frc2::CommandPtr PointWheelsToAngle(std::function<units::radian_t()> wheelAngle);
+  frc2::CommandPtr XPattern();
   frc2::CommandPtr Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative);
   frc2::CommandPtr AlignToAmp(); 
   frc2::CommandPtr SysIdSteerQuasistaticTorque(frc2::sysid::Direction dir);
@@ -35,6 +35,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   void SetupPathplanner();
 
   str::SwerveDrive swerveDrive;
+  str::WheelRadiusCharData wheelRadData;
 
   //It says volts, because sysid only supports volts for now. But we are using current anyway
   frc2::sysid::SysIdRoutine steerTorqueSysid{
@@ -125,11 +126,4 @@ class SwerveSubsystem : public frc2::SubsystemBase {
       "swerve-drive"
     }
   };
-
-  //For wheel radius calculation
-  units::radian_t lastGyroYaw;
-  units::radian_t accumGyroYaw;
-  std::array<units::radian_t, 4> startWheelPositions;
-  units::meter_t effectiveWheelRadius = 0_m;
-  frc::SlewRateLimiter<units::radians_per_second> omegaLimiter{1_rad_per_s / 1_s};
 };

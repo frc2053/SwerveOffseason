@@ -44,6 +44,19 @@ frc2::CommandPtr SwerveSubsystem::PointWheelsToAngle(std::function<units::radian
   }, {this}).WithName("Point Wheels At Angle");
 }
 
+frc2::CommandPtr SwerveSubsystem::XPattern() {
+  return frc2::cmd::Run([this] {
+    std::array<frc::SwerveModuleState, 4> states;
+
+    states[0].angle = 45_deg;
+    states[1].angle = -45_deg;
+    states[2].angle = -45_deg;
+    states[3].angle = 45_deg;
+
+    swerveDrive.SetModuleStates(states, true);
+  }, {this}).WithName("X Pattern");
+}
+
 void SwerveSubsystem::SetupPathplanner() {
   pathplanner::AutoBuilder::configureHolonomic(
     [this] {
@@ -167,11 +180,11 @@ frc2::CommandPtr SwerveSubsystem::SysIdDriveDynamicVoltage(frc2::sysid::Directio
 frc2::CommandPtr SwerveSubsystem::WheelRadius(frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
     frc2::cmd::RunOnce([this] {
-      lastGyroYaw = swerveDrive.GetYawFromImu();
-      accumGyroYaw = 0_rad;
-      startWheelPositions = swerveDrive.GetModuleDriveOutputShaftPositions();
-      omegaLimiter.Reset(0_rad_per_s);
-      effectiveWheelRadius = 0_in;
+      wheelRadData.lastGyroYaw = swerveDrive.GetYawFromImu();
+      wheelRadData.accumGyroYaw = 0_rad;
+      wheelRadData.startWheelPositions = swerveDrive.GetModuleDriveOutputShaftPositions();
+      wheelRadData.omegaLimiter.Reset(0_rad_per_s);
+      wheelRadData.effectiveWheelRadius = 0_in;
     }, 
     {this}
     ),
@@ -181,22 +194,22 @@ frc2::CommandPtr SwerveSubsystem::WheelRadius(frc2::sysid::Direction dir) {
           dirMulti = -1.0;
         }
         units::radian_t currentYaw = swerveDrive.GetYawFromImu();
-        swerveDrive.Drive(0_mps, 0_mps, omegaLimiter.Calculate(1_rad_per_s * dirMulti), true);
-        accumGyroYaw += frc::AngleModulus(currentYaw - lastGyroYaw);
-        lastGyroYaw = currentYaw;
+        swerveDrive.Drive(0_mps, 0_mps, wheelRadData.omegaLimiter.Calculate(1_rad_per_s * dirMulti), true);
+        wheelRadData.accumGyroYaw += frc::AngleModulus(currentYaw - wheelRadData.lastGyroYaw);
+        wheelRadData.lastGyroYaw = currentYaw;
         units::radian_t avgWheelPos = 0.0_rad;
         std::array<units::radian_t, 4> currentPositions;
         currentPositions = swerveDrive.GetModuleDriveOutputShaftPositions();
         for (int i = 0; i < 4; i++) {
           avgWheelPos += units::math::abs(currentPositions[i] -
-                                          startWheelPositions[i]);
+                                          wheelRadData.startWheelPositions[i]);
         }
         avgWheelPos /= 4.0;
-        effectiveWheelRadius = (accumGyroYaw * consts::swerve::physical::DRIVEBASE_RADIUS) / avgWheelPos;
+        wheelRadData.effectiveWheelRadius = (wheelRadData.accumGyroYaw * consts::swerve::physical::DRIVEBASE_RADIUS) / avgWheelPos;
     },
     [this] {
       swerveDrive.Drive(0_mps, 0_mps, 0_rad_per_s, true);
-      fmt::print("WHEEL RADIUS: {}\n\n\n\n\n", effectiveWheelRadius.convert<units::inches>().value());
+      fmt::print("WHEEL RADIUS: {}\n\n\n\n\n", wheelRadData.effectiveWheelRadius.convert<units::inches>().value());
     },
     {this})
   ).WithName("Wheel Radius Calculation");

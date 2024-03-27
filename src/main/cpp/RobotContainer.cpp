@@ -27,6 +27,7 @@ void RobotContainer::ConfigureBindings() {
   ));
 
   controller.LeftTrigger().WhileTrue(swerveSubsystem.AlignToAmp());
+  controller.LeftBumper().WhileTrue(swerveSubsystem.XPattern());
   controller.Back().WhileTrue(swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));
   controller.Start().WhileTrue(swerveSubsystem.WheelRadius(frc2::sysid::Direction::kForward));
 

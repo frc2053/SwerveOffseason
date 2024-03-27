@@ -3,6 +3,7 @@
 #include <str/Gains.h>
 #include <frc/system/plant/DCMotor.h>
 #include <units/base.h>
+#include <frc/filter/SlewRateLimiter.h>
 
 namespace str {
 struct SwerveModuleConstants {
@@ -48,5 +49,13 @@ struct SwerveModuleDriveGains {
   str::gains::radial::turn_amp_kp_unit_t kP;  
   str::gains::radial::turn_amp_ki_unit_t kI;
   str::gains::radial::turn_amp_kd_unit_t kD;
+};
+
+struct WheelRadiusCharData {
+  units::radian_t lastGyroYaw;
+  units::radian_t accumGyroYaw;
+  std::array<units::radian_t, 4> startWheelPositions;
+  units::meter_t effectiveWheelRadius = 0_m;
+  frc::SlewRateLimiter<units::radians_per_second> omegaLimiter{1_rad_per_s / 1_s};
 };
 }
