@@ -26,6 +26,8 @@ void RobotContainer::ConfigureBindings() {
   true
   ));
 
+  controller.LeftTrigger().WhileTrue(swerveSubsystem.AlignToAmp());
+
   // controller.A().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticTorque(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticTorque(frc2::sysid::Direction::kReverse));
   // controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kForward));

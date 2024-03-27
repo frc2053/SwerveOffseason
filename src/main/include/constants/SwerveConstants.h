@@ -77,7 +77,9 @@ inline frc::SwerveDriveKinematics<4> KINEMATICS{
     MODULE_LOCATIONS[3]};
 
 inline constexpr units::meters_per_second_t DRIVE_MAX_SPEED = ((DRIVE_MOTOR.freeSpeed / 1_rad) / DRIVE_GEARING) * WHEEL_RADIUS;
-inline constexpr units::radians_per_second_t DRIVE_MAX_ROT_SPEED = 720_deg_per_s;
+inline constexpr units::radians_per_second_t DRIVE_MAX_ROT_SPEED = 540_deg_per_s;
+inline constexpr units::meters_per_second_squared_t DRIVE_MAX_ACCEL = 20_fps_sq;
+inline constexpr units::radians_per_second_squared_t DRIVE_MAX_ROT_ACCEL = 720_deg_per_s_sq;
 }
 
 namespace gains {
@@ -135,6 +137,13 @@ inline const pathplanner::HolonomicPathFollowerConfig PATH_CONFIG{
         DYNAMIC_REPLAN_THRESHOLD_TOTAL,
         DYNAMIC_REPLAN_THRESHOLD_SPIKE
     }
+};
+
+inline constexpr pathplanner::PathConstraints constraints{
+    physical::DRIVE_MAX_SPEED,
+    physical::DRIVE_MAX_ACCEL,
+    physical::DRIVE_MAX_ROT_SPEED,
+    physical::DRIVE_MAX_ROT_ACCEL
 };
 }
 }

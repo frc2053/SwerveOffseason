@@ -19,7 +19,8 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   units::ampere_t GetSimulatedCurrentDraw() const;
   void UpdateSwerveOdom();
   frc2::CommandPtr PointWheelsToAngle(std::function<units::radian_t()> wheelAngle);
-  frc2::CommandPtr Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative); 
+  frc2::CommandPtr Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative);
+  frc2::CommandPtr AlignToAmp(); 
   frc2::CommandPtr SysIdSteerQuasistaticTorque(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdSteerDynamicTorque(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdDriveQuasistaticTorque(frc2::sysid::Direction dir);
