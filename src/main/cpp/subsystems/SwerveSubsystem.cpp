@@ -85,7 +85,7 @@ frc2::CommandPtr SwerveSubsystem::Drive(std::function<units::meters_per_second_t
 
 frc2::CommandPtr SwerveSubsystem::AlignToAmp() {
   auto alignToAmpPath = pathplanner::PathPlannerPath::fromChoreoTrajectory("AlignToAmp");
-  return pathplanner::AutoBuilder::pathfindThenFollowPath(alignToAmpPath, consts::swerve::pathplanning::constraints);
+  return pathplanner::AutoBuilder::pathfindThenFollowPath(alignToAmpPath, consts::swerve::pathplanning::constraints).WithName("AlignToAmp");
 }
 
 frc2::CommandPtr SwerveSubsystem::SysIdSteerQuasistaticTorque(frc2::sysid::Direction dir) {
