@@ -6,6 +6,7 @@
 
 #include <frc2/command/Commands.h>
 #include <frc/MathUtil.h>
+#include <str/DriverstationUtils.h>
 
 RobotContainer::RobotContainer() {
   ConfigureBindings();
@@ -14,10 +15,10 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureBindings() {
 
   swerveSubsystem.SetDefaultCommand(swerveSubsystem.Drive([this] {
-    return frc::ApplyDeadband<double>(-controller.GetLeftY(), .1) * consts::swerve::physical::DRIVE_MAX_SPEED;
+    return str::NegateIfRed(frc::ApplyDeadband<double>(-controller.GetLeftY(), .1) * consts::swerve::physical::DRIVE_MAX_SPEED);
   },
   [this] {
-    return frc::ApplyDeadband<double>(-controller.GetLeftX(), .1) * consts::swerve::physical::DRIVE_MAX_SPEED;
+    return str::NegateIfRed(frc::ApplyDeadband<double>(-controller.GetLeftX(), .1) * consts::swerve::physical::DRIVE_MAX_SPEED);
   },
   [this] {
     return frc::ApplyDeadband<double>(-controller.GetRightX(), .1) * consts::swerve::physical::DRIVE_MAX_ROT_SPEED;
