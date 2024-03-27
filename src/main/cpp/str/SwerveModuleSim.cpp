@@ -10,7 +10,6 @@ SwerveModuleSim::SwerveModuleSim(
   ctre::phoenix6::sim::TalonFXSimState& steerSimState,
   ctre::phoenix6::sim::CANcoderSimState& steerEncoderSimState
 )
-  //TODO: fix magic numbers
 : driveSim(physicalAttrib.driveMotor, physicalAttrib.driveGearing, 0.025_kg_sq_m),
   steerSim(physicalAttrib.steerMotor, physicalAttrib.steerGearing, 0.004_kg_sq_m),
   driveSimState(driveSimState),
