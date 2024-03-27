@@ -36,7 +36,7 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Ma
                                                             *cameraProps.get());
 
       visionSim->AddCamera(cameraSim.get(), robotToCamera);
-      cameraSim->EnableDrawWireframe(true);
+      cameraSim->EnableDrawWireframe(false);
     }
 }
 
