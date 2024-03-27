@@ -27,6 +27,14 @@ void SwerveSubsystem::SimulationPeriodic() {
   swerveDrive.SimulationPeriodic();
 }
 
+frc::Pose2d SwerveSubsystem::GetOdomPose() {
+  return swerveDrive.GetOdomPose();
+}
+
+frc::Pose2d SwerveSubsystem::GetRobotPose() {
+  return swerveDrive.GetPose();
+}
+
 units::ampere_t SwerveSubsystem::GetSimulatedCurrentDraw() const {
   return swerveDrive.GetSimulatedCurrentDraw();
 }

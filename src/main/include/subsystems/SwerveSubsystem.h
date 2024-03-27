@@ -17,6 +17,8 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   void Periodic() override;
   void SimulationPeriodic() override;
   units::ampere_t GetSimulatedCurrentDraw() const;
+  frc::Pose2d GetOdomPose();
+  frc::Pose2d GetRobotPose();
   void UpdateSwerveOdom();
   frc2::CommandPtr PointWheelsToAngle(std::function<units::radian_t()> wheelAngle);
   frc2::CommandPtr XPattern();

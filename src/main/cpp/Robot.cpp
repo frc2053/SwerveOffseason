@@ -13,6 +13,8 @@ void Robot::RobotInit() {
 
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
+
+  auto visionEstimates = m_container.GetVision().GetCameraEstimatedPoses();
 }
 
 void Robot::DisabledInit() {}
@@ -59,6 +61,8 @@ void Robot::SimulationPeriodic() {
   // FIXME: Current simulation is VERY wrong
   // units::volt_t battVoltage = frc::sim::BatterySim::Calculate({m_container.GetSwerveSubsystem().GetSimulatedCurrentDraw()});
   // frc::sim::RoboRioSim::SetVInVoltage(battVoltage);
+
+  m_container.GetVision().SimulationPeriodic(m_container.GetSwerveSubsystem().GetOdomPose());
 }
 
 #ifndef RUNNING_FRC_TESTS

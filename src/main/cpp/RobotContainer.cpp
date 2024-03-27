@@ -64,3 +64,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 SwerveSubsystem& RobotContainer::GetSwerveSubsystem() {
   return swerveSubsystem;
 }
+
+str::Vision& RobotContainer::GetVision() {
+  return vision;
+}
