@@ -28,6 +28,7 @@ public:
   frc::Pose2d GetOdomPose() const;
   frc::Pose2d GetPose() const;
   units::radian_t GetYawFromImu();
+  std::array<units::radian_t, 4> GetModuleDriveOutputShaftPositions();
   void SimulationPeriodic();
   void SetCharacterizationTorqueSteer(units::volt_t torqueAmps);
   void SetCharacterizationTorqueDrive(units::volt_t torqueAmps);

@@ -106,6 +106,22 @@ frc::SwerveModuleState SwerveModule::GetCurrentState() {
   return currentState;
 }
 
+units::radian_t SwerveModule::GetOutputShaftTurns() {
+  ctre::phoenix::StatusCode moduleSignalStatus = ctre::phoenix6::BaseStatusSignal::WaitForAll(
+    0_s,
+    drivePositionSig,
+    driveVelocitySig
+  );
+
+  if(!moduleSignalStatus.IsOK()) {
+    fmt::print("Error refreshing {} module signal in GetDriveMotorTurns()! Error was: {}\n", moduleName, moduleSignalStatus.GetName());
+  }
+
+  units::radian_t latencyCompDrivePos = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(drivePositionSig, driveVelocitySig);
+
+  return ConvertDriveMotorRotationsToWheelRotations(latencyCompDrivePos);
+}
+  
 frc::SwerveModuleState SwerveModule::UpdateSimulation(units::second_t deltaTime, units::volt_t supplyVoltage) {
   return moduleSim.Update(deltaTime, supplyVoltage);
 }

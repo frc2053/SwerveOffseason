@@ -19,6 +19,7 @@ public:
   // We return the optimized state to make sure we log what we actually set the module to
   frc::SwerveModuleState GoToState(frc::SwerveModuleState desiredState, bool optimize=true);
   frc::SwerveModulePosition GetCurrentPosition(bool refresh);
+  units::radian_t GetOutputShaftTurns();
   frc::SwerveModuleState GetCurrentState();
   frc::SwerveModuleState UpdateSimulation(units::second_t deltaTime, units::volt_t supplyVoltage);
   std::array<ctre::phoenix6::BaseStatusSignal*, 8> GetSignals();

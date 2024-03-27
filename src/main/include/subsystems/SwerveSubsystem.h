@@ -6,6 +6,7 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <str/SwerveDrive.h>
+#include <frc/filter/SlewRateLimiter.h>
 
 class SwerveSubsystem : public frc2::SubsystemBase {
  public:
@@ -29,6 +30,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   frc2::CommandPtr SysIdSteerDynamicVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdDriveQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdDriveDynamicVoltage(frc2::sysid::Direction dir);
+  frc2::CommandPtr WheelRadius(frc2::sysid::Direction dir);
  private:
   void SetupPathplanner();
 
@@ -123,4 +125,11 @@ class SwerveSubsystem : public frc2::SubsystemBase {
       "swerve-drive"
     }
   };
+
+  //For wheel radius calculation
+  units::radian_t lastGyroYaw;
+  units::radian_t accumGyroYaw;
+  std::array<units::radian_t, 4> startWheelPositions;
+  units::meter_t effectiveWheelRadius = 0_m;
+  frc::SlewRateLimiter<units::radians_per_second> omegaLimiter{1_rad_per_s / 1_s};
 };

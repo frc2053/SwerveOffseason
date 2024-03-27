@@ -84,6 +84,10 @@ units::radian_t SwerveDrive::GetYawFromImu() {
   return yawLatencyComped;
 }
 
+std::array<units::radian_t, 4> SwerveDrive::GetModuleDriveOutputShaftPositions() {
+  return {modules[0].GetOutputShaftTurns(), modules[1].GetOutputShaftTurns(), modules[2].GetOutputShaftTurns(), modules[3].GetOutputShaftTurns()};
+}
+
 void SwerveDrive::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize) {
   wpi::array<frc::SwerveModuleState, 4> finalState = desiredStates;
   frc::SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&finalState, consts::swerve::physical::DRIVE_MAX_SPEED);
