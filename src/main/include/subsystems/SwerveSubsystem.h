@@ -39,11 +39,10 @@ class SwerveSubsystem : public frc2::SubsystemBase {
       10_V / 1_s,
       30_V,
       10_s,
-      std::nullopt
-      // [this](frc::sysid::State state) {
-      //   ctre::phoenix6::SignalLogger().WriteString(
-      //       "state", frc::sysid::SysIdRoutineLog::StateEnumToString(state));
-      // }
+      [this](frc::sysid::State state) {
+        ctre::phoenix6::SignalLogger().WriteString(
+            "state", frc::sysid::SysIdRoutineLog::StateEnumToString(state));
+      }
     },
     frc2::sysid::Mechanism{
       [this](units::volt_t voltsToSend) {
@@ -62,11 +61,10 @@ class SwerveSubsystem : public frc2::SubsystemBase {
       std::nullopt,
       std::nullopt,
       std::nullopt,
-      std::nullopt
-      // [this](frc::sysid::State state) {
-      //   ctre::phoenix6::SignalLogger().WriteString(
-      //       "state", frc::sysid::SysIdRoutineLog::StateEnumToString(state));
-      // }
+      [this](frc::sysid::State state) {
+        ctre::phoenix6::SignalLogger().WriteString(
+            "state", frc::sysid::SysIdRoutineLog::StateEnumToString(state));
+      }
     },
     frc2::sysid::Mechanism{
       [this](units::volt_t voltsToSend) {
@@ -108,11 +106,10 @@ class SwerveSubsystem : public frc2::SubsystemBase {
       std::nullopt,
       std::nullopt,
       std::nullopt,
-      std::nullopt
-      // [this](frc::sysid::State state) {
-      //   ctre::phoenix6::SignalLogger().WriteString(
-      //       "state", frc::sysid::SysIdRoutineLog::StateEnumToString(state));
-      // }
+      [this](frc::sysid::State state) {
+        ctre::phoenix6::SignalLogger().WriteString(
+            "state", frc::sysid::SysIdRoutineLog::StateEnumToString(state));
+      }
     },
     frc2::sysid::Mechanism{
       [this](units::volt_t voltsToSend) {
