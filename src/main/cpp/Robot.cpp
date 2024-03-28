@@ -6,8 +6,12 @@
 
 #include <frc2/command/CommandScheduler.h>
 #include <frc/simulation/RoboRioSim.h>
+#include <frc/DataLogManager.h>
+#include <frc/DriverStation.h>
 
 void Robot::RobotInit() {
+  frc::DataLogManager::Start();
+  frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
   AddPeriodic([this] { m_container.GetSwerveSubsystem().UpdateSwerveOdom(); }, 1 / 250_Hz);
 }
 
