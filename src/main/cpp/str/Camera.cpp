@@ -46,6 +46,15 @@ photon::PhotonPipelineResult Camera::GetLatestResult() {
 std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
     auto visionEst = photonEstimator->Update();
     units::second_t latestTimestamp = camera->GetLatestResult().GetTimestamp();
+
+
+    //FIXME: waiting on wpilib for fix
+    //account for issue with NT sync not working correctly.
+    units::second_t now = frc::Timer::GetFPGATimestamp();
+    if(latestTimestamp > now) {
+        latestTimestamp = now;
+    }
+
     bool newResult = units::math::abs(latestTimestamp - lastEstTimestamp) > 1e-5_s;
     if (visionEst.has_value()) {
         posePub.Set(visionEst.value().estimatedPose.ToPose2d());

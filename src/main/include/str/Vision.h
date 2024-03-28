@@ -10,7 +10,7 @@
 namespace str {
 class Vision {
  public:
-  Vision();
+  Vision() = default;
   void SimulationPeriodic(frc::Pose2d simRobotPose);
   std::vector<std::optional<photon::EstimatedRobotPose>> GetCameraEstimatedPoses();
   std::vector<std::optional<Eigen::Matrix<double, 3, 1>>> GetPoseStdDevs(const std::vector<std::optional<photon::EstimatedRobotPose>>& poses);
