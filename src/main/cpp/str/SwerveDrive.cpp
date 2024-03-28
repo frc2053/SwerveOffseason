@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "str/SwerveDrive.h"
+#include "constants/Constants.h"
 
 using namespace str;
 
@@ -97,6 +98,21 @@ void SwerveDrive::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& d
     i++;
   }
   desiredStatesPub.Set(finalState);
+}
+
+void SwerveDrive::AddVisionMeasurement(const frc::Pose2d& visionMeasurement, units::second_t timestamp, const Eigen::Vector3d& stdDevs) {
+  // outside field, so we dont want to add this measurement to estimator,
+  // because we know its wrong
+  // TODO: Do we want to check if the edge of the robot is outside? Right now this only makes sure the center of the robot is outside
+  if (visionMeasurement.X() < 0_m || visionMeasurement.Y() < 0_m) {
+    return;
+  }
+  if (visionMeasurement.X() > consts::yearSpecific::aprilTagLayout.GetFieldLength() ||
+      visionMeasurement.Y() > consts::yearSpecific::aprilTagLayout.GetFieldWidth()) {
+    return;
+  }
+  wpi::array<double, 3> newStdDevs{stdDevs(0), stdDevs(1), stdDevs(2)};
+  poseEstimator.AddVisionMeasurement(visionMeasurement, timestamp, newStdDevs);
 }
 
 void SwerveDrive::UpdateSwerveOdom() {

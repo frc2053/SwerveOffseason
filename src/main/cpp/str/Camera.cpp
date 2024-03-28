@@ -1,5 +1,6 @@
 #include "str/Camera.h"
 #include <frc/RobotBase.h>
+#include "constants/Constants.h"
 
 using namespace str;
 
@@ -9,10 +10,8 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Ma
     singleTagDevs(singleTagDevs),
     multiTagDevs(multiTagDevs)
 {
-    frc::AprilTagFieldLayout layout = frc::LoadAprilTagLayoutField(frc::AprilTagField::k2024Crescendo);
-
     photonEstimator = std::make_unique<photon::PhotonPoseEstimator>(
-        layout, 
+        consts::yearSpecific::aprilTagLayout, 
         photon::PoseStrategy::MULTI_TAG_PNP_ON_COPROCESSOR,
         std::move(photon::PhotonCamera(cameraName)),
         robotToCamera
@@ -23,7 +22,7 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Ma
 
     if (frc::RobotBase::IsSimulation()) {
       visionSim = std::make_unique<photon::VisionSystemSim>(cameraName);
-      visionSim->AddAprilTags(layout);
+      visionSim->AddAprilTags(consts::yearSpecific::aprilTagLayout);
       cameraProps = std::make_unique<photon::SimCameraProperties>();
 
       cameraProps->SetCalibration(1600, 1200, frc::Rotation2d{90_deg});
@@ -36,7 +35,7 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Ma
                                                             *cameraProps.get());
 
       visionSim->AddCamera(cameraSim.get(), robotToCamera);
-      cameraSim->EnableDrawWireframe(false);
+      cameraSim->EnableDrawWireframe(true);
     }
 }
 
@@ -48,13 +47,11 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
     auto visionEst = photonEstimator->Update();
     units::second_t latestTimestamp = camera->GetLatestResult().GetTimestamp();
     bool newResult = units::math::abs(latestTimestamp - lastEstTimestamp) > 1e-5_s;
-    if (frc::RobotBase::IsSimulation()) {
-        if (visionEst.has_value()) {
+    if (visionEst.has_value()) {
         posePub.Set(visionEst.value().estimatedPose.ToPose2d());
-        } else {
+    } else {
         if (newResult) {
             posePub.Set({});
-        }
         }
     }
     if (newResult) {

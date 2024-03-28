@@ -18,6 +18,10 @@ void SwerveSubsystem::UpdateSwerveOdom()
   swerveDrive.UpdateSwerveOdom();
 }
 
+void SwerveSubsystem::AddVisionMeasurement(const frc::Pose2d& visionMeasurement, units::second_t timestamp, const Eigen::Vector3d& stdDevs) {
+  swerveDrive.AddVisionMeasurement(visionMeasurement, timestamp, stdDevs);
+}
+
 // This method will be called once per scheduler run
 void SwerveSubsystem::Periodic() {
   swerveDrive.UpdateNTEntries();

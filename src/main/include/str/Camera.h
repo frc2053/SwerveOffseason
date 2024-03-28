@@ -2,7 +2,6 @@
 
 #include <string>
 #include <frc/geometry/Transform3d.h>
-#include <frc/apriltag/AprilTagFieldLayout.h>
 #include <frc/apriltag/AprilTagFields.h>
 #include <photon/PhotonCamera.h>
 #include <photon/PhotonPoseEstimator.h>

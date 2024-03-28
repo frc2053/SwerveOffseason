@@ -20,6 +20,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   frc::Pose2d GetOdomPose();
   frc::Pose2d GetRobotPose();
   void UpdateSwerveOdom();
+  void AddVisionMeasurement(const frc::Pose2d& visionMeasurement, units::second_t timestamp, const Eigen::Vector3d& stdDevs);
   frc2::CommandPtr PointWheelsToAngle(std::function<units::radian_t()> wheelAngle);
   frc2::CommandPtr XPattern();
   frc2::CommandPtr Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative);

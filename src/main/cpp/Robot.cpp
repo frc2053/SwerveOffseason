@@ -13,8 +13,19 @@ void Robot::RobotInit() {
 
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
+  UpdateVision();
+}
 
+void Robot::UpdateVision() {
   auto visionEstimates = m_container.GetVision().GetCameraEstimatedPoses();
+  auto stdDevs = m_container.GetVision().GetPoseStdDevs(visionEstimates);
+  int i = 0;
+  for(const auto& est : visionEstimates) {
+    if(est.has_value()) {
+      //m_container.GetSwerveSubsystem().AddVisionMeasurement(est.value().estimatedPose.ToPose2d(), est.value().timestamp, stdDevs[i].value());
+    }
+    i++;
+  }
 }
 
 void Robot::DisabledInit() {}
