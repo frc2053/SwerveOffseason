@@ -8,7 +8,9 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Ma
     poseTopic(nt->GetStructTopic<frc::Pose2d>(cameraName + "PoseEstimation")),
     posePub(poseTopic.Publish()),
     singleTagDevs(singleTagDevs),
-    multiTagDevs(multiTagDevs)
+    multiTagDevs(multiTagDevs),
+    stdDevTopic(nt->GetStructTopic<frc::Pose2d>(cameraName + "StdDevs")),
+    stdDevPub(stdDevTopic.Publish())
 {
     photonEstimator = std::make_unique<photon::PhotonPoseEstimator>(
         consts::yearSpecific::aprilTagLayout, 
@@ -77,8 +79,8 @@ Eigen::Matrix<double, 3, 1> Camera::GetEstimationStdDevs(frc::Pose2d estimatedPo
     for (const auto& tgt : targetsfl) {
         auto tagPose = photonEstimator->GetFieldLayout().GetTagPose(tgt.GetFiducialId());
         if (tagPose.has_value()) {
-        numTags++;
-        avgDist += tagPose.value().ToPose2d().Translation().Distance(estimatedPose.Translation());
+            numTags++;
+            avgDist += tagPose.value().ToPose2d().Translation().Distance(estimatedPose.Translation());
         }
     }
     if (numTags == 0) {
@@ -93,6 +95,12 @@ Eigen::Matrix<double, 3, 1> Camera::GetEstimationStdDevs(frc::Pose2d estimatedPo
     } else {
         estStdDevs = estStdDevs * (1 + (avgDist.value() * avgDist.value() / 30));
     }
+
+    stdDevArr[0] = estStdDevs(0);
+    stdDevArr[1] = estStdDevs(1);
+    stdDevArr[2] = estStdDevs(2);
+
+    stdDevPub.Set(stdDevArr);
     return estStdDevs;
 }
 
