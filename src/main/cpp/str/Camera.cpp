@@ -4,7 +4,8 @@
 
 using namespace str;
 
-Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Matrix<double, 3, 1> singleTagStdDev, Eigen::Matrix<double, 3, 1> multiTagDevs) : 
+Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Matrix<double, 3, 1> singleTagStdDev, Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate) :
+    simulate(simulate),
     poseTopic(nt->GetStructTopic<frc::Pose2d>(cameraName + "PoseEstimation")),
     posePub(poseTopic.Publish()),
     singleTagDevs(singleTagDevs),
@@ -22,22 +23,24 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Ma
     camera->SetVersionCheckEnabled(false);
     photonEstimator->SetMultiTagFallbackStrategy(photon::PoseStrategy::LOWEST_AMBIGUITY);
 
-    if (frc::RobotBase::IsSimulation()) {
-      visionSim = std::make_unique<photon::VisionSystemSim>(cameraName);
-      visionSim->AddAprilTags(consts::yearSpecific::aprilTagLayout);
-      cameraProps = std::make_unique<photon::SimCameraProperties>();
+    if(simulate) {
+        if (frc::RobotBase::IsSimulation()) {
+        visionSim = std::make_unique<photon::VisionSystemSim>(cameraName);
+        visionSim->AddAprilTags(consts::yearSpecific::aprilTagLayout);
+        cameraProps = std::make_unique<photon::SimCameraProperties>();
 
-      cameraProps->SetCalibration(1600, 1200, frc::Rotation2d{90_deg});
-      cameraProps->SetCalibError(.35, .10);
-      cameraProps->SetFPS(45_Hz);
-      cameraProps->SetAvgLatency(20_ms);
-      cameraProps->SetLatencyStdDev(15_ms);
+        cameraProps->SetCalibration(1600, 1200, frc::Rotation2d{90_deg});
+        cameraProps->SetCalibError(.35, .10);
+        cameraProps->SetFPS(45_Hz);
+        cameraProps->SetAvgLatency(20_ms);
+        cameraProps->SetLatencyStdDev(15_ms);
 
-      cameraSim = std::make_shared<photon::PhotonCameraSim>(camera.get(),
-                                                            *cameraProps.get());
+        cameraSim = std::make_shared<photon::PhotonCameraSim>(camera.get(),
+                                                                *cameraProps.get());
 
-      visionSim->AddCamera(cameraSim.get(), robotToCamera);
-      cameraSim->EnableDrawWireframe(true);
+        visionSim->AddCamera(cameraSim.get(), robotToCamera);
+        cameraSim->EnableDrawWireframe(true);
+        }
     }
 }
 
@@ -105,5 +108,7 @@ Eigen::Matrix<double, 3, 1> Camera::GetEstimationStdDevs(frc::Pose2d estimatedPo
 }
 
 void Camera::SimPeriodic(frc::Pose2d robotSimPose) {
-    visionSim->Update(robotSimPose);
+    if(simulate) {
+        visionSim->Update(robotSimPose);
+    }
 }

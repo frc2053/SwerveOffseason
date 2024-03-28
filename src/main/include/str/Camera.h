@@ -14,12 +14,13 @@
 namespace str {
 class Camera {
 public:
-  Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Matrix<double, 3, 1> singleTagStdDev, Eigen::Matrix<double, 3, 1> multiTagDevs);
+  Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Matrix<double, 3, 1> singleTagStdDev, Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate);
   void SimPeriodic(frc::Pose2d robotSimPose);
   photon::PhotonPipelineResult GetLatestResult();
   std::optional<photon::EstimatedRobotPose> GetEstimatedGlobalPose();
   Eigen::Matrix<double, 3, 1> GetEstimationStdDevs(frc::Pose2d estimatedPose);
 private:
+  bool simulate;
   std::unique_ptr<photon::PhotonPoseEstimator> photonEstimator;
   std::shared_ptr<photon::PhotonCamera> camera;
   std::unique_ptr<photon::VisionSystemSim> visionSim;
