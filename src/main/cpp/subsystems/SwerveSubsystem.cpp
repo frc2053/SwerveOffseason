@@ -9,6 +9,7 @@
 #include <str/DriverstationUtils.h>
 
 SwerveSubsystem::SwerveSubsystem() {
+  SetName("SwerveSubsystem");
   frc::SmartDashboard::PutData(this);
   SetupPathplanner();
 }
