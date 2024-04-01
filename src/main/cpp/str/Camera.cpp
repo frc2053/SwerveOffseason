@@ -53,6 +53,11 @@ photon::PhotonPipelineResult Camera::GetLatestResult() {
 }
 
 std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
+
+    if(!simulate) {
+        return std::nullopt;
+    }
+
     auto visionEst = photonEstimator->Update();
     units::second_t latestTimestamp = camera->GetLatestResult().GetTimestamp();
 
@@ -103,9 +108,11 @@ Eigen::Matrix<double, 3, 1> Camera::GetEstimationStdDevs(frc::Pose2d estimatedPo
         estStdDevs = estStdDevs * (1 + (avgDist.value() * avgDist.value() / 30));
     }
 
-    stdDevXPosePub.Set(estStdDevs(0));
-    stdDevYPosePub.Set(estStdDevs(1));
-    stdDevRotPosePub.Set(estStdDevs(2));
+    if(!simulate) {
+        stdDevXPosePub.Set(estStdDevs(0));
+        stdDevYPosePub.Set(estStdDevs(1));
+        stdDevRotPosePub.Set(estStdDevs(2));
+    }
 
     return estStdDevs;
 }

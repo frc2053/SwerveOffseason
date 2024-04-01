@@ -4,6 +4,7 @@
 
 #include "str/SwerveDrive.h"
 #include "constants/Constants.h"
+#include "str/Math.h"
 
 using namespace str;
 
@@ -103,16 +104,14 @@ void SwerveDrive::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& d
 void SwerveDrive::AddVisionMeasurement(const frc::Pose2d& visionMeasurement, units::second_t timestamp, const Eigen::Vector3d& stdDevs) {
   // outside field, so we dont want to add this measurement to estimator,
   // because we know its wrong
-  // TODO: Do we want to check if the edge of the robot is outside? Right now this only makes sure the center of the robot is outside
-  if (visionMeasurement.X() < 0_m || visionMeasurement.Y() < 0_m) {
-    return;
+  // TODO: Maybe add a small a buffer around the robots frame to add poses that could be valid due to bumper compression
+  if(math::IsPoseInsideField(visionMeasurement)) {
+    wpi::array<double, 3> newStdDevs{stdDevs(0), stdDevs(1), stdDevs(2)};
+    poseEstimator.AddVisionMeasurement(visionMeasurement, timestamp, newStdDevs);
   }
-  if (visionMeasurement.X() > consts::yearSpecific::aprilTagLayout.GetFieldLength() ||
-      visionMeasurement.Y() > consts::yearSpecific::aprilTagLayout.GetFieldWidth()) {
-    return;
+  else {
+    fmt::print("WARNING: Vision pose was outside of field! Not adding to estimator!");
   }
-  wpi::array<double, 3> newStdDevs{stdDevs(0), stdDevs(1), stdDevs(2)};
-  poseEstimator.AddVisionMeasurement(visionMeasurement, timestamp, newStdDevs);
 }
 
 void SwerveDrive::UpdateSwerveOdom() {

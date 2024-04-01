@@ -27,7 +27,7 @@ void Robot::UpdateVision() {
   int i = 0;
   for(const auto& est : visionEstimates) {
     if(est.has_value()) {
-      //m_container.GetSwerveSubsystem().AddVisionMeasurement(est.value().estimatedPose.ToPose2d(), est.value().timestamp, stdDevs[i].value());
+      m_container.GetSwerveSubsystem().AddVisionMeasurement(est.value().estimatedPose.ToPose2d(), est.value().timestamp, stdDevs[i].value());
     }
     i++;
   }
