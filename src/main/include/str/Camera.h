@@ -35,8 +35,11 @@ private:
   nt::StructTopic<frc::Pose2d> poseTopic;
   nt::StructPublisher<frc::Pose2d> posePub;
 
-  std::array<double, 3> stdDevArr;
-  nt::DoubleArrayTopic stdDevTopic;
-  nt::DoubleArrayPublisher stdDevPub;
+  nt::DoubleTopic stdDevXPoseTopic;
+  nt::DoublePublisher stdDevXPosePub;
+  nt::DoubleTopic stdDevYPoseTopic;
+  nt::DoublePublisher stdDevYPosePub;
+  nt::DoubleTopic stdDevRotPoseTopic;
+  nt::DoublePublisher stdDevRotPosePub;
 };
 }

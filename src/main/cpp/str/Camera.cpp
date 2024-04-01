@@ -10,8 +10,12 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Ma
     posePub(poseTopic.Publish()),
     singleTagDevs(singleTagDevs),
     multiTagDevs(multiTagDevs),
-    stdDevTopic(nt->GetStructTopic<frc::Pose2d>(cameraName + "StdDevs")),
-    stdDevPub(stdDevTopic.Publish())
+    stdDevXPoseTopic(nt->GetStructTopic<frc::Pose2d>(cameraName + "StdDevsX")),
+    stdDevXPosePub(stdDevXPoseTopic.Publish()),
+    stdDevYPoseTopic(nt->GetStructTopic<frc::Pose2d>(cameraName + "StdDevsY")),
+    stdDevYPosePub(stdDevYPoseTopic.Publish()),
+    stdDevRotPoseTopic(nt->GetStructTopic<frc::Pose2d>(cameraName + "StdDevsRot")),
+    stdDevRotPosePub(stdDevRotPoseTopic.Publish())
 {
     photonEstimator = std::make_unique<photon::PhotonPoseEstimator>(
         consts::yearSpecific::aprilTagLayout, 
@@ -76,10 +80,10 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
 
 Eigen::Matrix<double, 3, 1> Camera::GetEstimationStdDevs(frc::Pose2d estimatedPose) {
     Eigen::Matrix<double, 3, 1> estStdDevs = singleTagDevs;
-    auto targetsfl = GetLatestResult().GetTargets();
+    auto targets = GetLatestResult().GetTargets();
     int numTags = 0;
     units::meter_t avgDist = 0_m;
-    for (const auto& tgt : targetsfl) {
+    for (const auto& tgt : targets) {
         auto tagPose = photonEstimator->GetFieldLayout().GetTagPose(tgt.GetFiducialId());
         if (tagPose.has_value()) {
             numTags++;
@@ -99,11 +103,10 @@ Eigen::Matrix<double, 3, 1> Camera::GetEstimationStdDevs(frc::Pose2d estimatedPo
         estStdDevs = estStdDevs * (1 + (avgDist.value() * avgDist.value() / 30));
     }
 
-    stdDevArr[0] = estStdDevs(0);
-    stdDevArr[1] = estStdDevs(1);
-    stdDevArr[2] = estStdDevs(2);
+    stdDevXPosePub.Set(estStdDevs(0));
+    stdDevYPosePub.Set(estStdDevs(1));
+    stdDevRotPosePub.Set(estStdDevs(2));
 
-    stdDevPub.Set(stdDevArr);
     return estStdDevs;
 }
 
