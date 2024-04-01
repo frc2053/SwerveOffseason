@@ -24,7 +24,7 @@ SwerveDrive::SwerveDrive() {
   allSignals[allSignals.size() - 1] = &imu.GetAngularVelocityZWorld();
 
   for(const auto& sig : allSignals) {
-    sig->SetUpdateFrequency(250_Hz);
+    sig->SetUpdateFrequency(1 / consts::LOOP_PERIOD);
   }
 
   for(auto& mod : modules) {
@@ -116,7 +116,7 @@ void SwerveDrive::AddVisionMeasurement(const frc::Pose2d& visionMeasurement, uni
 }
 
 void SwerveDrive::UpdateSwerveOdom() {
-  ctre::phoenix::StatusCode status = ctre::phoenix6::BaseStatusSignal::WaitForAll(2.0 / 250_Hz, allSignals);
+  ctre::phoenix::StatusCode status = ctre::phoenix6::BaseStatusSignal::WaitForAll(2.0 / (1 / consts::LOOP_PERIOD), allSignals);
 
   // if(!status.IsOK()) {
   //   fmt::print("Error updating swerve odom! Error was: {}\n", status.GetName());

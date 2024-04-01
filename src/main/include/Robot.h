@@ -12,10 +12,11 @@
 #include "RobotContainer.h"
 #include "str/SwerveModule.h"
 #include <frc/simulation/BatterySim.h>
+#include "constants/Constants.h"
 
 class Robot : public frc::TimedRobot {
  public:
-  Robot() : frc::TimedRobot(1 / 250_Hz) {};
+  Robot() : frc::TimedRobot(consts::LOOP_PERIOD) {};
   void RobotInit() override;
   void RobotPeriodic() override;
   void DisabledInit() override;

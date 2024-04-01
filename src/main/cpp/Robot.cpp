@@ -10,10 +10,10 @@
 #include <frc/DriverStation.h>
 
 void Robot::RobotInit() {
-  frc2::CommandScheduler::GetInstance().SetPeriod(1 / 250_Hz);
+  frc2::CommandScheduler::GetInstance().SetPeriod(consts::LOOP_PERIOD);
   frc::DataLogManager::Start();
   frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
-  AddPeriodic([this] { m_container.GetSwerveSubsystem().UpdateSwerveOdom(); }, 1 / 250_Hz);
+  AddPeriodic([this] { m_container.GetSwerveSubsystem().UpdateSwerveOdom(); }, consts::LOOP_PERIOD);
 }
 
 void Robot::RobotPeriodic() {
