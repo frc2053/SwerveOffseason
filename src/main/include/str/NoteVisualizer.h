@@ -9,12 +9,19 @@
 #include <networktables/StructTopic.h>
 #include "constants/Constants.h"
 #include <units/velocity.h>
+#include <frc/kinematics/ChassisSpeeds.h>
 
 namespace str {
 
+struct NoteVelocity {
+  units::meters_per_second_t xVel;
+  units::meters_per_second_t yVel;
+  units::meters_per_second_t zVel;
+};
+
 struct FlyingNote {
   frc::Pose3d initialPose{};
-  units::meters_per_second_t initialVelocity{};
+  NoteVelocity initialVelocity{};
   frc::Pose3d currentPose{};
 };
 
@@ -22,7 +29,7 @@ class NoteVisualizer {
 public:
   NoteVisualizer();
   void Periodic();
-  void LaunchNote(frc::Pose3d currentRobotPose, frc::Pose3d noteExitPose, units::meters_per_second_t initialVelocity);
+  void LaunchNote(frc::Pose3d currentRobotPose, frc::ChassisSpeeds robotCurrentVelocity, frc::Pose3d noteExitPose, units::meters_per_second_t initialVelocity);
 private:
   void UpdateLaunchedNotes();
   void ProjectileMotion(FlyingNote& note);

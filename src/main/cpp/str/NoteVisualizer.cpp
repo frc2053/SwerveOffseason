@@ -12,8 +12,16 @@ NoteVisualizer::NoteVisualizer()  {
     robotNotePub.Set(robotNote);
 }
 
-void NoteVisualizer::LaunchNote(frc::Pose3d currentRobotPose, frc::Pose3d noteExitPose, units::meters_per_second_t initialVelocity) {
+void NoteVisualizer::LaunchNote(frc::Pose3d currentRobotPose, frc::ChassisSpeeds robotCurrentVelocity, frc::Pose3d noteExitPose, units::meters_per_second_t initialVelocity) {
+    NoteVelocity noteVelocity;
+    noteVelocity.xVel = robotCurrentVelocity.vx + initialVelocity;
+    noteVelocity.yVel = robotCurrentVelocity.vy + initialVelocity;
+    noteVelocity.zVel = 0_mps;
 
+    FlyingNote noteToAdd;
+    noteToAdd.initialPose = currentRobotPose.RelativeTo(noteExitPose);
+    noteToAdd.initialVelocity = noteVelocity;
+    noteToAdd.currentPose = noteToAdd.initialPose;
 }
 
 void NoteVisualizer::Periodic() {
@@ -29,6 +37,6 @@ void NoteVisualizer::UpdateLaunchedNotes() {
 }
 
 void NoteVisualizer::ProjectileMotion(FlyingNote& note) {
-    
+    //note.
 }
 
