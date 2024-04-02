@@ -68,3 +68,7 @@ SwerveSubsystem& RobotContainer::GetSwerveSubsystem() {
 str::Vision& RobotContainer::GetVision() {
   return vision;
 }
+
+str::NoteVisualizer& RobotContainer::GetNoteVisualizer() {
+  return noteVisualizer;
+}

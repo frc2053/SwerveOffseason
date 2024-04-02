@@ -1,6 +1,8 @@
 #pragma once
 
 #include <frc/apriltag/AprilTagFieldLayout.h>
+#include <units/time.h>
+#include <units/frequency.h>
 
 namespace consts {
 

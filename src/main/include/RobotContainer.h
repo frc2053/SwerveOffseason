@@ -9,6 +9,7 @@
 #include "str/Vision.h"
 #include <frc2/command/button/CommandXboxController.h>
 #include "Autos.h"
+#include "str/NoteVisualizer.h"
 
 class RobotContainer {
  public:
@@ -18,6 +19,7 @@ class RobotContainer {
 
   SwerveSubsystem& GetSwerveSubsystem();
   str::Vision& GetVision();
+  str::NoteVisualizer& GetNoteVisualizer();
 
  private:
   void ConfigureBindings();
@@ -25,6 +27,7 @@ class RobotContainer {
   
   SwerveSubsystem swerveSubsystem;
   str::Vision vision;
+  str::NoteVisualizer noteVisualizer;
 
   Autos autos;
 };
