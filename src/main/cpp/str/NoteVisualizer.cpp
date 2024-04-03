@@ -4,6 +4,7 @@
 
 #include "str/NoteVisualizer.h"
 #include <frc/Timer.h>
+#include <units/acceleration.h>
 
 using namespace str;
 
@@ -15,13 +16,19 @@ NoteVisualizer::NoteVisualizer()  {
 
 void NoteVisualizer::LaunchNote(frc::Pose3d currentRobotPose, frc::ChassisSpeeds robotCurrentVelocity, frc::Transform3d noteExitPose, units::meters_per_second_t initialVelocity) {
     NoteVelocity noteVelocity;
-    noteVelocity.xVel = 0_mps;
-    noteVelocity.yVel = robotCurrentVelocity.vy + units::math::sin(noteExitPose.Rotation().Y()) * initialVelocity;
-    noteVelocity.zVel = robotCurrentVelocity.vx + units::math::cos(noteExitPose.Rotation().X()) * initialVelocity;
+    noteVelocity.xVel =  robotCurrentVelocity.vx + (units::math::cos(-noteExitPose.Rotation().Y()) * initialVelocity);
+    noteVelocity.yVel = robotCurrentVelocity.vy;
+    noteVelocity.zVel = units::math::sin(-noteExitPose.Rotation().Y()) * initialVelocity;
+
+    frc::Translation3d noteRotatedVel = frc::Translation3d{Eigen::Vector3d{noteVelocity.xVel.value(), noteVelocity.yVel.value(), noteVelocity.zVel.value()}}.RotateBy(currentRobotPose.Rotation());
+    noteVelocity.xVel = units::meters_per_second_t{noteRotatedVel.X().value()};
+    noteVelocity.yVel = units::meters_per_second_t{noteRotatedVel.Y().value()};
+    noteVelocity.zVel = units::meters_per_second_t{noteRotatedVel.Z().value()};
 
     FlyingNote noteToAdd;
     noteToAdd.initialPose = currentRobotPose.TransformBy(noteExitPose);
     noteToAdd.initialVelocity = noteVelocity;
+    noteToAdd.currentVelocity = noteVelocity;
     noteToAdd.currentPose = noteToAdd.initialPose;
 
     launchedNotes.emplace_back(noteToAdd);
@@ -37,6 +44,8 @@ void NoteVisualizer::Periodic() {
     stagedNotesPub.Set(initialNoteLocations);
     launchedNotesPub.Set(launchedNotePoses);
     robotNotePub.Set(robotNote);
+
+    lastLoopTime = now;
 }
 
 void NoteVisualizer::UpdateLaunchedNotes(units::second_t loopTime) {
@@ -49,13 +58,26 @@ void NoteVisualizer::UpdateLaunchedNotes(units::second_t loopTime) {
 }
 
 void NoteVisualizer::ProjectileMotion(FlyingNote& note, units::second_t loopTime) {
-    note.currentPose = note.currentPose.TransformBy(
-        frc::Transform3d{
-            note.initialVelocity.xVel * loopTime, 
-            note.initialVelocity.yVel * loopTime, 
-            note.initialVelocity.zVel * loopTime, 
-            frc::Rotation3d{}
-        }
-    );
+    
+    note.currentVelocity.zVel = note.currentVelocity.zVel - (9.81_mps_sq * loopTime);
+
+    frc::Pose3d newPose{
+        frc::Translation3d{
+            note.currentPose.X() + (note.currentVelocity.xVel * loopTime),
+            note.currentPose.Y() + (note.currentVelocity.yVel * loopTime),
+            note.currentPose.Z() + (note.currentVelocity.zVel * loopTime),
+        },
+        note.currentPose.Rotation()
+    };
+
+    if(newPose.Z() <= 1_in) {
+        frc::Pose3d groundPose{newPose.X(), newPose.Y(), 1_in, frc::Rotation3d{}};
+        newPose = groundPose;
+        note.currentVelocity.xVel = 0_mps;
+        note.currentVelocity.yVel = 0_mps;
+        note.currentVelocity.zVel = 0_mps;
+    }
+
+    note.currentPose = newPose;
 }
 

@@ -40,6 +40,10 @@ frc::Pose2d SwerveSubsystem::GetRobotPose() {
   return swerveDrive.GetPose();
 }
 
+frc::ChassisSpeeds SwerveSubsystem::GetRobotRelativeSpeed() const {
+  return swerveDrive.GetRobotRelativeSpeeds();
+}
+
 units::ampere_t SwerveSubsystem::GetSimulatedCurrentDraw() const {
   return swerveDrive.GetSimulatedCurrentDraw();
 }

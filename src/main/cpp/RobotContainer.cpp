@@ -34,9 +34,9 @@ void RobotContainer::ConfigureBindings() {
   controller.A().OnTrue(frc2::cmd::RunOnce([this] {
     noteVisualizer.LaunchNote(
       frc::Pose3d{swerveSubsystem.GetRobotPose()}, 
-      frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s}, 
-      frc::Transform3d{frc::Translation3d{0_m, 0_m, 12_in}, frc::Rotation3d{0_deg, -45_deg, 0_deg}}, 
-      0.001_fps
+      swerveSubsystem.GetRobotRelativeSpeed(), 
+      frc::Transform3d{frc::Translation3d{0_m, 0_m, 12_in}, frc::Rotation3d{0_deg, -30_deg, 0_deg}}, 
+      41.71_fps
     );
   }));
 

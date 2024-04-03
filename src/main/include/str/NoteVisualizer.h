@@ -22,6 +22,7 @@ struct NoteVelocity {
 struct FlyingNote {
   frc::Pose3d initialPose{};
   NoteVelocity initialVelocity{};
+  NoteVelocity currentVelocity{};
   frc::Pose3d currentPose{};
 };
 
