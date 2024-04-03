@@ -31,6 +31,15 @@ void RobotContainer::ConfigureBindings() {
   controller.Back().WhileTrue(swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));
   controller.Start().WhileTrue(swerveSubsystem.WheelRadius(frc2::sysid::Direction::kForward));
 
+  controller.A().OnTrue(frc2::cmd::RunOnce([this] {
+    noteVisualizer.LaunchNote(
+      frc::Pose3d{swerveSubsystem.GetRobotPose()}, 
+      frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s}, 
+      frc::Transform3d{frc::Translation3d{0_m, 0_m, 12_in}, frc::Rotation3d{0_deg, -45_deg, 0_deg}}, 
+      0.001_fps
+    );
+  }));
+
   // controller.A().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticTorque(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticTorque(frc2::sysid::Direction::kReverse));
   // controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kForward));

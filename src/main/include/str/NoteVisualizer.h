@@ -29,10 +29,12 @@ class NoteVisualizer {
 public:
   NoteVisualizer();
   void Periodic();
-  void LaunchNote(frc::Pose3d currentRobotPose, frc::ChassisSpeeds robotCurrentVelocity, frc::Pose3d noteExitPose, units::meters_per_second_t initialVelocity);
+  void LaunchNote(frc::Pose3d currentRobotPose, frc::ChassisSpeeds robotCurrentVelocity, frc::Transform3d noteExitPose, units::meters_per_second_t initialVelocity);
 private:
-  void UpdateLaunchedNotes();
-  void ProjectileMotion(FlyingNote& note);
+  void UpdateLaunchedNotes(units::second_t loopTime);
+  void ProjectileMotion(FlyingNote& note, units::second_t loopTime);
+
+  units::second_t lastLoopTime;
 
   static constexpr units::meter_t NOTE_VERTICAL_SPACING = 57_in;
   static constexpr units::meter_t NOTE_MIDDLE_SPACING = 66_in;
