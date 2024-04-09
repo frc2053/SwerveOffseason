@@ -6,6 +6,7 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <str/SwerveDrive.h>
+#include "constants/Constants.h"
 
 class SwerveSubsystem : public frc2::SubsystemBase {
  public:
@@ -19,12 +20,14 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   units::ampere_t GetSimulatedCurrentDraw() const;
   frc::Pose2d GetOdomPose();
   frc::Pose2d GetRobotPose();
+  frc::ChassisSpeeds GetFieldRelativeSpeed();
   frc::ChassisSpeeds GetRobotRelativeSpeed() const;
   void UpdateSwerveOdom();
   void AddVisionMeasurement(const frc::Pose2d& visionMeasurement, units::second_t timestamp, const Eigen::Vector3d& stdDevs);
   frc2::CommandPtr PointWheelsToAngle(std::function<units::radian_t()> wheelAngle);
   frc2::CommandPtr XPattern();
   frc2::CommandPtr Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative);
+  frc2::CommandPtr PIDToPose(std::function<frc::Pose2d()> goalPose);
   frc2::CommandPtr AlignToAmp(); 
   frc2::CommandPtr SysIdSteerQuasistaticTorque(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdSteerDynamicTorque(frc2::sysid::Direction dir);
@@ -37,9 +40,49 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   frc2::CommandPtr WheelRadius(frc2::sysid::Direction dir);
  private:
   void SetupPathplanner();
+  frc::Translation2d GetAmpLocation();
+  bool IsNearAmp();
+
+  frc::TrapezoidProfile<units::meters>::Constraints translationConstraints{
+    consts::swerve::physical::DRIVE_MAX_SPEED,
+    consts::swerve::physical::DRIVE_MAX_ACCEL,
+  };
+
+  frc::TrapezoidProfile<units::radians>::Constraints rotationConstraints{
+    consts::swerve::physical::DRIVE_MAX_ROT_SPEED,
+    consts::swerve::physical::DRIVE_MAX_ROT_ACCEL,
+  };
+
+  frc::ProfiledPIDController<units::meters> xPoseController{
+    consts::swerve::pathplanning::POSE_P,
+    consts::swerve::pathplanning::POSE_I,
+    consts::swerve::pathplanning::POSE_D,
+    translationConstraints,
+    consts::LOOP_PERIOD
+  };
+
+  frc::ProfiledPIDController<units::meters> yPoseController{
+    consts::swerve::pathplanning::POSE_P,
+    consts::swerve::pathplanning::POSE_I,
+    consts::swerve::pathplanning::POSE_D,
+    translationConstraints,
+    consts::LOOP_PERIOD
+  };
+
+  frc::ProfiledPIDController<units::radians> thetaController{
+    consts::swerve::pathplanning::ROTATION_P,
+    consts::swerve::pathplanning::ROTATION_I,
+    consts::swerve::pathplanning::ROTATION_D,
+    rotationConstraints,
+    consts::LOOP_PERIOD
+  };
 
   str::SwerveDrive swerveDrive;
   str::WheelRadiusCharData wheelRadData;
+
+  std::shared_ptr<nt::NetworkTable> nt{nt::NetworkTableInstance::GetDefault().GetTable("SwerveDrive")};
+  nt::StructTopic<frc::Pose2d> pidPoseSetpointTopic{nt->GetStructTopic<frc::Pose2d>("PIDToPoseSetpoint")};
+  nt::StructPublisher<frc::Pose2d> pidPoseSetpointPub{pidPoseSetpointTopic.Publish()};
 
   //It says volts, because sysid only supports volts for now. But we are using current anyway
   frc2::sysid::SysIdRoutine steerTorqueSysid{

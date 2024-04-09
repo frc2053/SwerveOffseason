@@ -10,5 +10,7 @@ inline constexpr units::second_t LOOP_PERIOD = 1 / 250_Hz;
 
 namespace yearSpecific {
     inline const frc::AprilTagFieldLayout aprilTagLayout = frc::LoadAprilTagLayoutField(frc::AprilTagField::k2024Crescendo);
+    inline constexpr frc::Translation2d ampLocation{1.838_m, 7.782_m};
+    inline constexpr units::meter_t closeToAmpDistance{2_ft};
 }
 }

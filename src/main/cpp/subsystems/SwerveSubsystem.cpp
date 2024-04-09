@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/SwerveSubsystem.h"
+#include "constants/Constants.h"
 #include <frc2/command/Commands.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
@@ -38,6 +39,10 @@ frc::Pose2d SwerveSubsystem::GetOdomPose() {
 
 frc::Pose2d SwerveSubsystem::GetRobotPose() {
   return swerveDrive.GetPose();
+}
+
+frc::ChassisSpeeds SwerveSubsystem::GetFieldRelativeSpeed() {
+  return frc::ChassisSpeeds::FromRobotRelativeSpeeds(swerveDrive.GetRobotRelativeSpeeds(), GetRobotPose().Rotation()); 
 }
 
 frc::ChassisSpeeds SwerveSubsystem::GetRobotRelativeSpeed() const {
@@ -94,15 +99,73 @@ void SwerveSubsystem::SetupPathplanner() {
   );
 }
 
+frc::Translation2d SwerveSubsystem::GetAmpLocation() {
+  frc::Translation2d ampToGoTo = consts::yearSpecific::ampLocation;
+  if(str::IsOnRed()) {
+    ampToGoTo = pathplanner::GeometryUtil::flipFieldPosition(ampToGoTo);
+  }
+  return ampToGoTo;
+}
+
+bool SwerveSubsystem::IsNearAmp() {
+  return GetRobotPose().Translation().Distance(GetAmpLocation()) < consts::yearSpecific::closeToAmpDistance;
+}
+
 frc2::CommandPtr SwerveSubsystem::Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative) {
   return frc2::cmd::Run([this, xVel, yVel, omega, fieldRelative] {
     swerveDrive.Drive(xVel(), yVel(), omega(), fieldRelative);
   }, {this}).WithName("Drive Command");
 }
 
+frc2::CommandPtr SwerveSubsystem::PIDToPose(std::function<frc::Pose2d()> goalPose) {
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([this, goalPose] {
+      frc::Pose2d currentPose = GetRobotPose();
+      frc::ChassisSpeeds currentSpeeds = GetFieldRelativeSpeed();
+      xPoseController.Reset(currentPose.Translation().X(), currentSpeeds.vx);
+      yPoseController.Reset(currentPose.Translation().Y(), currentSpeeds.vy);
+      thetaController.Reset(currentPose.Rotation().Radians(), currentSpeeds.omega);
+      thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi}, units::radian_t{std::numbers::pi});
+      xPoseController.SetGoal(goalPose().X());
+      yPoseController.SetGoal(goalPose().Y());
+      thetaController.SetGoal(goalPose().Rotation().Radians());
+      xPoseController.SetTolerance(consts::swerve::pathplanning::translationalPIDTolerance, consts::swerve::pathplanning::translationalVelPIDTolerance);
+      yPoseController.SetTolerance(consts::swerve::pathplanning::translationalPIDTolerance, consts::swerve::pathplanning::translationalVelPIDTolerance);
+      thetaController.SetTolerance(consts::swerve::pathplanning::rotationalPIDTolerance, consts::swerve::pathplanning::rotationalVelPIDTolerance);
+      pidPoseSetpointPub.Set(goalPose());
+    }, {this}).WithName("PIDToPose Init"),
+    frc2::cmd::Run([this] {
+      frc::Pose2d currentPose = GetRobotPose();
+
+
+      units::meters_per_second_t xSpeed{xPoseController.Calculate(currentPose.Translation().X())};
+      units::meters_per_second_t ySpeed{yPoseController.Calculate(currentPose.Translation().Y())};
+      units::radians_per_second_t thetaSpeed{thetaController.Calculate(currentPose.Rotation().Radians())};
+      
+      swerveDrive.Drive(
+        xSpeed, 
+        ySpeed,
+        thetaSpeed,
+        true
+      );
+    }, {this}).Until([this] {
+      return xPoseController.AtGoal() && yPoseController.AtGoal() && thetaController.AtGoal();
+    }).WithName("PIDToPose Run"),
+    frc2::cmd::Run([this] {
+      swerveDrive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
+    }).WithName("PIDToPose Stop")
+  ).WithName("PIDToPose");
+}
+
 frc2::CommandPtr SwerveSubsystem::AlignToAmp() {
   auto alignToAmpPath = pathplanner::PathPlannerPath::fromChoreoTrajectory("AlignToAmp");
-  return pathplanner::AutoBuilder::pathfindThenFollowPath(alignToAmpPath, consts::swerve::pathplanning::constraints).WithName("AlignToAmp");
+
+  //If we are close enough to the amp, just pid there
+  return frc2::cmd::Either(
+    PIDToPose([this] { return frc::Pose2d{GetAmpLocation(), frc::Rotation2d{90_deg}}; }),
+    pathplanner::AutoBuilder::pathfindThenFollowPath(alignToAmpPath, consts::swerve::pathplanning::constraints).WithName("AlignToAmp"),
+    [this] { return IsNearAmp(); }
+  );
 }
 
 frc2::CommandPtr SwerveSubsystem::SysIdSteerQuasistaticTorque(frc2::sysid::Direction dir) {
