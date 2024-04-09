@@ -134,20 +134,31 @@ frc2::CommandPtr SwerveSubsystem::PIDToPose(std::function<frc::Pose2d()> goalPos
       thetaController.SetTolerance(consts::swerve::pathplanning::rotationalPIDTolerance, consts::swerve::pathplanning::rotationalVelPIDTolerance);
       pidPoseSetpointPub.Set(goalPose());
     }, {this}).WithName("PIDToPose Init"),
-    frc2::cmd::Run([this] {
+    frc2::cmd::Run([this, goalPose] {
       frc::Pose2d currentPose = GetRobotPose();
 
+      units::meters_per_second_t xFF = xPoseController.GetSetpoint().velocity;
+      units::meters_per_second_t yFF = yPoseController.GetSetpoint().velocity;
+      units::radians_per_second_t rotFF = thetaController.GetSetpoint().velocity;
 
       units::meters_per_second_t xSpeed{xPoseController.Calculate(currentPose.Translation().X())};
       units::meters_per_second_t ySpeed{yPoseController.Calculate(currentPose.Translation().Y())};
       units::radians_per_second_t thetaSpeed{thetaController.Calculate(currentPose.Rotation().Radians())};
+
+      frc::SmartDashboard::PutNumber("xFF", xFF.value());
+      frc::SmartDashboard::PutNumber("yFF", yFF.value());
+      frc::SmartDashboard::PutNumber("thetaFF", rotFF.value());
+      frc::SmartDashboard::PutNumber("xPid", xSpeed.value());
+      frc::SmartDashboard::PutNumber("yPid", ySpeed.value());
+      frc::SmartDashboard::PutNumber("thetaPid", thetaSpeed.value());
+
       
-      swerveDrive.Drive(
-        xSpeed, 
-        ySpeed,
-        thetaSpeed,
-        true
-      );
+      swerveDrive.DriveRobotRelative(
+        frc::ChassisSpeeds::FromFieldRelativeSpeeds(frc::ChassisSpeeds{
+        xFF + xSpeed, 
+        yFF + ySpeed,
+        rotFF + thetaSpeed,
+      }, currentPose.Rotation()));
     }, {this}).Until([this] {
       return xPoseController.AtGoal() && yPoseController.AtGoal() && thetaController.AtGoal();
     }).WithName("PIDToPose Run"),
@@ -164,7 +175,7 @@ frc2::CommandPtr SwerveSubsystem::AlignToAmp() {
   return frc2::cmd::Either(
     PIDToPose([this] { return frc::Pose2d{GetAmpLocation(), frc::Rotation2d{90_deg}}; }),
     pathplanner::AutoBuilder::pathfindThenFollowPath(alignToAmpPath, consts::swerve::pathplanning::constraints).WithName("AlignToAmp"),
-    [this] { return IsNearAmp(); }
+    [this] { return true; }
   );
 }
 

@@ -90,7 +90,7 @@ inline frc::SwerveDriveKinematics<4> KINEMATICS{
 
 inline constexpr units::meters_per_second_t DRIVE_MAX_SPEED = ((DRIVE_MOTOR.freeSpeed / 1_rad) / DRIVE_GEARING) * WHEEL_RADIUS;
 inline constexpr units::radians_per_second_t DRIVE_MAX_ROT_SPEED = 540_deg_per_s;
-inline constexpr units::meters_per_second_squared_t DRIVE_MAX_ACCEL = 20_fps_sq;
+inline constexpr units::meters_per_second_squared_t DRIVE_MAX_ACCEL = 2000_fps_sq;
 inline constexpr units::radians_per_second_squared_t DRIVE_MAX_ROT_ACCEL = 720_deg_per_s_sq;
 }
 
