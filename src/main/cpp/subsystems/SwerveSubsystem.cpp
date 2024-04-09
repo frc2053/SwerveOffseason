@@ -107,6 +107,14 @@ frc::Translation2d SwerveSubsystem::GetAmpLocation() {
   return ampToGoTo;
 }
 
+frc::Translation2d SwerveSubsystem::GetFrontAmpLocation() {
+  frc::Translation2d ampToGoTo = consts::yearSpecific::inFrontOfAmpLocation;
+  if(str::IsOnRed()) {
+    ampToGoTo = pathplanner::GeometryUtil::flipFieldPosition(ampToGoTo);
+  }
+  return ampToGoTo;
+}
+
 bool SwerveSubsystem::IsNearAmp() {
   return GetRobotPose().Translation().Distance(GetAmpLocation()) < consts::yearSpecific::closeToAmpDistance;
 }
@@ -137,28 +145,16 @@ frc2::CommandPtr SwerveSubsystem::PIDToPose(std::function<frc::Pose2d()> goalPos
     frc2::cmd::Run([this, goalPose] {
       frc::Pose2d currentPose = GetRobotPose();
 
-      units::meters_per_second_t xFF = xPoseController.GetSetpoint().velocity;
-      units::meters_per_second_t yFF = yPoseController.GetSetpoint().velocity;
-      units::radians_per_second_t rotFF = thetaController.GetSetpoint().velocity;
-
       units::meters_per_second_t xSpeed{xPoseController.Calculate(currentPose.Translation().X())};
       units::meters_per_second_t ySpeed{yPoseController.Calculate(currentPose.Translation().Y())};
       units::radians_per_second_t thetaSpeed{thetaController.Calculate(currentPose.Rotation().Radians())};
 
-      frc::SmartDashboard::PutNumber("xFF", xFF.value());
-      frc::SmartDashboard::PutNumber("yFF", yFF.value());
-      frc::SmartDashboard::PutNumber("thetaFF", rotFF.value());
-      frc::SmartDashboard::PutNumber("xPid", xSpeed.value());
-      frc::SmartDashboard::PutNumber("yPid", ySpeed.value());
-      frc::SmartDashboard::PutNumber("thetaPid", thetaSpeed.value());
-
-      
-      swerveDrive.DriveRobotRelative(
-        frc::ChassisSpeeds::FromFieldRelativeSpeeds(frc::ChassisSpeeds{
-        xFF + xSpeed, 
-        yFF + ySpeed,
-        rotFF + thetaSpeed,
-      }, currentPose.Rotation()));
+      swerveDrive.Drive(
+        xSpeed, 
+        ySpeed,
+        thetaSpeed,
+        true
+      );
     }, {this}).Until([this] {
       return xPoseController.AtGoal() && yPoseController.AtGoal() && thetaController.AtGoal();
     }).WithName("PIDToPose Run"),
@@ -169,14 +165,15 @@ frc2::CommandPtr SwerveSubsystem::PIDToPose(std::function<frc::Pose2d()> goalPos
 }
 
 frc2::CommandPtr SwerveSubsystem::AlignToAmp() {
-  auto alignToAmpPath = pathplanner::PathPlannerPath::fromChoreoTrajectory("AlignToAmp");
-
   //If we are close enough to the amp, just pid there
   return frc2::cmd::Either(
     PIDToPose([this] { return frc::Pose2d{GetAmpLocation(), frc::Rotation2d{90_deg}}; }),
-    pathplanner::AutoBuilder::pathfindThenFollowPath(alignToAmpPath, consts::swerve::pathplanning::constraints).WithName("AlignToAmp"),
-    [this] { return true; }
-  );
+    frc2::cmd::Sequence(
+      pathplanner::AutoBuilder::pathfindToPoseFlipped(frc::Pose2d{GetFrontAmpLocation(), frc::Rotation2d{90_deg}}, consts::swerve::pathplanning::constraints, 3_fps),
+      PIDToPose([this] { return frc::Pose2d{GetAmpLocation(), frc::Rotation2d{90_deg}}; })
+    ),
+    [this] { return IsNearAmp(); }
+  ).WithName("AlignToAmp");
 }
 
 frc2::CommandPtr SwerveSubsystem::SysIdSteerQuasistaticTorque(frc2::sysid::Direction dir) {

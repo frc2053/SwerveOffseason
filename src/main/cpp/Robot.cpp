@@ -17,9 +17,15 @@ void Robot::RobotInit() {
 }
 
 void Robot::RobotPeriodic() {
+  units::second_t now = frc::Timer::GetFPGATimestamp();
+  units::second_t loopTime = now - lastTotalLoopTime;
+  loopTimePub.Set((1 / loopTime).value());
+
   frc2::CommandScheduler::GetInstance().Run();
   m_container.GetNoteVisualizer().Periodic();
   UpdateVision();
+
+  lastTotalLoopTime = now;
 }
 
 void Robot::UpdateVision() {

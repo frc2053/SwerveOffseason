@@ -41,6 +41,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
  private:
   void SetupPathplanner();
   frc::Translation2d GetAmpLocation();
+  frc::Translation2d GetFrontAmpLocation();
   bool IsNearAmp();
 
   frc::TrapezoidProfile<units::meters>::Constraints translationConstraints{
