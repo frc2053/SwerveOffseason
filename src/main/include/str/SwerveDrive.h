@@ -28,6 +28,7 @@ public:
   frc::ChassisSpeeds GetRobotRelativeSpeeds() const;
   frc::Pose2d GetOdomPose() const;
   frc::Pose2d GetPose() const;
+  frc::Pose2d GetPredictedPose(units::second_t translationLookahead, units::second_t rotationLookahead);
   units::radian_t GetYawFromImu();
   std::array<units::radian_t, 4> GetModuleDriveOutputShaftPositions();
   void SimulationPeriodic();
@@ -167,5 +168,8 @@ private:
 
   nt::StructTopic<frc::Pose2d> estimatorTopic{nt->GetStructTopic<frc::Pose2d>("PoseEstimatorPose")};
   nt::StructPublisher<frc::Pose2d> estimatorPub{estimatorTopic.Publish()};
+
+  nt::StructTopic<frc::Pose2d> lookaheadTopic{nt->GetStructTopic<frc::Pose2d>("LookaheadPose")};
+  nt::StructPublisher<frc::Pose2d> lookaheadPub{lookaheadTopic.Publish()};
 };
 }

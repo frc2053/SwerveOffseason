@@ -82,6 +82,15 @@ frc::Pose2d SwerveDrive::GetPose() const {
   return poseEstimator.GetEstimatedPosition();
 }
 
+frc::Pose2d SwerveDrive::GetPredictedPose(units::second_t translationLookahead, units::second_t rotationLookahead) {
+  frc::ChassisSpeeds currentVel = GetRobotRelativeSpeeds();
+  return GetPose().TransformBy(frc::Transform2d{
+    currentVel.vx * translationLookahead,
+    currentVel.vy * translationLookahead,
+    frc::Rotation2d{currentVel.omega * rotationLookahead}
+  });
+}
+
 units::radian_t SwerveDrive::GetYawFromImu() {
   return yawLatencyComped;
 }
@@ -137,6 +146,7 @@ void SwerveDrive::UpdateNTEntries() {
   currentStatesPub.Set(moduleStates);
   currentPositionsPub.Set(modulePositions);
   odomPosePub.Set(GetOdomPose());
+  lookaheadPub.Set(GetPredictedPose(1_s, 1_s));
   estimatorPub.Set(GetPose());
 }
 
