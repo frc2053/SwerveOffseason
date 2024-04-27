@@ -84,7 +84,8 @@ private:
         consts::swerve::can_ids::FL_ENC,
         consts::swerve::physical::FL_ENC_OFFSET,
         consts::swerve::physical::FL_DRIVE_INVERT,
-        consts::swerve::physical::FL_STEER_INVERT
+        consts::swerve::physical::FL_STEER_INVERT,
+        frc::Transform2d{consts::swerve::physical::DRIVEBASE_LENGTH / 2, consts::swerve::physical::DRIVEBASE_WIDTH / 2, frc::Rotation2d{}}
       },
       swervePhysical,
       steerGains,
@@ -98,7 +99,8 @@ private:
         consts::swerve::can_ids::FR_ENC,
         consts::swerve::physical::FR_ENC_OFFSET,
         consts::swerve::physical::FR_DRIVE_INVERT,
-        consts::swerve::physical::FR_STEER_INVERT
+        consts::swerve::physical::FR_STEER_INVERT,
+        frc::Transform2d{consts::swerve::physical::DRIVEBASE_LENGTH / 2, -consts::swerve::physical::DRIVEBASE_WIDTH / 2, frc::Rotation2d{}}
       },
       swervePhysical,
       steerGains,
@@ -112,7 +114,8 @@ private:
         consts::swerve::can_ids::BL_ENC,
         consts::swerve::physical::BL_ENC_OFFSET,
         consts::swerve::physical::BL_DRIVE_INVERT,
-        consts::swerve::physical::BL_STEER_INVERT
+        consts::swerve::physical::BL_STEER_INVERT,
+        frc::Transform2d{-consts::swerve::physical::DRIVEBASE_LENGTH / 2, consts::swerve::physical::DRIVEBASE_WIDTH / 2, frc::Rotation2d{}}
       },
       swervePhysical,
       steerGains,
@@ -126,7 +129,8 @@ private:
         consts::swerve::can_ids::BR_ENC,
         consts::swerve::physical::BR_ENC_OFFSET,
         consts::swerve::physical::BR_DRIVE_INVERT,
-        consts::swerve::physical::BR_STEER_INVERT
+        consts::swerve::physical::BR_STEER_INVERT,
+        frc::Transform2d{-consts::swerve::physical::DRIVEBASE_LENGTH / 2, -consts::swerve::physical::DRIVEBASE_WIDTH / 2, frc::Rotation2d{}}
       },
       swervePhysical,
       steerGains,
@@ -141,7 +145,9 @@ private:
 
   std::array<frc::SwerveModulePosition, 4> modulePositions;
   std::array<frc::SwerveModuleState, 4> moduleStates;
+  std::array<frc::Pose2d, 4> moduleOdomPoses;
 
+  std::array<str::SwerveWheelOdometry, 4> moduleOdom;
   frc::SwerveDriveOdometry<4> odom{consts::swerve::physical::KINEMATICS, frc::Rotation2d{0_deg}, modulePositions};
   frc::SwerveDrivePoseEstimator<4> poseEstimator{consts::swerve::physical::KINEMATICS, frc::Rotation2d{0_deg}, modulePositions, frc::Pose2d{}};
 
@@ -162,6 +168,9 @@ private:
 
   nt::StructArrayTopic<frc::SwerveModulePosition> currentPositionsTopic{nt->GetStructArrayTopic<frc::SwerveModulePosition>("CurrentPositions")};
   nt::StructArrayPublisher<frc::SwerveModulePosition> currentPositionsPub{currentPositionsTopic.Publish()};
+
+  nt::StructArrayTopic<frc::Pose2d> currentModulePosesTopic{nt->GetStructArrayTopic<frc::Pose2d>("CurrentPositionsPoses")};
+  nt::StructArrayPublisher<frc::Pose2d> currentModulePosesPub{currentModulePosesTopic.Publish()};
 
   nt::StructTopic<frc::Pose2d> odomPoseTopic{nt->GetStructTopic<frc::Pose2d>("OdometryPose")};
   nt::StructPublisher<frc::Pose2d> odomPosePub{odomPoseTopic.Publish()};

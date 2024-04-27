@@ -5,6 +5,7 @@
 #include "str/SwerveDrive.h"
 #include "constants/Constants.h"
 #include "str/Math.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 
 using namespace str;
 
@@ -36,6 +37,12 @@ SwerveDrive::SwerveDrive() {
 
   if(!imu.OptimizeBusUtilization().IsOK()) {
     fmt::print("Failed to optimize bus signals for imu!\n");
+  }
+
+  int i = 0;
+  for(auto& wheelOdom : moduleOdom) {
+    wheelOdom.ResetPosition(modules[i].GetCurrentPosition(true), GetPose().TransformBy(modules[i].GetPositionOffset()));
+    i++;
   }
 }
 
@@ -125,6 +132,7 @@ void SwerveDrive::AddVisionMeasurement(const frc::Pose2d& visionMeasurement, uni
 
 void SwerveDrive::UpdateSwerveOdom() {
   ctre::phoenix::StatusCode status = ctre::phoenix6::BaseStatusSignal::WaitForAll(2.0 / (1 / consts::LOOP_PERIOD), allSignals);
+  yawLatencyComped = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(imu.GetYaw(), imu.GetAngularVelocityZWorld());
 
   // if(!status.IsOK()) {
   //   fmt::print("Error updating swerve odom! Error was: {}\n", status.GetName());
@@ -133,11 +141,20 @@ void SwerveDrive::UpdateSwerveOdom() {
   int i = 0;
   for(auto& mod : modules) {
     modulePositions[i] = mod.GetCurrentPosition(false);
+    moduleOdom[i].Update(modulePositions[i], yawLatencyComped);
     moduleStates[i] = mod.GetCurrentState();
+    moduleOdomPoses[i] = moduleOdom[i].GetPose();
     i++;
   }
 
-  yawLatencyComped = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(imu.GetYaw(), imu.GetAngularVelocityZWorld());
+  units::meter_t flblLength = moduleOdomPoses[0].Translation().Distance(moduleOdomPoses[2].Translation());
+  units::meter_t frbrLength = moduleOdomPoses[1].Translation().Distance(moduleOdomPoses[3].Translation());
+  units::meter_t flfrLength = moduleOdomPoses[0].Translation().Distance(moduleOdomPoses[1].Translation());
+  units::meter_t blbrLength = moduleOdomPoses[2].Translation().Distance(moduleOdomPoses[3].Translation());
+
+  frc::SmartDashboard::PutNumber("Length Skew", (flblLength - frbrLength).convert<units::inches>().value());
+  frc::SmartDashboard::PutNumber("Width Skew", (flfrLength - blbrLength).convert<units::inches>().value());
+
   poseEstimator.Update(frc::Rotation2d{yawLatencyComped}, modulePositions);
   odom.Update(frc::Rotation2d{yawLatencyComped}, modulePositions);
 }
@@ -145,6 +162,7 @@ void SwerveDrive::UpdateSwerveOdom() {
 void SwerveDrive::UpdateNTEntries() {
   currentStatesPub.Set(moduleStates);
   currentPositionsPub.Set(modulePositions);
+  currentModulePosesPub.Set(moduleOdomPoses);
   odomPosePub.Set(GetOdomPose());
   lookaheadPub.Set(GetPredictedPose(1_s, 1_s));
   estimatorPub.Set(GetPose());

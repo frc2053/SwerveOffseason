@@ -25,6 +25,7 @@ public:
   std::array<ctre::phoenix6::BaseStatusSignal*, 8> GetSignals();
   bool OptimizeBusSignals();
   std::string GetName() const;
+  frc::Transform2d GetPositionOffset() const;
   units::ampere_t GetSimulatedCurrentDraw() const;
   void SetSteerToTorque(units::volt_t voltsToSend);
   void SetDriveToTorque(units::volt_t voltsToSend);
@@ -67,6 +68,7 @@ private:
   ctre::phoenix6::controls::VoltageOut driveVoltageSetter{0_V};
 
   std::string moduleName;
+  frc::Transform2d positionOffset;
 
   SwerveModuleSteerGains steerGains;
   SwerveModuleDriveGains driveGains;

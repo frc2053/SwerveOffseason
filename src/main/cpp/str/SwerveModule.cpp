@@ -8,6 +8,7 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
   driveMotor(constants.driveId, "*"), 
   steerEncoder(constants.encoderId, "*"),
   moduleName(constants.moduleName),
+  positionOffset(constants.centerOffset),
   steerGains(steerGains),
   driveGains(driveGains),
   couplingRatio(physicalAttrib.couplingRatio),
@@ -240,6 +241,10 @@ bool SwerveModule::OptimizeBusSignals() {
 
 std::string SwerveModule::GetName() const {
   return moduleName;
+}
+
+frc::Transform2d SwerveModule::GetPositionOffset() const {
+  return positionOffset;
 }
 
 units::ampere_t SwerveModule::GetSimulatedCurrentDraw() const {

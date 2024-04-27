@@ -14,6 +14,7 @@ struct SwerveModuleConstants {
   const units::turn_t steerEncoderOffset;
   const bool invertDrive;
   const bool invertSteer;
+  const frc::Transform2d centerOffset;
 };
 
 struct SwerveModulePhysical {
