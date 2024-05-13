@@ -1,5 +1,9 @@
 # Swerve Drive From Built Chassis To Path Following Steps
 
+TODO:
+- Log loop time of subsystems
+- Use pose3d from photon where applicable
+
 ## Pre-requisites
 0. Make sure all motors have valid CTRE pro license and are visible in phoenix tool
 1. Update all motor controllers to latest PRO version
