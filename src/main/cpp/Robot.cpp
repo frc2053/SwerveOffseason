@@ -13,7 +13,7 @@ void Robot::RobotInit() {
   frc2::CommandScheduler::GetInstance().SetPeriod(consts::LOOP_PERIOD);
   frc::DataLogManager::Start();
   frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
-  AddPeriodic([this] { m_container.GetSwerveSubsystem().UpdateSwerveOdom(); }, consts::LOOP_PERIOD);
+  AddPeriodic([this] { m_container.GetSwerveSubsystem().UpdateSwerveOdom(); }, consts::SWERVE_ODOM_LOOP_PERIOD);
 }
 
 void Robot::RobotPeriodic() {

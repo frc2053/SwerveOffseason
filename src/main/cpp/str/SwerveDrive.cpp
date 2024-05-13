@@ -124,7 +124,7 @@ void SwerveDrive::AddVisionMeasurement(const frc::Pose2d& visionMeasurement, uni
 }
 
 void SwerveDrive::UpdateSwerveOdom() {
-  ctre::phoenix::StatusCode status = ctre::phoenix6::BaseStatusSignal::WaitForAll(2.0 / (1 / consts::LOOP_PERIOD), allSignals);
+  ctre::phoenix::StatusCode status = ctre::phoenix6::BaseStatusSignal::WaitForAll(2.0 / (1 / consts::SWERVE_ODOM_LOOP_PERIOD), allSignals);
 
   // if(!status.IsOK()) {
   //   fmt::print("Error updating swerve odom! Error was: {}\n", status.GetName());
