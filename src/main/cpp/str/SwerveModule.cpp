@@ -65,6 +65,9 @@ frc::SwerveModuleState SwerveModule::GoToState(frc::SwerveModuleState desiredSta
     driveMotor.SetControl(driveVelocitySetter.WithVelocity(motorSpeed));
   }
 
+  //Just for logging
+  desiredState.speed = ConvertWheelVelToLinearVel(ConvertDriveMotorVelToWheelVel(motorSpeed));
+
   return desiredState;
 }
 

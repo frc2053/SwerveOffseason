@@ -23,7 +23,6 @@ void RobotContainer::ConfigureBindings() {
   [this] {
     return frc::ApplyDeadband<double>(-controller.GetRightX(), .1) * consts::swerve::physical::DRIVE_MAX_ROT_SPEED;
   },
-  true,
   true
   ));
 

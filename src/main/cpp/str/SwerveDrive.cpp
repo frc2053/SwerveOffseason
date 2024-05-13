@@ -34,7 +34,7 @@ SwerveDrive::SwerveDrive() {
   allSignals[allSignals.size() - 1] = &imu.GetAngularVelocityZWorld();
 
   for(const auto& sig : allSignals) {
-    sig->SetUpdateFrequency(1 / consts::LOOP_PERIOD);
+    sig->SetUpdateFrequency(1 / consts::SWERVE_ODOM_LOOP_PERIOD);
   }
 
   for(auto& mod : modules) {
