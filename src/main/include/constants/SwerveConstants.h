@@ -175,9 +175,9 @@ inline constexpr pathplanner::PathConstraints constraints{
     physical::DRIVE_MAX_ROT_ACCEL
 };
 
-inline constexpr units::meter_t translationalPIDTolerance = 3_in;
+inline constexpr units::meter_t translationalPIDTolerance = .5_in;
 inline constexpr units::meters_per_second_t translationalVelPIDTolerance = 1_fps;
-inline constexpr units::radian_t rotationalPIDTolerance = 10_deg;
+inline constexpr units::radian_t rotationalPIDTolerance = 1_deg;
 inline constexpr units::radians_per_second_t rotationalVelPIDTolerance = 10_deg_per_s;
 inline constexpr units::meters_per_second_t translationalVelPIDDeadband = 0.5_fps;
 inline constexpr units::radians_per_second_t rotationalVelPIDDeadband = 5_deg_per_s;
