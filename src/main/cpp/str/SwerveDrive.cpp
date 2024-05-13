@@ -64,7 +64,7 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_secon
 
   frc::ChassisSpeeds speedsToSend;
   if(fieldRelative) {
-    speedsToSend = frc::ChassisSpeeds::FromFieldRelativeSpeeds(xVel, yVel, omega, frc::Rotation2d{GetYawFromImu()});
+    speedsToSend = frc::ChassisSpeeds::FromFieldRelativeSpeeds(xVel, yVel, omega, poseEstimator.GetEstimatedPosition().Rotation());
   }
   else {
     speedsToSend.vx = xVel;
