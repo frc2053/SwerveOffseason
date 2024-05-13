@@ -13,6 +13,7 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
   couplingRatio(physicalAttrib.couplingRatio),
   driveGearing(physicalAttrib.driveGearing),
   wheelRadius(physicalAttrib.wheelRadius),
+  maxLinearSpeed(((physicalAttrib.driveMotor.freeSpeed / 1_rad) / driveGearing) * wheelRadius),
   moduleSim(
     constants,
     physicalAttrib,
@@ -21,10 +22,10 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
     steerEncoder.GetSimState()
   )
 {
-  if(!ConfigureSteerMotor(constants.invertSteer, physicalAttrib.steerGearing, physicalAttrib.supplySideLimit)) {
+  if(!ConfigureSteerMotor(constants.invertSteer, physicalAttrib.steerGearing, physicalAttrib.steerTorqueCurrentLimit, physicalAttrib.steerTorqueCurrentLimit)) {
     fmt::print("ERROR: Failed to configure steer motor!");
   }
-  if(!ConfigureDriveMotor(constants.invertDrive, physicalAttrib.supplySideLimit, physicalAttrib.slipCurrent)) {
+  if(!ConfigureDriveMotor(constants.invertDrive, physicalAttrib.driveSupplySideLimit, physicalAttrib.slipCurrent)) {
     fmt::print("ERROR: Failed to configure drive motor!");
   }
   if(!ConfigureSteerEncoder(constants.steerEncoderOffset)) {
@@ -33,7 +34,7 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
   ConfigureControlSignals();
 }
 
-frc::SwerveModuleState SwerveModule::GoToState(frc::SwerveModuleState desiredState, bool optimize) {
+frc::SwerveModuleState SwerveModule::GoToState(frc::SwerveModuleState desiredState, bool optimize, bool openLoopDrive) {
   frc::SwerveModuleState currentState = GetCurrentState();
   if(optimize) {
     desiredState = frc::SwerveModuleState::Optimize(desiredState, currentState.angle);
@@ -57,7 +58,12 @@ frc::SwerveModuleState SwerveModule::GoToState(frc::SwerveModuleState desiredSta
   units::radians_per_second_t driveBackout = steerVelocitySig.GetValue() * couplingRatio;
   motorSpeed += driveBackout;
 
-  driveMotor.SetControl(driveVelocitySetter.WithVelocity(motorSpeed));
+  if(openLoopDrive) {
+     driveMotor.SetControl(driveVoltageSetter.WithOutput((motorSpeed / ConvertWheelVelToMotorVel(ConvertLinearVelToWheelVel(maxLinearSpeed))) * 12_V));
+  }
+  else {
+    driveMotor.SetControl(driveVelocitySetter.WithVelocity(motorSpeed));
+  }
 
   return desiredState;
 }
@@ -130,7 +136,7 @@ std::array<ctre::phoenix6::BaseStatusSignal*, 8> SwerveModule::GetSignals() {
   return {&drivePositionSig, &driveVelocitySig, &steerPositionSig, &steerVelocitySig, &driveTorqueCurrentSig, &steerTorqueCurrentSig, &driveVoltageSig, &steerVoltageSig};
 }
 
-bool SwerveModule::ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit) {
+bool SwerveModule::ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit, units::ampere_t torqueCurrentLimit) {
   ctre::phoenix6::configs::TalonFXConfiguration steerConfig{};
   ctre::phoenix6::configs::Slot0Configs steerSlotConfig{};
 
@@ -157,6 +163,9 @@ bool SwerveModule::ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGe
   //Motion magic expo kv and ka are always in terms of volts, even if we are controlling current.
   steerConfig.MotionMagic.MotionMagicExpo_kV = steerGains.motionMagicExpoKv.value();
   steerConfig.MotionMagic.MotionMagicExpo_kA = steerGains.motionMagicExpoKa.value();
+
+  steerConfig.TorqueCurrent.PeakForwardTorqueCurrent = torqueCurrentLimit.value();
+  steerConfig.TorqueCurrent.PeakReverseTorqueCurrent = -torqueCurrentLimit.value();
 
   //Supply side limiting only effects non torque modes. We should set these anyway in case we want to control in a different mode
   steerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -206,6 +215,8 @@ bool SwerveModule::ConfigureDriveMotor(bool invertDrive, units::ampere_t supplyC
 bool SwerveModule::ConfigureSteerEncoder(units::turn_t encoderOffset) {
   ctre::phoenix6::configs::CANcoderConfiguration encoderConfig{};
   encoderConfig.MagnetSensor.MagnetOffset = encoderOffset.value();
+  encoderConfig.MagnetSensor.AbsoluteSensorRange = ctre::phoenix6::signals::AbsoluteSensorRangeValue::Signed_PlusMinusHalf;
+  encoderConfig.MagnetSensor.SensorDirection = ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;
   ctre::phoenix::StatusCode configResult = steerEncoder.GetConfigurator().Apply(encoderConfig);
 
   fmt::print("Configured steer encoder on module {}. Result was: {}\n", moduleName, configResult.GetName());

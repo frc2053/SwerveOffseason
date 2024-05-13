@@ -17,7 +17,7 @@ class SwerveModule {
 public:
   explicit SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical physicalAttrib, SwerveModuleSteerGains steerGains, SwerveModuleDriveGains driveGains);
   // We return the optimized state to make sure we log what we actually set the module to
-  frc::SwerveModuleState GoToState(frc::SwerveModuleState desiredState, bool optimize=true);
+  frc::SwerveModuleState GoToState(frc::SwerveModuleState desiredState, bool optimize=true, bool openLoop=false);
   frc::SwerveModulePosition GetCurrentPosition(bool refresh);
   units::radian_t GetOutputShaftTurns();
   frc::SwerveModuleState GetCurrentState();
@@ -31,7 +31,7 @@ public:
   void SetSteerToVoltage(units::volt_t voltsToSend);
   void SetDriveToVoltage(units::volt_t voltsToSend);
 private:
-  bool ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit);
+  bool ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing, units::ampere_t supplyCurrentLimit, units::ampere_t torqueCurrentLimit);
   bool ConfigureDriveMotor(bool invertDrive, units::ampere_t supplyCurrentLimit, units::ampere_t slipCurrentLimit);
   bool ConfigureSteerEncoder(units::turn_t encoderOffset);
   void ConfigureControlSignals();
@@ -74,6 +74,7 @@ private:
   units::scalar_t couplingRatio;
   units::scalar_t driveGearing;
   units::meter_t wheelRadius;
+  units::meters_per_second_t maxLinearSpeed;
 
   SwerveModuleSim moduleSim;
 };

@@ -23,6 +23,7 @@ void RobotContainer::ConfigureBindings() {
   [this] {
     return frc::ApplyDeadband<double>(-controller.GetRightX(), .1) * consts::swerve::physical::DRIVE_MAX_ROT_SPEED;
   },
+  true,
   true
   ));
 
@@ -45,10 +46,15 @@ void RobotContainer::ConfigureBindings() {
   // controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kForward));
   // controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kReverse));
 
-  // controller.A().WhileTrue(swerveSubsystem.SysIdSteerQuasistaticTorque(frc2::sysid::Direction::kForward));
-  // controller.B().WhileTrue(swerveSubsystem.SysIdSteerQuasistaticTorque(frc2::sysid::Direction::kReverse));
-  // controller.X().WhileTrue(swerveSubsystem.SysIdSteerDynamicTorque(frc2::sysid::Direction::kForward));
-  // controller.Y().WhileTrue(swerveSubsystem.SysIdSteerDynamicTorque(frc2::sysid::Direction::kReverse));
+  controller.A().WhileTrue(swerveSubsystem.SysIdSteerMk4nQuasistaticTorque(frc2::sysid::Direction::kForward));
+  controller.B().WhileTrue(swerveSubsystem.SysIdSteerMk4nQuasistaticTorque(frc2::sysid::Direction::kReverse));
+  controller.X().WhileTrue(swerveSubsystem.SysIdSteerMk4nDynamicTorque(frc2::sysid::Direction::kForward));
+  controller.Y().WhileTrue(swerveSubsystem.SysIdSteerMk4nDynamicTorque(frc2::sysid::Direction::kReverse));
+
+  // controller.A().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kForward));
+  // controller.B().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kReverse));
+  // controller.X().WhileTrue(swerveSubsystem.SysIdSteerMk4iDynamicTorque(frc2::sysid::Direction::kForward));
+  // controller.Y().WhileTrue(swerveSubsystem.SysIdSteerMk4iDynamicTorque(frc2::sysid::Direction::kReverse));
 
   // controller.A().WhileTrue(swerveSubsystem.SysIdSteerQuasistaticVoltage(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(swerveSubsystem.SysIdSteerQuasistaticVoltage(frc2::sysid::Direction::kReverse));

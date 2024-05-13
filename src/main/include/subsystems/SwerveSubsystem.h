@@ -26,7 +26,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   void AddVisionMeasurement(const frc::Pose2d& visionMeasurement, units::second_t timestamp, const Eigen::Vector3d& stdDevs);
   frc2::CommandPtr PointWheelsToAngle(std::function<units::radian_t()> wheelAngle);
   frc2::CommandPtr XPattern();
-  frc2::CommandPtr Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative);
+  frc2::CommandPtr Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative, bool openLoop=false);
   frc2::CommandPtr PIDToPose(std::function<frc::Pose2d()> goalPose);
   frc2::CommandPtr AlignToAmp(); 
   frc2::CommandPtr SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction dir);

@@ -19,7 +19,8 @@ struct SwerveModuleConstants {
 struct SwerveModulePhysical {
   const units::scalar_t steerGearing;
   const units::scalar_t driveGearing;
-  const units::ampere_t supplySideLimit;
+  const units::ampere_t driveSupplySideLimit;
+  const units::ampere_t steerTorqueCurrentLimit;
   const units::ampere_t slipCurrent;
   const frc::DCMotor driveMotor;
   const frc::DCMotor steerMotor;

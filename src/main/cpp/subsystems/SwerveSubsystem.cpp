@@ -119,9 +119,9 @@ bool SwerveSubsystem::IsNearAmp() {
   return GetRobotPose().Translation().Distance(GetAmpLocation()) < consts::yearSpecific::closeToAmpDistance;
 }
 
-frc2::CommandPtr SwerveSubsystem::Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative) {
-  return frc2::cmd::Run([this, xVel, yVel, omega, fieldRelative] {
-    swerveDrive.Drive(xVel(), yVel(), omega(), fieldRelative);
+frc2::CommandPtr SwerveSubsystem::Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative, bool openLoop) {
+  return frc2::cmd::Run([this, xVel, yVel, omega, fieldRelative, openLoop] {
+    swerveDrive.Drive(xVel(), yVel(), omega(), fieldRelative, openLoop);
   }, {this}).WithName("Drive Command");
 }
 

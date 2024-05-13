@@ -21,6 +21,15 @@ SwerveDrive::SwerveDrive() {
     allSignals[(i * 8) + 7] = modSigs[7];
   }
 
+  ctre::phoenix6::configs::Pigeon2Configuration imuConfig;
+  imuConfig.MountPose.MountPoseRoll = consts::swerve::physical::IMU_ROLL_OFFSET.convert<units::degrees>().value();
+  imuConfig.MountPose.MountPosePitch = consts::swerve::physical::IMU_PITCH_OFFSET.convert<units::degrees>().value();
+  imuConfig.MountPose.MountPoseYaw = consts::swerve::physical::IMU_YAW_OFFSET.convert<units::degrees>().value();
+
+  if(!imu.GetConfigurator().Apply(imuConfig).IsOK()) {
+    fmt::print("Failed to configure IMU!\n");
+  }
+
   allSignals[allSignals.size() - 2] = &imu.GetYaw();
   allSignals[allSignals.size() - 1] = &imu.GetAngularVelocityZWorld();
 
@@ -48,7 +57,7 @@ void SwerveDrive::DriveRobotRelative(const frc::ChassisSpeeds& robotRelativeSpee
   Drive(robotRelativeSpeeds.vx, robotRelativeSpeeds.vy, robotRelativeSpeeds.omega, false);
 }
 
-void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radians_per_second_t omega, bool fieldRelative) {
+void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radians_per_second_t omega, bool fieldRelative, bool openLoop) {
 
   units::second_t now = frc::Timer::GetFPGATimestamp();
   units::second_t loopTime = now - lastDriveLoopTime;
@@ -65,7 +74,7 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_secon
 
   speedsToSend = frc::ChassisSpeeds::Discretize(speedsToSend, loopTime);
 
-  SetModuleStates(consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend));
+  SetModuleStates(consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend), true, openLoop);
 
   lastDriveLoopTime = now;
 }
@@ -99,12 +108,12 @@ std::array<units::radian_t, 4> SwerveDrive::GetModuleDriveOutputShaftPositions()
   return {modules[0].GetOutputShaftTurns(), modules[1].GetOutputShaftTurns(), modules[2].GetOutputShaftTurns(), modules[3].GetOutputShaftTurns()};
 }
 
-void SwerveDrive::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize) {
+void SwerveDrive::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize, bool openLoop) {
   wpi::array<frc::SwerveModuleState, 4> finalState = desiredStates;
   frc::SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&finalState, consts::swerve::physical::DRIVE_MAX_SPEED);
   int i = 0;
   for(auto& mod : modules) {
-    finalState[i] = mod.GoToState(finalState[i], optimize);
+    finalState[i] = mod.GoToState(finalState[i], optimize, openLoop);
     i++;
   }
   desiredStatesPub.Set(finalState);

@@ -29,11 +29,16 @@ inline constexpr int IMU = 14;
 }
 
 namespace current_limits {
+inline constexpr units::ampere_t STEER_TORQUE_CURRENT_LIMIT = 40_A;
 inline constexpr units::ampere_t SUPPLY_CURRENT_LIMIT = 60_A;
 inline constexpr units::ampere_t SLIP_CURRENT_LIMIT = 180_A;
 }
 
 namespace physical {
+
+inline constexpr units::radian_t IMU_ROLL_OFFSET = 0_rad;
+inline constexpr units::radian_t IMU_PITCH_OFFSET = 0_rad;
+inline constexpr units::radian_t IMU_YAW_OFFSET = 0_rad;
 
 inline constexpr units::turn_t FL_ENC_OFFSET = 0.25_tr;
 inline constexpr units::turn_t FR_ENC_OFFSET = 0.25_tr;
