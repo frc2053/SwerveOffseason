@@ -50,13 +50,13 @@ inline constexpr bool FR_DRIVE_INVERT = false;
 inline constexpr bool BL_DRIVE_INVERT = false;
 inline constexpr bool BR_DRIVE_INVERT = false;
 
-//SDS MK4i
-inline constexpr units::scalar_t STEER_GEARING = (50.0 / 14.0) * (60.0 / 10.0);
-//L2 with 16T pinion
-inline constexpr units::scalar_t DRIVE_GEARING = (50.0 / 16.0) * (17.0 / 27.0) * (45.0 / 15.0);
+inline constexpr units::scalar_t STEER_GEARING_MK4I = (50.0 / 14.0) * (60.0 / 10.0);
+inline constexpr units::scalar_t STEER_GEARING_MK4N = (50.0 / 16.0) * (60.0 / 10.0);
+//L3 with 16T pinion
+inline constexpr units::scalar_t DRIVE_GEARING = (50.0 / 16.0) * (16.0 / 28.0) * (45.0 / 15.0);
 inline constexpr units::scalar_t COUPLING_RATIO = (50.0 / 16.0);
 
-inline constexpr frc::DCMotor DRIVE_MOTOR = frc::DCMotor::Falcon500FOC(1);
+inline constexpr frc::DCMotor DRIVE_MOTOR = frc::DCMotor::KrakenX60FOC(1);
 inline constexpr frc::DCMotor STEER_MOTOR = frc::DCMotor::Falcon500FOC(1);
 
 inline constexpr units::meter_t WHEEL_RADIUS = 2_in;
@@ -95,16 +95,27 @@ inline constexpr units::radians_per_second_squared_t DRIVE_MAX_ROT_ACCEL = 720_d
 }
 
 namespace gains {
-inline constexpr units::radians_per_second_t STEER_CRUISE_VEL = physical::STEER_MOTOR.freeSpeed / physical::STEER_GEARING;
-inline constexpr str::gains::radial::turn_volt_ka_unit_t STEER_MOTION_MAGIC_KA{.1};
-inline constexpr str::gains::radial::turn_volt_kv_unit_t STEER_MOTION_MAGIC_KV{.12 * physical::STEER_GEARING.value()};
-inline constexpr str::gains::radial::turn_amp_ka_unit_t STEER_KA{.5};
-inline constexpr str::gains::radial::turn_amp_kv_unit_t STEER_KV{0};
-inline constexpr units::ampere_t STEER_KS{19.018};
-inline constexpr units::volt_t STEER_KS_V{.1};
-inline constexpr str::gains::radial::turn_amp_kp_unit_t STEER_KP{1000};
-inline constexpr str::gains::radial::turn_amp_ki_unit_t STEER_KI{0};
-inline constexpr str::gains::radial::turn_amp_kd_unit_t STEER_KD{50};
+inline constexpr units::radians_per_second_t MK4I_STEER_CRUISE_VEL = physical::STEER_MOTOR.freeSpeed / physical::STEER_GEARING_MK4I;
+inline constexpr str::gains::radial::turn_volt_ka_unit_t MK4I_STEER_MOTION_MAGIC_KA{.1};
+inline constexpr str::gains::radial::turn_volt_kv_unit_t MK4I_STEER_MOTION_MAGIC_KV{.12 * physical::STEER_GEARING_MK4I.value()};
+inline constexpr str::gains::radial::turn_amp_ka_unit_t MK4I_STEER_KA{.5};
+inline constexpr str::gains::radial::turn_amp_kv_unit_t MK4I_STEER_KV{0};
+inline constexpr units::ampere_t MK4I_STEER_KS{19.018};
+inline constexpr units::volt_t MK4I_STEER_KS_V{.1};
+inline constexpr str::gains::radial::turn_amp_kp_unit_t MK4I_STEER_KP{1000};
+inline constexpr str::gains::radial::turn_amp_ki_unit_t MK4I_STEER_KI{0};
+inline constexpr str::gains::radial::turn_amp_kd_unit_t MK4I_STEER_KD{50};
+
+inline constexpr units::radians_per_second_t MK4N_STEER_CRUISE_VEL = physical::STEER_MOTOR.freeSpeed / physical::STEER_GEARING_MK4N;
+inline constexpr str::gains::radial::turn_volt_ka_unit_t MK4N_STEER_MOTION_MAGIC_KA{.1};
+inline constexpr str::gains::radial::turn_volt_kv_unit_t MK4N_STEER_MOTION_MAGIC_KV{.12 * physical::STEER_GEARING_MK4N.value()};
+inline constexpr str::gains::radial::turn_amp_ka_unit_t MK4N_STEER_KA{.5};
+inline constexpr str::gains::radial::turn_amp_kv_unit_t MK4N_STEER_KV{0};
+inline constexpr units::ampere_t MK4N_STEER_KS{19.018};
+inline constexpr units::volt_t MK4N_STEER_KS_V{.1};
+inline constexpr str::gains::radial::turn_amp_kp_unit_t MK4N_STEER_KP{1000};
+inline constexpr str::gains::radial::turn_amp_ki_unit_t MK4N_STEER_KI{0};
+inline constexpr str::gains::radial::turn_amp_kd_unit_t MK4N_STEER_KD{50};
 
 inline constexpr str::gains::radial::turn_amp_ka_unit_t DRIVE_KA{51.54};
 inline constexpr str::gains::radial::turn_amp_kv_unit_t DRIVE_KV{0};

@@ -32,17 +32,21 @@ public:
   units::radian_t GetYawFromImu();
   std::array<units::radian_t, 4> GetModuleDriveOutputShaftPositions();
   void SimulationPeriodic();
-  void SetCharacterizationTorqueSteer(units::volt_t torqueAmps);
+  void SetMk4iCharacterizationTorqueSteer(units::volt_t torqueAmps);
+  void SetMk4nCharacterizationTorqueSteer(units::volt_t torqueAmps);
   void SetCharacterizationTorqueDrive(units::volt_t torqueAmps);
-  void SetCharacterizationVoltageSteer(units::volt_t volts);
+  void SetMk4iCharacterizationVoltageSteer(units::volt_t volts);
+  void SetMk4nCharacterizationVoltageSteer(units::volt_t volts);
   void SetCharacterizationVoltageDrive(units::volt_t volts);
-  void LogSteerTorque(frc::sysid::SysIdRoutineLog* log);
+  void LogMk4iSteerTorque(frc::sysid::SysIdRoutineLog* log);
+  void LogMk4nSteerTorque(frc::sysid::SysIdRoutineLog* log);
   void LogDriveTorque(frc::sysid::SysIdRoutineLog* log);
-  void LogSteerVoltage(frc::sysid::SysIdRoutineLog* log);
+  void LogMk4iSteerVoltage(frc::sysid::SysIdRoutineLog* log);
+  void LogMk4nSteerVoltage(frc::sysid::SysIdRoutineLog* log);
   void LogDriveVoltage(frc::sysid::SysIdRoutineLog* log);
 private:
-  SwerveModulePhysical swervePhysical{
-    consts::swerve::physical::STEER_GEARING,
+  SwerveModulePhysical swervePhysicalFront{
+    consts::swerve::physical::STEER_GEARING_MK4I,
     consts::swerve::physical::DRIVE_GEARING,
     consts::swerve::current_limits::SUPPLY_CURRENT_LIMIT,
     consts::swerve::current_limits::SLIP_CURRENT_LIMIT,
@@ -51,20 +55,46 @@ private:
     consts::swerve::physical::COUPLING_RATIO,
     consts::swerve::physical::WHEEL_RADIUS,
     consts::swerve::gains::DRIVE_KS_V,
-    consts::swerve::gains::STEER_KS_V,
+    consts::swerve::gains::MK4I_STEER_KS_V,
   };
 
-  SwerveModuleSteerGains steerGains{
-    consts::swerve::gains::STEER_CRUISE_VEL,
-    consts::swerve::gains::STEER_MOTION_MAGIC_KA,
-    consts::swerve::gains::STEER_MOTION_MAGIC_KV,
-    consts::swerve::gains::STEER_KA,
-    consts::swerve::gains::STEER_KV,
-    consts::swerve::gains::STEER_KS,
-    consts::swerve::gains::STEER_KP,
-    consts::swerve::gains::STEER_KI,
-    consts::swerve::gains::STEER_KD,
+  SwerveModulePhysical swervePhysicalBack{
+    consts::swerve::physical::STEER_GEARING_MK4N,
+    consts::swerve::physical::DRIVE_GEARING,
+    consts::swerve::current_limits::SUPPLY_CURRENT_LIMIT,
+    consts::swerve::current_limits::SLIP_CURRENT_LIMIT,
+    consts::swerve::physical::DRIVE_MOTOR,
+    consts::swerve::physical::STEER_MOTOR,
+    consts::swerve::physical::COUPLING_RATIO,
+    consts::swerve::physical::WHEEL_RADIUS,
+    consts::swerve::gains::DRIVE_KS_V,
+    consts::swerve::gains::MK4N_STEER_KS_V,
   };
+
+  SwerveModuleSteerGains steerGainsMk4i{
+    consts::swerve::gains::MK4I_STEER_CRUISE_VEL,
+    consts::swerve::gains::MK4I_STEER_MOTION_MAGIC_KA,
+    consts::swerve::gains::MK4I_STEER_MOTION_MAGIC_KV,
+    consts::swerve::gains::MK4I_STEER_KA,
+    consts::swerve::gains::MK4I_STEER_KV,
+    consts::swerve::gains::MK4I_STEER_KS,
+    consts::swerve::gains::MK4I_STEER_KP,
+    consts::swerve::gains::MK4I_STEER_KI,
+    consts::swerve::gains::MK4I_STEER_KD,
+  };
+
+  SwerveModuleSteerGains steerGainsMk4n{
+    consts::swerve::gains::MK4N_STEER_CRUISE_VEL,
+    consts::swerve::gains::MK4N_STEER_MOTION_MAGIC_KA,
+    consts::swerve::gains::MK4N_STEER_MOTION_MAGIC_KV,
+    consts::swerve::gains::MK4N_STEER_KA,
+    consts::swerve::gains::MK4N_STEER_KV,
+    consts::swerve::gains::MK4N_STEER_KS,
+    consts::swerve::gains::MK4N_STEER_KP,
+    consts::swerve::gains::MK4N_STEER_KI,
+    consts::swerve::gains::MK4N_STEER_KD,
+  };
+
 
   SwerveModuleDriveGains driveGains{
     consts::swerve::gains::DRIVE_KA,
@@ -86,8 +116,8 @@ private:
         consts::swerve::physical::FL_DRIVE_INVERT,
         consts::swerve::physical::FL_STEER_INVERT
       },
-      swervePhysical,
-      steerGains,
+      swervePhysicalFront,
+      steerGainsMk4i,
       driveGains
     },
     SwerveModule{
@@ -100,8 +130,8 @@ private:
         consts::swerve::physical::FR_DRIVE_INVERT,
         consts::swerve::physical::FR_STEER_INVERT
       },
-      swervePhysical,
-      steerGains,
+      swervePhysicalFront,
+      steerGainsMk4i,
       driveGains
     },
     SwerveModule{
@@ -114,8 +144,8 @@ private:
         consts::swerve::physical::BL_DRIVE_INVERT,
         consts::swerve::physical::BL_STEER_INVERT
       },
-      swervePhysical,
-      steerGains,
+      swervePhysicalBack,
+      steerGainsMk4n,
       driveGains
     },
     SwerveModule{
@@ -128,8 +158,8 @@ private:
         consts::swerve::physical::BR_DRIVE_INVERT,
         consts::swerve::physical::BR_STEER_INVERT
       },
-      swervePhysical,
-      steerGains,
+      swervePhysicalBack,
+      steerGainsMk4n,
       driveGains
     }
   };

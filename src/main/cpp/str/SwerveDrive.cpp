@@ -180,8 +180,12 @@ units::ampere_t SwerveDrive::GetSimulatedCurrentDraw() const {
   return totalCurrent;
 }
 
-void SwerveDrive::SetCharacterizationTorqueSteer(units::volt_t torqueAmps) {
+void SwerveDrive::SetMk4iCharacterizationTorqueSteer(units::volt_t torqueAmps) {
   modules[0].SetSteerToTorque(torqueAmps);
+}
+
+void SwerveDrive::SetMk4nCharacterizationTorqueSteer(units::volt_t torqueAmps) {
+  modules[2].SetSteerToTorque(torqueAmps);
 }
 
 void SwerveDrive::SetCharacterizationTorqueDrive(units::volt_t torqueAmps) {
@@ -191,8 +195,12 @@ void SwerveDrive::SetCharacterizationTorqueDrive(units::volt_t torqueAmps) {
   modules[3].SetDriveToTorque(torqueAmps);
 }
 
-void SwerveDrive::SetCharacterizationVoltageSteer(units::volt_t volts) {
+void SwerveDrive::SetMk4iCharacterizationVoltageSteer(units::volt_t volts) {
   modules[0].SetSteerToVoltage(volts);
+}
+
+void SwerveDrive::SetMk4nCharacterizationVoltageSteer(units::volt_t volts) {
+  modules[2].SetSteerToVoltage(volts);
 }
 
 void SwerveDrive::SetCharacterizationVoltageDrive(units::volt_t volts) {
@@ -202,11 +210,19 @@ void SwerveDrive::SetCharacterizationVoltageDrive(units::volt_t volts) {
   modules[3].SetDriveToVoltage(volts);
 }
 
-void SwerveDrive::LogSteerTorque(frc::sysid::SysIdRoutineLog* log) {
-  log->Motor("swerve-steer")
+void SwerveDrive::LogMk4iSteerTorque(frc::sysid::SysIdRoutineLog* log) {
+  log->Motor("swerve-steer-mk4i")
     .voltage(units::volt_t{allSignals[5]->GetValueAsDouble()})
     .position(units::turn_t{allSignals[2]->GetValueAsDouble()})
     .velocity(units::turns_per_second_t{allSignals[3]->GetValueAsDouble()});
+}
+
+//This assumes the mk4n's are in the back of the robot
+void SwerveDrive::LogMk4nSteerTorque(frc::sysid::SysIdRoutineLog* log) {
+  log->Motor("swerve-steer-mk4n")
+    .voltage(units::volt_t{allSignals[21]->GetValueAsDouble()})
+    .position(units::turn_t{allSignals[18]->GetValueAsDouble()})
+    .velocity(units::turns_per_second_t{allSignals[19]->GetValueAsDouble()});
 }
 
 void SwerveDrive::LogDriveTorque(frc::sysid::SysIdRoutineLog* log) {
@@ -216,11 +232,19 @@ void SwerveDrive::LogDriveTorque(frc::sysid::SysIdRoutineLog* log) {
     .velocity(units::turns_per_second_t{allSignals[1]->GetValueAsDouble()});
 }
 
-void SwerveDrive::LogSteerVoltage(frc::sysid::SysIdRoutineLog* log) {
-  log->Motor("swerve-steer")
+void SwerveDrive::LogMk4iSteerVoltage(frc::sysid::SysIdRoutineLog* log) {
+  log->Motor("swerve-steer-mk4i")
     .voltage(units::volt_t{allSignals[7]->GetValueAsDouble()})
     .position(units::turn_t{allSignals[2]->GetValueAsDouble()})
     .velocity(units::turns_per_second_t{allSignals[3]->GetValueAsDouble()});
+}
+
+//This assumes the mk4n's are in the back of the robot
+void SwerveDrive::LogMk4nSteerVoltage(frc::sysid::SysIdRoutineLog* log) {
+  log->Motor("swerve-steer-mk4n")
+    .voltage(units::volt_t{allSignals[23]->GetValueAsDouble()})
+    .position(units::turn_t{allSignals[18]->GetValueAsDouble()})
+    .velocity(units::turns_per_second_t{allSignals[19]->GetValueAsDouble()});
 }
 
 void SwerveDrive::LogDriveVoltage(frc::sysid::SysIdRoutineLog* log) {

@@ -176,22 +176,41 @@ frc2::CommandPtr SwerveSubsystem::AlignToAmp() {
   ).WithName("AlignToAmp");
 }
 
-frc2::CommandPtr SwerveSubsystem::SysIdSteerQuasistaticTorque(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
     frc2::cmd::RunOnce([] { 
       ctre::phoenix6::SignalLogger::Start();
     }),
-    steerTorqueSysid.Quasistatic(dir)
-  ).WithName("Steer Quasistatic Torque");
+    steerMk4iTorqueSysid.Quasistatic(dir)
+  ).WithName("Steer Mk4i Quasistatic Torque");
 }
 
-frc2::CommandPtr SwerveSubsystem::SysIdSteerDynamicTorque(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4iDynamicTorque(frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
     frc2::cmd::RunOnce([] { 
       ctre::phoenix6::SignalLogger::Start();
     }),
-    steerTorqueSysid.Dynamic(dir)
-  ).WithName("Steer Dynamic Torque");}
+    steerMk4iTorqueSysid.Dynamic(dir)
+  ).WithName("Steer Mk4i Dynamic Torque");
+}
+
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4nQuasistaticTorque(frc2::sysid::Direction dir) {
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] { 
+      ctre::phoenix6::SignalLogger::Start();
+    }),
+    steerMk4nTorqueSysid.Quasistatic(dir)
+  ).WithName("Steer Mk4n Quasistatic Torque");
+}
+
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4nDynamicTorque(frc2::sysid::Direction dir) {
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] { 
+      ctre::phoenix6::SignalLogger::Start();
+    }),
+    steerMk4nTorqueSysid.Dynamic(dir)
+  ).WithName("Steer Mk4n Dynamic Torque");
+}
 
 frc2::CommandPtr SwerveSubsystem::SysIdDriveQuasistaticTorque(frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
@@ -219,22 +238,40 @@ frc2::CommandPtr SwerveSubsystem::SysIdDriveDynamicTorque(frc2::sysid::Direction
     PointWheelsToAngle([] { return 0_rad; })
   ).WithName("Drive Dynamic Torque");}
 
-frc2::CommandPtr SwerveSubsystem::SysIdSteerQuasistaticVoltage(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4iQuasistaticVoltage(frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
     frc2::cmd::RunOnce([] {
       ctre::phoenix6::SignalLogger::Start();
     }, {this}),
-    steerVoltageSysid.Quasistatic(dir)
-  ).WithName("Steer Quasistatic Voltage");
+    steerMk4iVoltageSysid.Quasistatic(dir)
+  ).WithName("Steer Mk4i Quasistatic Voltage");
 }
 
-frc2::CommandPtr SwerveSubsystem::SysIdSteerDynamicVoltage(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4iDynamicVoltage(frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
     frc2::cmd::RunOnce([] {
       ctre::phoenix6::SignalLogger::Start();
     }, {this}),
-    steerVoltageSysid.Dynamic(dir)
-  ).WithName("Steer Quasistatic Voltage");
+    steerMk4iVoltageSysid.Dynamic(dir)
+  ).WithName("Steer Mk4i Dynamic Voltage");
+}
+
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4nQuasistaticVoltage(frc2::sysid::Direction dir) {
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] {
+      ctre::phoenix6::SignalLogger::Start();
+    }, {this}),
+    steerMk4nVoltageSysid.Quasistatic(dir)
+  ).WithName("Steer Mk4n Quasistatic Voltage");
+}
+
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4nDynamicVoltage(frc2::sysid::Direction dir) {
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([] {
+      ctre::phoenix6::SignalLogger::Start();
+    }, {this}),
+    steerMk4nVoltageSysid.Dynamic(dir)
+  ).WithName("Steer Mk4n Dynamic Voltage");
 }
 
 frc2::CommandPtr SwerveSubsystem::SysIdDriveQuasistaticVoltage(frc2::sysid::Direction dir) {
