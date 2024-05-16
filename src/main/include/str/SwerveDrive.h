@@ -10,6 +10,7 @@
 #include <ctre/phoenix6/Pigeon2.hpp>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <networktables/StructArrayTopic.h>
+#include <networktables/DoubleTopic.h>
 #include <networktables/StructTopic.h>
 #include <frc/geometry/Pose2d.h>
 
@@ -183,25 +184,13 @@ private:
   frc::Rotation2d lastSimAngle;
 
   std::shared_ptr<nt::NetworkTable> nt{nt::NetworkTableInstance::GetDefault().GetTable("SwerveDrive")};
-  nt::StructArrayTopic<frc::SwerveModuleState> desiredStatesTopic{nt->GetStructArrayTopic<frc::SwerveModuleState>("DesiredStates")};
-  nt::StructArrayPublisher<frc::SwerveModuleState> desiredStatesPub{desiredStatesTopic.Publish()};
-  
-  nt::StructArrayTopic<frc::SwerveModuleState> currentStatesTopic{nt->GetStructArrayTopic<frc::SwerveModuleState>("CurrentStates")};
-  nt::StructArrayPublisher<frc::SwerveModuleState> currentStatesPub{currentStatesTopic.Publish()};
-
-  nt::StructArrayTopic<frc::SwerveModuleState> simStatesTopic{nt->GetStructArrayTopic<frc::SwerveModuleState>("SimStates")};
-  nt::StructArrayPublisher<frc::SwerveModuleState> simStatesPub{simStatesTopic.Publish()};
-
-  nt::StructArrayTopic<frc::SwerveModulePosition> currentPositionsTopic{nt->GetStructArrayTopic<frc::SwerveModulePosition>("CurrentPositions")};
-  nt::StructArrayPublisher<frc::SwerveModulePosition> currentPositionsPub{currentPositionsTopic.Publish()};
-
-  nt::StructTopic<frc::Pose2d> odomPoseTopic{nt->GetStructTopic<frc::Pose2d>("OdometryPose")};
-  nt::StructPublisher<frc::Pose2d> odomPosePub{odomPoseTopic.Publish()};
-
-  nt::StructTopic<frc::Pose2d> estimatorTopic{nt->GetStructTopic<frc::Pose2d>("PoseEstimatorPose")};
-  nt::StructPublisher<frc::Pose2d> estimatorPub{estimatorTopic.Publish()};
-
-  nt::StructTopic<frc::Pose2d> lookaheadTopic{nt->GetStructTopic<frc::Pose2d>("LookaheadPose")};
-  nt::StructPublisher<frc::Pose2d> lookaheadPub{lookaheadTopic.Publish()};
+  nt::DoublePublisher loopTimePub{nt::NetworkTableInstance::GetDefault().GetTable("Metadata")->GetDoubleTopic("SwerveDriveOdomLoopRate").Publish()};
+  nt::StructArrayPublisher<frc::SwerveModuleState> desiredStatesPub{nt->GetStructArrayTopic<frc::SwerveModuleState>("DesiredStates").Publish()};
+  nt::StructArrayPublisher<frc::SwerveModuleState> currentStatesPub{nt->GetStructArrayTopic<frc::SwerveModuleState>("CurrentStates").Publish()};
+  nt::StructArrayPublisher<frc::SwerveModuleState> simStatesPub{nt->GetStructArrayTopic<frc::SwerveModuleState>("SimStates").Publish()};
+  nt::StructArrayPublisher<frc::SwerveModulePosition> currentPositionsPub{nt->GetStructArrayTopic<frc::SwerveModulePosition>("CurrentPositions").Publish()};
+  nt::StructPublisher<frc::Pose2d> odomPosePub{nt->GetStructTopic<frc::Pose2d>("OdometryPose").Publish()};
+  nt::StructPublisher<frc::Pose2d> estimatorPub{nt->GetStructTopic<frc::Pose2d>("PoseEstimatorPose").Publish()};
+  nt::StructPublisher<frc::Pose2d> lookaheadPub{nt->GetStructTopic<frc::Pose2d>("LookaheadPose").Publish()};
 };
 }

@@ -86,8 +86,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   str::WheelRadiusCharData wheelRadData;
 
   std::shared_ptr<nt::NetworkTable> nt{nt::NetworkTableInstance::GetDefault().GetTable("SwerveDrive")};
-  nt::StructTopic<frc::Pose2d> pidPoseSetpointTopic{nt->GetStructTopic<frc::Pose2d>("PIDToPoseSetpoint")};
-  nt::StructPublisher<frc::Pose2d> pidPoseSetpointPub{pidPoseSetpointTopic.Publish()};
+  nt::StructPublisher<frc::Pose2d> pidPoseSetpointPub{nt->GetStructTopic<frc::Pose2d>("PIDToPoseSetpoint").Publish()};
 
   //It says volts, because sysid only supports volts for now. But we are using current anyway
   frc2::sysid::SysIdRoutine steerMk4iTorqueSysid{

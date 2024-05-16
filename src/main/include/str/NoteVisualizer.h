@@ -68,11 +68,8 @@ private:
   frc::Pose3d robotNote{};
 
   std::shared_ptr<nt::NetworkTable> nt{nt::NetworkTableInstance::GetDefault().GetTable("NoteVisualizer")};
-  nt::StructArrayTopic<frc::Pose3d> stagedNotesTopic{nt->GetStructArrayTopic<frc::Pose3d>("StagedNotes")};
-  nt::StructArrayTopic<frc::Pose3d> launchedNotesTopic{nt->GetStructArrayTopic<frc::Pose3d>("LaunchedNotes")};
-  nt::StructTopic<frc::Pose3d> robotNoteTopic{nt->GetStructArrayTopic<frc::Pose3d>("RobotNote")};
-  nt::StructArrayPublisher<frc::Pose3d> stagedNotesPub{stagedNotesTopic.Publish()};
-  nt::StructArrayPublisher<frc::Pose3d> launchedNotesPub{launchedNotesTopic.Publish()};
-  nt::StructPublisher<frc::Pose3d> robotNotePub{robotNoteTopic.Publish()};
+  nt::StructArrayPublisher<frc::Pose3d> stagedNotesPub{nt->GetStructArrayTopic<frc::Pose3d>("StagedNotes").Publish()};
+  nt::StructArrayPublisher<frc::Pose3d> launchedNotesPub{nt->GetStructArrayTopic<frc::Pose3d>("LaunchedNotes").Publish()};
+  nt::StructPublisher<frc::Pose3d> robotNotePub{nt->GetStructTopic<frc::Pose3d>("RobotNote").Publish()};
 };
 }

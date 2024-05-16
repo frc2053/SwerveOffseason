@@ -42,5 +42,5 @@ class Robot : public frc::TimedRobot {
   RobotContainer m_container;
 
   units::second_t lastTotalLoopTime;
-  nt::DoublePublisher loopTimePub{nt::NetworkTableInstance::GetDefault().GetTable("Metadata")->GetDoubleTopic("LoopRate").Publish()};
+  nt::DoublePublisher loopTimePub{nt::NetworkTableInstance::GetDefault().GetTable("Metadata")->GetDoubleTopic("RobotPeriodicLoopRate").Publish()};
 };

@@ -61,6 +61,7 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_secon
 
   units::second_t now = frc::Timer::GetFPGATimestamp();
   units::second_t loopTime = now - lastDriveLoopTime;
+  loopTimePub.Set((1 / loopTime).value());
 
   frc::ChassisSpeeds speedsToSend;
   if(fieldRelative) {

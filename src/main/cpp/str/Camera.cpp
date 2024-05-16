@@ -6,16 +6,12 @@ using namespace str;
 
 Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera, Eigen::Matrix<double, 3, 1> singleTagStdDev, Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate) :
     simulate(simulate),
-    poseTopic(nt->GetStructTopic<frc::Pose2d>(cameraName + "PoseEstimation")),
-    posePub(poseTopic.Publish()),
+    posePub(nt->GetStructTopic<frc::Pose2d>(cameraName + "PoseEstimation").Publish()),
     singleTagDevs(singleTagDevs),
     multiTagDevs(multiTagDevs),
-    stdDevXPoseTopic(nt->GetStructTopic<frc::Pose2d>(cameraName + "StdDevsX")),
-    stdDevXPosePub(stdDevXPoseTopic.Publish()),
-    stdDevYPoseTopic(nt->GetStructTopic<frc::Pose2d>(cameraName + "StdDevsY")),
-    stdDevYPosePub(stdDevYPoseTopic.Publish()),
-    stdDevRotPoseTopic(nt->GetStructTopic<frc::Pose2d>(cameraName + "StdDevsRot")),
-    stdDevRotPosePub(stdDevRotPoseTopic.Publish())
+    stdDevXPosePub(nt->GetDoubleTopic(cameraName + "StdDevsX").Publish()),
+    stdDevYPosePub(nt->GetDoubleTopic(cameraName + "StdDevsY").Publish()),
+    stdDevRotPosePub(nt->GetDoubleTopic(cameraName + "StdDevsRot").Publish())
 {
     photonEstimator = std::make_unique<photon::PhotonPoseEstimator>(
         consts::yearSpecific::aprilTagLayout, 

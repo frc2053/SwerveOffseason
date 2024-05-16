@@ -32,14 +32,9 @@ private:
   Eigen::Matrix<double, 3, 1> multiTagDevs;
 
   std::shared_ptr<nt::NetworkTable> nt{nt::NetworkTableInstance::GetDefault().GetTable("Vision")};
-  nt::StructTopic<frc::Pose2d> poseTopic;
   nt::StructPublisher<frc::Pose2d> posePub;
-
-  nt::DoubleTopic stdDevXPoseTopic;
   nt::DoublePublisher stdDevXPosePub;
-  nt::DoubleTopic stdDevYPoseTopic;
   nt::DoublePublisher stdDevYPosePub;
-  nt::DoubleTopic stdDevRotPoseTopic;
   nt::DoublePublisher stdDevRotPosePub;
 };
 }
