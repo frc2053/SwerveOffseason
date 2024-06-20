@@ -29,5 +29,5 @@ class RobotContainer {
   str::Vision vision;
   str::NoteVisualizer noteVisualizer;
 
-  Autos autos;
+  Autos autos{swerveSubsystem};
 };

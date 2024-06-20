@@ -8,11 +8,19 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <str/DriverstationUtils.h>
+#include <frc/Filesystem.h>
+#include <choreo/lib/Choreo.h>
 
-SwerveSubsystem::SwerveSubsystem() {
+SwerveSubsystem::SwerveSubsystem() : choreoController(
+  choreolib::Choreo::ChoreoSwerveController(
+    frc::PIDController{consts::swerve::pathplanning::POSE_P, consts::swerve::pathplanning::POSE_I, consts::swerve::pathplanning::POSE_D}, 
+    frc::PIDController{consts::swerve::pathplanning::POSE_P, consts::swerve::pathplanning::POSE_I, consts::swerve::pathplanning::POSE_D}, 
+    frc::PIDController{consts::swerve::pathplanning::ROTATION_P, consts::swerve::pathplanning::ROTATION_I, consts::swerve::pathplanning::ROTATION_D}
+  )) {
   SetName("SwerveSubsystem");
   frc::SmartDashboard::PutData(this);
   SetupPathplanner();
+  LoadChoreoTrajectories();
 }
 
 void SwerveSubsystem::UpdateSwerveOdom()
@@ -51,6 +59,32 @@ frc::ChassisSpeeds SwerveSubsystem::GetRobotRelativeSpeed() const {
 
 units::ampere_t SwerveSubsystem::GetSimulatedCurrentDraw() const {
   return swerveDrive.GetSimulatedCurrentDraw();
+}
+
+frc2::CommandPtr SwerveSubsystem::FollowChoreoTrajectory(std::function<std::string()> pathName) {
+  return frc2::cmd::Either(
+      frc2::cmd::Sequence(
+          frc2::cmd::RunOnce([this, pathName] {
+            if (str::IsOnRed()) {
+              choreolib::ChoreoTrajectory flippedTraj =
+                  pathMap[pathName()].Flipped();
+                  swerveDrive.ResetPose(flippedTraj.GetInitialPose());
+            } else {
+              swerveDrive.ResetPose(pathMap[pathName()].GetInitialPose());
+            }
+          }),
+          choreolib::Choreo::ChoreoSwerveCommandFactory(
+              pathMap[pathName()], [this] { return swerveDrive.GetPose(); },
+              choreoController,
+              [this](frc::ChassisSpeeds speeds) {
+                swerveDrive.DriveRobotRelative(speeds);
+              },
+              [this] { return str::IsOnRed(); }, {this}),
+          frc2::cmd::RunOnce(
+              [this] { swerveDrive.Drive(0_mps, 0_mps, 0_rad_per_s, false); })),
+      frc2::cmd::Print(
+          "ERROR: Choreo path wasn't found in pathMap!!!!\n\n\n\n"),
+      [this, pathName] { return pathMap.contains(pathName()); });
 }
 
 frc2::CommandPtr SwerveSubsystem::PointWheelsToAngle(std::function<units::radian_t()> wheelAngle) {
@@ -97,6 +131,15 @@ void SwerveSubsystem::SetupPathplanner() {
     [] { return str::IsOnRed(); },
     this
   );
+}
+
+void SwerveSubsystem::LoadChoreoTrajectories() {
+  for (const auto& entry : std::filesystem::directory_iterator(
+           frc::filesystem::GetDeployDirectory() + "/choreo/")) {
+    std::string fileName = entry.path().stem().string();
+    fmt::print("Loaded choreo trajectory: {}\n", fileName);
+    pathMap[fileName] = choreolib::Choreo::GetTrajectory(fileName);
+  }
 }
 
 frc::Translation2d SwerveSubsystem::GetAmpLocation() {

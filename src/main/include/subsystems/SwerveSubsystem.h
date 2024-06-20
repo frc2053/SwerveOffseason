@@ -7,6 +7,9 @@
 #include <frc2/command/SubsystemBase.h>
 #include <str/SwerveDrive.h>
 #include "constants/Constants.h"
+#include <choreo/lib/Choreo.h>
+#include <choreo/lib/ChoreoTrajectory.h>
+#include <choreo/lib/ChoreoSwerveCommand.h>
 
 class SwerveSubsystem : public frc2::SubsystemBase {
  public:
@@ -24,6 +27,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   frc::ChassisSpeeds GetRobotRelativeSpeed() const;
   void UpdateSwerveOdom();
   void AddVisionMeasurement(const frc::Pose2d& visionMeasurement, units::second_t timestamp, const Eigen::Vector3d& stdDevs);
+  frc2::CommandPtr FollowChoreoTrajectory(std::function<std::string()> pathName);
   frc2::CommandPtr PointWheelsToAngle(std::function<units::radian_t()> wheelAngle);
   frc2::CommandPtr XPattern();
   frc2::CommandPtr Drive(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> omega, bool fieldRelative, bool openLoop=false);
@@ -44,6 +48,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   frc2::CommandPtr WheelRadius(frc2::sysid::Direction dir);
  private:
   void SetupPathplanner();
+  void LoadChoreoTrajectories();
   frc::Translation2d GetAmpLocation();
   frc::Translation2d GetFrontAmpLocation();
   bool IsNearAmp();
@@ -87,6 +92,9 @@ class SwerveSubsystem : public frc2::SubsystemBase {
 
   std::shared_ptr<nt::NetworkTable> nt{nt::NetworkTableInstance::GetDefault().GetTable("SwerveDrive")};
   nt::StructPublisher<frc::Pose2d> pidPoseSetpointPub{nt->GetStructTopic<frc::Pose2d>("PIDToPoseSetpoint").Publish()};
+
+  choreolib::ChoreoControllerFunction choreoController;
+  std::unordered_map<std::string, choreolib::ChoreoTrajectory> pathMap;
 
   //It says volts, because sysid only supports volts for now. But we are using current anyway
   frc2::sysid::SysIdRoutine steerMk4iTorqueSysid{
