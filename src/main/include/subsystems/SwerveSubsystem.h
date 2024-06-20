@@ -10,6 +10,7 @@
 #include <choreo/lib/Choreo.h>
 #include <choreo/lib/ChoreoTrajectory.h>
 #include <choreo/lib/ChoreoSwerveCommand.h>
+#include <networktables/StructArrayTopic.h>
 
 class SwerveSubsystem : public frc2::SubsystemBase {
  public:
@@ -95,6 +96,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
 
   choreolib::ChoreoControllerFunction choreoController;
   std::unordered_map<std::string, choreolib::ChoreoTrajectory> pathMap;
+  nt::StructArrayPublisher<frc::Pose2d> choreoTrajectoryPub{nt->GetStructArrayTopic<frc::Pose2d>("CurrentChoreoTrajectory").Publish()};
 
   //It says volts, because sysid only supports volts for now. But we are using current anyway
   frc2::sysid::SysIdRoutine steerMk4iTorqueSysid{

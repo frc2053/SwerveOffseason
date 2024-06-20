@@ -69,8 +69,10 @@ frc2::CommandPtr SwerveSubsystem::FollowChoreoTrajectory(std::function<std::stri
               choreolib::ChoreoTrajectory flippedTraj =
                   pathMap[pathName()].Flipped();
                   swerveDrive.ResetPose(flippedTraj.GetInitialPose());
+                  choreoTrajectoryPub.Set(flippedTraj.GetPoses());
             } else {
               swerveDrive.ResetPose(pathMap[pathName()].GetInitialPose());
+              choreoTrajectoryPub.Set(pathMap[pathName()].GetPoses());
             }
           }),
           choreolib::Choreo::ChoreoSwerveCommandFactory(
