@@ -62,7 +62,7 @@ frc::SwerveModuleState SwerveModule::GoToState(frc::SwerveModuleState desiredSta
      driveMotor.SetControl(driveVoltageSetter.WithOutput((motorSpeed / ConvertWheelVelToMotorVel(ConvertLinearVelToWheelVel(maxLinearSpeed))) * 12_V));
   }
   else {
-    driveMotor.SetControl(driveVelocitySetter.WithVelocity(motorSpeed).WithFeedForward(arbff));
+    driveMotor.SetControl(driveVelocitySetter.WithVelocity(motorSpeed).WithFeedForward(units::math::copysign(arbff, motorSpeed)));
   }
 
   //Just for logging

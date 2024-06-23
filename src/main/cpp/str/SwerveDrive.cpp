@@ -278,12 +278,11 @@ std::array<units::ampere_t, 4> SwerveDrive::ConvertModuleForcesToTorqueCurrent(
 ) {
   std::array<units::ampere_t, 4> retVal;
   for(int i = 0; i < 4; i++) {
-    units::ampere_t xAmps = (xForce[i] * consts::swerve::physical::WHEEL_RADIUS) / consts::swerve::physical::DRIVE_MOTOR.Kt;
-    units::ampere_t yAmps = (yForce[i] * consts::swerve::physical::WHEEL_RADIUS) / consts::swerve::physical::DRIVE_MOTOR.Kt;
-
-    fmt::print("xAmps: {} yAmps: {}\n", xAmps, yAmps);
-
-    retVal[i] = xAmps + yAmps;
+    frc::Translation2d moduleForceFieldRef{units::meter_t{xForce[i].value()}, units::meter_t{yForce[i].value()}};
+    frc::Translation2d moduleForceRobotRef = moduleForceFieldRef.RotateBy(GetPose().Rotation());
+    units::newton_meter_t totalTorqueAtMotor = (units::newton_t{moduleForceRobotRef.Norm().value()} * consts::swerve::physical::WHEEL_RADIUS) / consts::swerve::physical::DRIVE_GEARING;
+    units::ampere_t expectedTorqueCurrent = totalTorqueAtMotor / consts::swerve::physical::DRIVE_MOTOR.Kt;
+    retVal[i] = expectedTorqueCurrent;
   }
 
   return retVal;

@@ -126,7 +126,7 @@ inline constexpr str::gains::radial::turn_amp_ka_unit_t DRIVE_KA{51.54};
 inline constexpr str::gains::radial::turn_amp_kv_unit_t DRIVE_KV{0};
 inline constexpr units::ampere_t DRIVE_KS{25.247};
 inline constexpr units::volt_t DRIVE_KS_V{1};
-inline constexpr str::gains::radial::turn_amp_kp_unit_t DRIVE_KP{10};
+inline constexpr str::gains::radial::turn_amp_kp_unit_t DRIVE_KP{9};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t DRIVE_KI{0};
 inline constexpr str::gains::radial::turn_amp_kd_unit_t DRIVE_KD{0};
 }
