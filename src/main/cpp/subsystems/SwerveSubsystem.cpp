@@ -10,6 +10,7 @@
 #include <str/DriverstationUtils.h>
 #include <frc/Filesystem.h>
 #include <choreo/lib/Choreo.h>
+#include <str/ChoreoSwerveCommandWithForce.h>
 
 SwerveSubsystem::SwerveSubsystem() : choreoController(
   choreolib::Choreo::ChoreoSwerveController(
@@ -75,13 +76,19 @@ frc2::CommandPtr SwerveSubsystem::FollowChoreoTrajectory(std::function<std::stri
               choreoTrajectoryPub.Set(pathMap[pathName()].GetPoses());
             }
           }),
-          choreolib::Choreo::ChoreoSwerveCommandFactory(
+          str::ChoreoSwerveCommandWithForce(
               pathMap[pathName()], [this] { return swerveDrive.GetPose(); },
               choreoController,
               [this](frc::ChassisSpeeds speeds) {
                 swerveDrive.DriveRobotRelative(speeds);
               },
-              [this] { return str::IsOnRed(); }, {this}),
+              [this](std::array<units::newton_t, 4> xForce) {
+                swerveDrive.SetXModuleForces(xForce);
+              },
+              [this](std::array<units::newton_t, 4> yForce) {
+                swerveDrive.SetYModuleForces(yForce);
+              },
+              [this] { return str::IsOnRed(); }, {this}).ToPtr(),
           frc2::cmd::RunOnce(
               [this] { swerveDrive.Drive(0_mps, 0_mps, 0_rad_per_s, false); })),
       frc2::cmd::Print(

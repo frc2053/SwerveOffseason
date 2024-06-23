@@ -17,12 +17,14 @@ public:
       [this] { return autoChooser.GetSelected(); },
       std::pair{DRIVE_FORWARD, pathplanner::PathPlannerAuto("DriveForward").ToPtr()},
       std::pair{AMP_SIDE_FIVE, pathplanner::PathPlannerAuto("AmpSideFive").ToPtr()},
-      std::pair{CHOREO_TEST, swerveSub.FollowChoreoTrajectory([] { return "AmpSideFive"; })}
+      std::pair{CHOREO_TEST, swerveSub.FollowChoreoTrajectory([] { return "AmpSideFive"; })},
+      std::pair{CHOREO_SQUARE, swerveSub.FollowChoreoTrajectory([] { return "Square"; })}
     );
 
     autoChooser.SetDefaultOption("Drive Forward", AutoSelector::DRIVE_FORWARD);
     autoChooser.AddOption("Amp Side Five", AutoSelector::AMP_SIDE_FIVE);
     autoChooser.AddOption("Choreo Test", AutoSelector::CHOREO_TEST);
+    autoChooser.AddOption("Choreo Square", AutoSelector::CHOREO_SQUARE);
 
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
   };
@@ -31,7 +33,7 @@ public:
     return selectCommand.get();
   }
 private:
-  enum AutoSelector { DRIVE_FORWARD, AMP_SIDE_FIVE, CHOREO_TEST };
+  enum AutoSelector { DRIVE_FORWARD, AMP_SIDE_FIVE, CHOREO_TEST, CHOREO_SQUARE };
 
   frc::SendableChooser<AutoSelector> autoChooser;
 

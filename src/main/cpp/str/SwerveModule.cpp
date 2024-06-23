@@ -34,7 +34,7 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical
   ConfigureControlSignals();
 }
 
-frc::SwerveModuleState SwerveModule::GoToState(frc::SwerveModuleState desiredState, bool optimize, bool openLoopDrive) {
+frc::SwerveModuleState SwerveModule::GoToState(frc::SwerveModuleState desiredState, bool optimize, bool openLoopDrive, units::ampere_t arbff) {
   frc::SwerveModuleState currentState = GetCurrentState();
   if(optimize) {
     desiredState = frc::SwerveModuleState::Optimize(desiredState, currentState.angle);
@@ -62,7 +62,7 @@ frc::SwerveModuleState SwerveModule::GoToState(frc::SwerveModuleState desiredSta
      driveMotor.SetControl(driveVoltageSetter.WithOutput((motorSpeed / ConvertWheelVelToMotorVel(ConvertLinearVelToWheelVel(maxLinearSpeed))) * 12_V));
   }
   else {
-    driveMotor.SetControl(driveVelocitySetter.WithVelocity(motorSpeed));
+    driveMotor.SetControl(driveVelocitySetter.WithVelocity(motorSpeed).WithFeedForward(arbff));
   }
 
   //Just for logging

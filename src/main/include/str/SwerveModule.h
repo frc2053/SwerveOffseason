@@ -17,7 +17,7 @@ class SwerveModule {
 public:
   explicit SwerveModule(SwerveModuleConstants constants, SwerveModulePhysical physicalAttrib, SwerveModuleSteerGains steerGains, SwerveModuleDriveGains driveGains);
   // We return the optimized state to make sure we log what we actually set the module to
-  frc::SwerveModuleState GoToState(frc::SwerveModuleState desiredState, bool optimize=true, bool openLoop=false);
+  frc::SwerveModuleState GoToState(frc::SwerveModuleState desiredState, bool optimize=true, bool openLoop=false, units::ampere_t arbFF=0_A);
   frc::SwerveModulePosition GetCurrentPosition(bool refresh);
   units::radian_t GetOutputShaftTurns();
   frc::SwerveModuleState GetCurrentState();

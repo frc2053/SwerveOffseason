@@ -75,7 +75,7 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_secon
 
   speedsToSend = frc::ChassisSpeeds::Discretize(speedsToSend, loopTime);
 
-  SetModuleStates(consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend), true, openLoop);
+  SetModuleStates(consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend), true, openLoop, ConvertModuleForcesToTorqueCurrent(xModuleForce, yModuleForce));
 
   lastDriveLoopTime = now;
 }
@@ -109,12 +109,12 @@ std::array<units::radian_t, 4> SwerveDrive::GetModuleDriveOutputShaftPositions()
   return {modules[0].GetOutputShaftTurns(), modules[1].GetOutputShaftTurns(), modules[2].GetOutputShaftTurns(), modules[3].GetOutputShaftTurns()};
 }
 
-void SwerveDrive::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize, bool openLoop) {
+void SwerveDrive::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize, bool openLoop, const std::array<units::ampere_t, 4>& moduleTorqueCurrentsFF) {
   wpi::array<frc::SwerveModuleState, 4> finalState = desiredStates;
   frc::SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&finalState, consts::swerve::physical::DRIVE_MAX_SPEED);
   int i = 0;
   for(auto& mod : modules) {
-    finalState[i] = mod.GoToState(finalState[i], optimize, openLoop);
+    finalState[i] = mod.GoToState(finalState[i], optimize, openLoop, moduleTorqueCurrentsFF[i]);
     i++;
   }
   desiredStatesPub.Set(finalState);
@@ -190,6 +190,14 @@ units::ampere_t SwerveDrive::GetSimulatedCurrentDraw() const {
   return totalCurrent;
 }
 
+void SwerveDrive::SetXModuleForces(const std::array<units::newton_t, 4>& xForce) {
+  xModuleForce = xForce;
+}
+
+void SwerveDrive::SetYModuleForces(const std::array<units::newton_t, 4>& yForce) {
+  yModuleForce = yForce;
+}
+
 void SwerveDrive::SetMk4iCharacterizationTorqueSteer(units::volt_t torqueAmps) {
   modules[0].SetSteerToTorque(torqueAmps);
 }
@@ -262,4 +270,21 @@ void SwerveDrive::LogDriveVoltage(frc::sysid::SysIdRoutineLog* log) {
     .voltage(units::volt_t{allSignals[6]->GetValueAsDouble()})
     .position(units::turn_t{allSignals[0]->GetValueAsDouble()})
     .velocity(units::turns_per_second_t{allSignals[1]->GetValueAsDouble()});
+}
+
+std::array<units::ampere_t, 4> SwerveDrive::ConvertModuleForcesToTorqueCurrent(
+  const std::array<units::newton_t, 4>& xForce, 
+  const std::array<units::newton_t, 4>& yForce
+) {
+  std::array<units::ampere_t, 4> retVal;
+  for(int i = 0; i < 4; i++) {
+    units::ampere_t xAmps = (xForce[i] * consts::swerve::physical::WHEEL_RADIUS) / consts::swerve::physical::DRIVE_MOTOR.Kt;
+    units::ampere_t yAmps = (yForce[i] * consts::swerve::physical::WHEEL_RADIUS) / consts::swerve::physical::DRIVE_MOTOR.Kt;
+
+    fmt::print("xAmps: {} yAmps: {}\n", xAmps, yAmps);
+
+    retVal[i] = xAmps + yAmps;
+  }
+
+  return retVal;
 }

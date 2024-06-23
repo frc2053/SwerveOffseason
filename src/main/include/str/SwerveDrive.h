@@ -21,9 +21,11 @@ public:
   void ResetPose(const frc::Pose2d& resetPose);
   void DriveRobotRelative(const frc::ChassisSpeeds& robotRelativeSpeeds);
   void Drive(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radians_per_second_t omega, bool fieldRelative, bool openLoop=false);
-  void SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize=true, bool openLoop=false);
+  void SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize=true, bool openLoop=false, const std::array<units::ampere_t, 4>& moduleTorqueCurrentsFF={});
   void AddVisionMeasurement(const frc::Pose2d& visionMeasurement, units::second_t timestamp, const Eigen::Vector3d& stdDevs);
   units::ampere_t GetSimulatedCurrentDraw() const;
+  void SetXModuleForces(const std::array<units::newton_t, 4>& xForce);
+  void SetYModuleForces(const std::array<units::newton_t, 4>& yForce);
   void UpdateSwerveOdom();
   void UpdateNTEntries();
   frc::ChassisSpeeds GetRobotRelativeSpeeds() const;
@@ -46,6 +48,12 @@ public:
   void LogMk4nSteerVoltage(frc::sysid::SysIdRoutineLog* log);
   void LogDriveVoltage(frc::sysid::SysIdRoutineLog* log);
 private:
+
+  std::array<units::ampere_t, 4> ConvertModuleForcesToTorqueCurrent(
+    const std::array<units::newton_t, 4>& xForce, 
+    const std::array<units::newton_t, 4>& yForce
+  );
+
   SwerveModulePhysical swervePhysicalFront{
     consts::swerve::physical::STEER_GEARING_MK4I,
     consts::swerve::physical::DRIVE_GEARING,
@@ -174,6 +182,8 @@ private:
 
   std::array<frc::SwerveModulePosition, 4> modulePositions;
   std::array<frc::SwerveModuleState, 4> moduleStates;
+  std::array<units::newton_t, 4> xModuleForce;
+  std::array<units::newton_t, 4> yModuleForce;
 
   frc::SwerveDriveOdometry<4> odom{consts::swerve::physical::KINEMATICS, frc::Rotation2d{0_deg}, modulePositions};
   frc::SwerveDrivePoseEstimator<4> poseEstimator{consts::swerve::physical::KINEMATICS, frc::Rotation2d{0_deg}, modulePositions, frc::Pose2d{}};
