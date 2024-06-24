@@ -287,3 +287,18 @@ std::array<units::ampere_t, 4> SwerveDrive::ConvertModuleForcesToTorqueCurrent(
 
   return retVal;
 }
+
+bool SwerveDrive::IsSlipping() {
+  double slipCoeff = 1.5;
+  frc::ChassisSpeeds robotRelSpeeds = GetRobotRelativeSpeeds();
+  frc::ChassisSpeeds rotationComponent{0_mps, 0_mps, robotRelSpeeds.omega};
+  frc::ChassisSpeeds translationComponent = robotRelSpeeds - rotationComponent;
+  std::array<frc::SwerveModuleState, 4> transStates = consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(translationComponent);
+  auto maxIt = std::max_element(transStates.begin(), transStates.end(), [](const frc::SwerveModuleState& a, const frc::SwerveModuleState& b) {
+    return a.speed < b.speed;
+  });
+  auto minIt = std::min_element(transStates.begin(), transStates.end(), [](const frc::SwerveModuleState& a, const frc::SwerveModuleState& b) {
+    return a.speed < b.speed;
+  });
+  return (maxIt->speed / minIt->speed) > slipCoeff;
+}

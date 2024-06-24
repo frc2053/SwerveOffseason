@@ -54,6 +54,8 @@ private:
     const std::array<units::newton_t, 4>& yForce
   );
 
+  bool IsSlipping();
+
   SwerveModulePhysical swervePhysicalFront{
     consts::swerve::physical::STEER_GEARING_MK4I,
     consts::swerve::physical::DRIVE_GEARING,
