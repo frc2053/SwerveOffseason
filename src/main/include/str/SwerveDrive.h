@@ -11,6 +11,7 @@
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <networktables/StructArrayTopic.h>
 #include <networktables/DoubleTopic.h>
+#include <networktables/BooleanTopic.h>
 #include <networktables/StructTopic.h>
 #include <frc/geometry/Pose2d.h>
 
@@ -197,6 +198,7 @@ private:
 
   std::shared_ptr<nt::NetworkTable> nt{nt::NetworkTableInstance::GetDefault().GetTable("SwerveDrive")};
   nt::DoublePublisher loopTimePub{nt::NetworkTableInstance::GetDefault().GetTable("Metadata")->GetDoubleTopic("SwerveDriveOdomLoopRate").Publish()};
+  nt::BooleanPublisher isSlippingPub{nt->GetBooleanTopic("IsSlipping").Publish()};
   nt::StructArrayPublisher<frc::SwerveModuleState> desiredStatesPub{nt->GetStructArrayTopic<frc::SwerveModuleState>("DesiredStates").Publish()};
   nt::StructArrayPublisher<frc::SwerveModuleState> currentStatesPub{nt->GetStructArrayTopic<frc::SwerveModuleState>("CurrentStates").Publish()};
   nt::StructArrayPublisher<frc::SwerveModuleState> simStatesPub{nt->GetStructArrayTopic<frc::SwerveModuleState>("SimStates").Publish()};
