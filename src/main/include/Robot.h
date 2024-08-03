@@ -1,23 +1,23 @@
-// Copyright (c) FIRST and other WPILib contributors.
+// Copyright (c) FRC 2053.
 // Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// the MIT License file in the root of this project
 
 #pragma once
 
-#include <optional>
-
 #include <frc/TimedRobot.h>
-#include <frc2/command/CommandPtr.h>
-
-#include "RobotContainer.h"
-#include "str/SwerveModule.h"
 #include <frc/simulation/BatterySim.h>
-#include "constants/Constants.h"
+#include <frc2/command/CommandPtr.h>
 #include <networktables/DoubleTopic.h>
 
+#include <optional>
+
+#include "RobotContainer.h"
+#include "constants/Constants.h"
+#include "str/SwerveModule.h"
+
 class Robot : public frc::TimedRobot {
- public:
-  Robot() : frc::TimedRobot(consts::LOOP_PERIOD) {};
+public:
+  Robot() : frc::TimedRobot(consts::LOOP_PERIOD) {}
   void RobotInit() override;
   void RobotPeriodic() override;
   void DisabledInit() override;
@@ -36,11 +36,14 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override;
   void UpdateVision();
 
- private:
-  frc2::Command* m_autonomousCommand = nullptr;
+private:
+  frc2::Command *m_autonomousCommand = nullptr;
 
   RobotContainer m_container;
 
   units::second_t lastTotalLoopTime;
-  nt::DoublePublisher loopTimePub{nt::NetworkTableInstance::GetDefault().GetTable("Metadata")->GetDoubleTopic("RobotPeriodicLoopRate").Publish()};
+  nt::DoublePublisher loopTimePub{nt::NetworkTableInstance::GetDefault()
+                                      .GetTable("Metadata")
+                                      ->GetDoubleTopic("RobotPeriodicLoopRate")
+                                      .Publish()};
 };

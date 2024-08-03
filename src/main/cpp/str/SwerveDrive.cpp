@@ -1,16 +1,17 @@
-// Copyright (c) FIRST and other WPILib contributors.
+// Copyright (c) FRC 2053.
 // Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// the MIT License file in the root of this project
 
 #include "str/SwerveDrive.h"
+
 #include "constants/Constants.h"
 #include "str/Math.h"
 
 using namespace str;
 
 SwerveDrive::SwerveDrive() {
-  for(std::size_t i = 0; i < modules.size(); i++) {
-    const auto& modSigs = modules[i].GetSignals();
+  for (size_t i = 0; i < modules.size(); i++) {
+    const auto &modSigs = modules[i].GetSignals();
     allSignals[(i * 8) + 0] = modSigs[0];
     allSignals[(i * 8) + 1] = modSigs[1];
     allSignals[(i * 8) + 2] = modSigs[2];
@@ -22,52 +23,64 @@ SwerveDrive::SwerveDrive() {
   }
 
   ctre::phoenix6::configs::Pigeon2Configuration imuConfig;
-  imuConfig.MountPose.MountPoseRoll = consts::swerve::physical::IMU_ROLL_OFFSET.convert<units::degrees>().value();
-  imuConfig.MountPose.MountPosePitch = consts::swerve::physical::IMU_PITCH_OFFSET.convert<units::degrees>().value();
-  imuConfig.MountPose.MountPoseYaw = consts::swerve::physical::IMU_YAW_OFFSET.convert<units::degrees>().value();
+  imuConfig.MountPose.MountPoseRoll =
+      consts::swerve::physical::IMU_ROLL_OFFSET.convert<units::degrees>()
+          .value();
+  imuConfig.MountPose.MountPosePitch =
+      consts::swerve::physical::IMU_PITCH_OFFSET.convert<units::degrees>()
+          .value();
+  imuConfig.MountPose.MountPoseYaw =
+      consts::swerve::physical::IMU_YAW_OFFSET.convert<units::degrees>()
+          .value();
 
-  if(!imu.GetConfigurator().Apply(imuConfig).IsOK()) {
+  if (!imu.GetConfigurator().Apply(imuConfig).IsOK()) {
     fmt::print("Failed to configure IMU!\n");
   }
 
   allSignals[allSignals.size() - 2] = &imu.GetYaw();
   allSignals[allSignals.size() - 1] = &imu.GetAngularVelocityZWorld();
 
-  for(const auto& sig : allSignals) {
+  for (const auto &sig : allSignals) {
     sig->SetUpdateFrequency(1 / consts::SWERVE_ODOM_LOOP_PERIOD);
   }
 
-  for(auto& mod : modules) {
-    if(!mod.OptimizeBusSignals()) {
+  for (auto &mod : modules) {
+    if (!mod.OptimizeBusSignals()) {
       fmt::print("Failed to optimize bus signals for {}\n", mod.GetName());
     }
   }
 
-  if(!imu.OptimizeBusUtilization().IsOK()) {
+  if (!imu.OptimizeBusUtilization().IsOK()) {
     fmt::print("Failed to optimize bus signals for imu!\n");
   }
 }
 
-void SwerveDrive::ResetPose(const frc::Pose2d& resetPose) {
-  odom.ResetPosition(frc::Rotation2d{GetYawFromImu()}, modulePositions, resetPose);
-  poseEstimator.ResetPosition(frc::Rotation2d{GetYawFromImu()}, modulePositions, resetPose);
+void SwerveDrive::ResetPose(const frc::Pose2d &resetPose) {
+  odom.ResetPosition(frc::Rotation2d{GetYawFromImu()}, modulePositions,
+                     resetPose);
+  poseEstimator.ResetPosition(frc::Rotation2d{GetYawFromImu()}, modulePositions,
+                              resetPose);
 }
 
-void SwerveDrive::DriveRobotRelative(const frc::ChassisSpeeds& robotRelativeSpeeds) {
-  Drive(robotRelativeSpeeds.vx, robotRelativeSpeeds.vy, robotRelativeSpeeds.omega, false);
+void SwerveDrive::DriveRobotRelative(
+    const frc::ChassisSpeeds &robotRelativeSpeeds) {
+  Drive(robotRelativeSpeeds.vx, robotRelativeSpeeds.vy,
+        robotRelativeSpeeds.omega, false);
 }
 
-void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radians_per_second_t omega, bool fieldRelative, bool openLoop) {
-
+void SwerveDrive::Drive(units::meters_per_second_t xVel,
+                        units::meters_per_second_t yVel,
+                        units::radians_per_second_t omega, bool fieldRelative,
+                        bool openLoop) {
   units::second_t now = frc::Timer::GetFPGATimestamp();
   units::second_t loopTime = now - lastDriveLoopTime;
   loopTimePub.Set((1 / loopTime).value());
 
   frc::ChassisSpeeds speedsToSend;
-  if(fieldRelative) {
-    speedsToSend = frc::ChassisSpeeds::FromFieldRelativeSpeeds(xVel, yVel, omega, poseEstimator.GetEstimatedPosition().Rotation());
-  }
-  else {
+  if (fieldRelative) {
+    speedsToSend = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+        xVel, yVel, omega, poseEstimator.GetEstimatedPosition().Rotation());
+  } else {
     speedsToSend.vx = xVel;
     speedsToSend.vy = yVel;
     speedsToSend.omega = omega;
@@ -75,7 +88,10 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel, units::meters_per_secon
 
   speedsToSend = frc::ChassisSpeeds::Discretize(speedsToSend, loopTime);
 
-  SetModuleStates(consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend), true, openLoop, ConvertModuleForcesToTorqueCurrent(xModuleForce, yModuleForce));
+  SetModuleStates(
+      consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend),
+      true, openLoop,
+      ConvertModuleForcesToTorqueCurrent(xModuleForce, yModuleForce));
 
   lastDriveLoopTime = now;
 }
@@ -84,70 +100,82 @@ frc::ChassisSpeeds SwerveDrive::GetRobotRelativeSpeeds() const {
   return consts::swerve::physical::KINEMATICS.ToChassisSpeeds(moduleStates);
 }
 
-frc::Pose2d SwerveDrive::GetOdomPose() const {
-  return odom.GetPose();
-}
+frc::Pose2d SwerveDrive::GetOdomPose() const { return odom.GetPose(); }
 
 frc::Pose2d SwerveDrive::GetPose() const {
   return poseEstimator.GetEstimatedPosition();
 }
 
-frc::Pose2d SwerveDrive::GetPredictedPose(units::second_t translationLookahead, units::second_t rotationLookahead) {
+frc::Pose2d SwerveDrive::GetPredictedPose(units::second_t translationLookahead,
+                                          units::second_t rotationLookahead) {
   frc::ChassisSpeeds currentVel = GetRobotRelativeSpeeds();
-  return GetPose().TransformBy(frc::Transform2d{
-    currentVel.vx * translationLookahead,
-    currentVel.vy * translationLookahead,
-    frc::Rotation2d{currentVel.omega * rotationLookahead}
-  });
+  return GetPose().TransformBy(
+      frc::Transform2d{currentVel.vx * translationLookahead,
+                       currentVel.vy * translationLookahead,
+                       frc::Rotation2d{currentVel.omega * rotationLookahead}});
 }
 
-units::radian_t SwerveDrive::GetYawFromImu() {
-  return yawLatencyComped;
+units::radian_t SwerveDrive::GetYawFromImu() { return yawLatencyComped; }
+
+std::array<units::radian_t, 4>
+SwerveDrive::GetModuleDriveOutputShaftPositions() {
+  return {modules[0].GetOutputShaftTurns(), modules[1].GetOutputShaftTurns(),
+          modules[2].GetOutputShaftTurns(), modules[3].GetOutputShaftTurns()};
 }
 
-std::array<units::radian_t, 4> SwerveDrive::GetModuleDriveOutputShaftPositions() {
-  return {modules[0].GetOutputShaftTurns(), modules[1].GetOutputShaftTurns(), modules[2].GetOutputShaftTurns(), modules[3].GetOutputShaftTurns()};
-}
-
-void SwerveDrive::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize, bool openLoop, const std::array<units::ampere_t, 4>& moduleTorqueCurrentsFF) {
+void SwerveDrive::SetModuleStates(
+    const std::array<frc::SwerveModuleState, 4> &desiredStates, bool optimize,
+    bool openLoop,
+    const std::array<units::ampere_t, 4> &moduleTorqueCurrentsFF) {
   wpi::array<frc::SwerveModuleState, 4> finalState = desiredStates;
-  frc::SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&finalState, consts::swerve::physical::DRIVE_MAX_SPEED);
+  frc::SwerveDriveKinematics<4>::DesaturateWheelSpeeds(
+      &finalState, consts::swerve::physical::DRIVE_MAX_SPEED);
   int i = 0;
-  for(auto& mod : modules) {
-    finalState[i] = mod.GoToState(finalState[i], optimize, openLoop, moduleTorqueCurrentsFF[i]);
+  for (auto &mod : modules) {
+    finalState[i] = mod.GoToState(finalState[i], optimize, openLoop,
+                                  moduleTorqueCurrentsFF[i]);
     i++;
   }
   desiredStatesPub.Set(finalState);
 }
 
-void SwerveDrive::AddVisionMeasurement(const frc::Pose2d& visionMeasurement, units::second_t timestamp, const Eigen::Vector3d& stdDevs) {
+void SwerveDrive::AddVisionMeasurement(const frc::Pose2d &visionMeasurement,
+                                       units::second_t timestamp,
+                                       const Eigen::Vector3d &stdDevs) {
   // outside field, so we dont want to add this measurement to estimator,
   // because we know its wrong
-  // TODO: Maybe add a small a buffer around the robots frame to add poses that could be valid due to bumper compression
-  if(math::IsPoseInsideField(visionMeasurement)) {
+  // TODO: Maybe add a small a buffer around the robots frame to add poses that
+  // could be valid due to bumper compression
+  if (math::IsPoseInsideField(visionMeasurement)) {
     wpi::array<double, 3> newStdDevs{stdDevs(0), stdDevs(1), stdDevs(2)};
-    poseEstimator.AddVisionMeasurement(visionMeasurement, timestamp, newStdDevs);
-  }
-  else {
-    fmt::print("WARNING: Vision pose was outside of field! Not adding to estimator!");
+    poseEstimator.AddVisionMeasurement(visionMeasurement, timestamp,
+                                       newStdDevs);
+  } else {
+    fmt::print(
+        "WARNING: Vision pose was outside of field! Not adding to estimator!");
   }
 }
 
 void SwerveDrive::UpdateSwerveOdom() {
-  ctre::phoenix::StatusCode status = ctre::phoenix6::BaseStatusSignal::WaitForAll(2.0 / (1 / consts::SWERVE_ODOM_LOOP_PERIOD), allSignals);
+  ctre::phoenix::StatusCode status =
+      ctre::phoenix6::BaseStatusSignal::WaitForAll(
+          2.0 / (1 / consts::SWERVE_ODOM_LOOP_PERIOD), allSignals);
 
   // if(!status.IsOK()) {
-  //   fmt::print("Error updating swerve odom! Error was: {}\n", status.GetName());
+  //   fmt::print("Error updating swerve odom! Error was: {}\n",
+  //   status.GetName());
   // }
 
   int i = 0;
-  for(auto& mod : modules) {
+  for (auto &mod : modules) {
     modulePositions[i] = mod.GetCurrentPosition(false);
     moduleStates[i] = mod.GetCurrentState();
     i++;
   }
 
-  yawLatencyComped = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(imu.GetYaw(), imu.GetAngularVelocityZWorld());
+  yawLatencyComped =
+      ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(
+          imu.GetYaw(), imu.GetAngularVelocityZWorld());
   poseEstimator.Update(frc::Rotation2d{yawLatencyComped}, modulePositions);
   odom.Update(frc::Rotation2d{yawLatencyComped}, modulePositions);
 }
@@ -167,14 +195,16 @@ void SwerveDrive::SimulationPeriodic() {
 
   std::array<frc::SwerveModuleState, 4> simState;
   int i = 0;
-  for(auto& swerveModule : modules) {
-    simState[i] = swerveModule.UpdateSimulation(loopTime, frc::RobotController::GetBatteryVoltage());
+  for (auto &swerveModule : modules) {
+    simState[i] = swerveModule.UpdateSimulation(
+        loopTime, frc::RobotController::GetBatteryVoltage());
     i++;
   }
 
   simStatesPub.Set(simState);
 
-  units::radians_per_second_t omega = consts::swerve::physical::KINEMATICS.ToChassisSpeeds(simState).omega;
+  units::radians_per_second_t omega =
+      consts::swerve::physical::KINEMATICS.ToChassisSpeeds(simState).omega;
   units::radian_t angleChange = omega * loopTime;
 
   lastSimAngle = lastSimAngle + frc::Rotation2d{angleChange};
@@ -185,17 +215,19 @@ void SwerveDrive::SimulationPeriodic() {
 
 units::ampere_t SwerveDrive::GetSimulatedCurrentDraw() const {
   units::ampere_t totalCurrent = 0_A;
-  for(const auto& swerveModule : modules) {
+  for (const auto &swerveModule : modules) {
     totalCurrent += swerveModule.GetSimulatedCurrentDraw();
   }
   return totalCurrent;
 }
 
-void SwerveDrive::SetXModuleForces(const std::array<units::newton_t, 4>& xForce) {
+void SwerveDrive::SetXModuleForces(
+    const std::array<units::newton_t, 4> &xForce) {
   xModuleForce = xForce;
 }
 
-void SwerveDrive::SetYModuleForces(const std::array<units::newton_t, 4>& yForce) {
+void SwerveDrive::SetYModuleForces(
+    const std::array<units::newton_t, 4> &yForce) {
   yModuleForce = yForce;
 }
 
@@ -229,60 +261,65 @@ void SwerveDrive::SetCharacterizationVoltageDrive(units::volt_t volts) {
   modules[3].SetDriveToVoltage(volts);
 }
 
-void SwerveDrive::LogMk4iSteerTorque(frc::sysid::SysIdRoutineLog* log) {
+void SwerveDrive::LogMk4iSteerTorque(frc::sysid::SysIdRoutineLog *log) {
   log->Motor("swerve-steer-mk4i")
-    .voltage(units::volt_t{allSignals[5]->GetValueAsDouble()})
-    .position(units::turn_t{allSignals[2]->GetValueAsDouble()})
-    .velocity(units::turns_per_second_t{allSignals[3]->GetValueAsDouble()});
+      .voltage(units::volt_t{allSignals[5]->GetValueAsDouble()})
+      .position(units::turn_t{allSignals[2]->GetValueAsDouble()})
+      .velocity(units::turns_per_second_t{allSignals[3]->GetValueAsDouble()});
 }
 
-//This assumes the mk4n's are in the back of the robot
-void SwerveDrive::LogMk4nSteerTorque(frc::sysid::SysIdRoutineLog* log) {
+// This assumes the mk4n's are in the back of the robot
+void SwerveDrive::LogMk4nSteerTorque(frc::sysid::SysIdRoutineLog *log) {
   log->Motor("swerve-steer-mk4n")
-    .voltage(units::volt_t{allSignals[21]->GetValueAsDouble()})
-    .position(units::turn_t{allSignals[18]->GetValueAsDouble()})
-    .velocity(units::turns_per_second_t{allSignals[19]->GetValueAsDouble()});
+      .voltage(units::volt_t{allSignals[21]->GetValueAsDouble()})
+      .position(units::turn_t{allSignals[18]->GetValueAsDouble()})
+      .velocity(units::turns_per_second_t{allSignals[19]->GetValueAsDouble()});
 }
 
-void SwerveDrive::LogDriveTorque(frc::sysid::SysIdRoutineLog* log) {
+void SwerveDrive::LogDriveTorque(frc::sysid::SysIdRoutineLog *log) {
   log->Motor("swerve-drive")
-    .voltage(units::volt_t{allSignals[4]->GetValueAsDouble()})
-    .position(units::turn_t{allSignals[0]->GetValueAsDouble()})
-    .velocity(units::turns_per_second_t{allSignals[1]->GetValueAsDouble()});
+      .voltage(units::volt_t{allSignals[4]->GetValueAsDouble()})
+      .position(units::turn_t{allSignals[0]->GetValueAsDouble()})
+      .velocity(units::turns_per_second_t{allSignals[1]->GetValueAsDouble()});
 }
 
-void SwerveDrive::LogMk4iSteerVoltage(frc::sysid::SysIdRoutineLog* log) {
+void SwerveDrive::LogMk4iSteerVoltage(frc::sysid::SysIdRoutineLog *log) {
   log->Motor("swerve-steer-mk4i")
-    .voltage(units::volt_t{allSignals[7]->GetValueAsDouble()})
-    .position(units::turn_t{allSignals[2]->GetValueAsDouble()})
-    .velocity(units::turns_per_second_t{allSignals[3]->GetValueAsDouble()});
+      .voltage(units::volt_t{allSignals[7]->GetValueAsDouble()})
+      .position(units::turn_t{allSignals[2]->GetValueAsDouble()})
+      .velocity(units::turns_per_second_t{allSignals[3]->GetValueAsDouble()});
 }
 
-//This assumes the mk4n's are in the back of the robot
-void SwerveDrive::LogMk4nSteerVoltage(frc::sysid::SysIdRoutineLog* log) {
+// This assumes the mk4n's are in the back of the robot
+void SwerveDrive::LogMk4nSteerVoltage(frc::sysid::SysIdRoutineLog *log) {
   log->Motor("swerve-steer-mk4n")
-    .voltage(units::volt_t{allSignals[23]->GetValueAsDouble()})
-    .position(units::turn_t{allSignals[18]->GetValueAsDouble()})
-    .velocity(units::turns_per_second_t{allSignals[19]->GetValueAsDouble()});
+      .voltage(units::volt_t{allSignals[23]->GetValueAsDouble()})
+      .position(units::turn_t{allSignals[18]->GetValueAsDouble()})
+      .velocity(units::turns_per_second_t{allSignals[19]->GetValueAsDouble()});
 }
 
-void SwerveDrive::LogDriveVoltage(frc::sysid::SysIdRoutineLog* log) {
+void SwerveDrive::LogDriveVoltage(frc::sysid::SysIdRoutineLog *log) {
   log->Motor("swerve-drive")
-    .voltage(units::volt_t{allSignals[6]->GetValueAsDouble()})
-    .position(units::turn_t{allSignals[0]->GetValueAsDouble()})
-    .velocity(units::turns_per_second_t{allSignals[1]->GetValueAsDouble()});
+      .voltage(units::volt_t{allSignals[6]->GetValueAsDouble()})
+      .position(units::turn_t{allSignals[0]->GetValueAsDouble()})
+      .velocity(units::turns_per_second_t{allSignals[1]->GetValueAsDouble()});
 }
 
 std::array<units::ampere_t, 4> SwerveDrive::ConvertModuleForcesToTorqueCurrent(
-  const std::array<units::newton_t, 4>& xForce, 
-  const std::array<units::newton_t, 4>& yForce
-) {
+    const std::array<units::newton_t, 4> &xForce,
+    const std::array<units::newton_t, 4> &yForce) {
   std::array<units::ampere_t, 4> retVal;
-  for(int i = 0; i < 4; i++) {
-    frc::Translation2d moduleForceFieldRef{units::meter_t{xForce[i].value()}, units::meter_t{yForce[i].value()}};
-    frc::Translation2d moduleForceRobotRef = moduleForceFieldRef.RotateBy(GetPose().Rotation());
-    units::newton_meter_t totalTorqueAtMotor = (units::newton_t{moduleForceRobotRef.Norm().value()} * consts::swerve::physical::WHEEL_RADIUS) / consts::swerve::physical::DRIVE_GEARING;
-    units::ampere_t expectedTorqueCurrent = totalTorqueAtMotor / consts::swerve::physical::DRIVE_MOTOR.Kt;
+  for (int i = 0; i < 4; i++) {
+    frc::Translation2d moduleForceFieldRef{units::meter_t{xForce[i].value()},
+                                           units::meter_t{yForce[i].value()}};
+    frc::Translation2d moduleForceRobotRef =
+        moduleForceFieldRef.RotateBy(GetPose().Rotation());
+    units::newton_meter_t totalTorqueAtMotor =
+        (units::newton_t{moduleForceRobotRef.Norm().value()} *
+         consts::swerve::physical::WHEEL_RADIUS) /
+        consts::swerve::physical::DRIVE_GEARING;
+    units::ampere_t expectedTorqueCurrent =
+        totalTorqueAtMotor / consts::swerve::physical::DRIVE_MOTOR.Kt;
     retVal[i] = expectedTorqueCurrent;
   }
 
@@ -294,12 +331,18 @@ bool SwerveDrive::IsSlipping() {
   frc::ChassisSpeeds robotRelSpeeds = GetRobotRelativeSpeeds();
   frc::ChassisSpeeds rotationComponent{0_mps, 0_mps, robotRelSpeeds.omega};
   frc::ChassisSpeeds translationComponent = robotRelSpeeds - rotationComponent;
-  std::array<frc::SwerveModuleState, 4> transStates = consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(translationComponent);
-  auto maxIt = std::max_element(transStates.begin(), transStates.end(), [](const frc::SwerveModuleState& a, const frc::SwerveModuleState& b) {
-    return a.speed < b.speed;
-  });
-  auto minIt = std::min_element(transStates.begin(), transStates.end(), [](const frc::SwerveModuleState& a, const frc::SwerveModuleState& b) {
-    return a.speed < b.speed;
-  });
+  std::array<frc::SwerveModuleState, 4> transStates =
+      consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(
+          translationComponent);
+  auto maxIt = std::max_element(
+      transStates.begin(), transStates.end(),
+      [](const frc::SwerveModuleState &a, const frc::SwerveModuleState &b) {
+        return a.speed < b.speed;
+      });
+  auto minIt = std::min_element(
+      transStates.begin(), transStates.end(),
+      [](const frc::SwerveModuleState &a, const frc::SwerveModuleState &b) {
+        return a.speed < b.speed;
+      });
   return (maxIt->speed / minIt->speed) > slipCoeff;
 }

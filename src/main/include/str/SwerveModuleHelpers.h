@@ -1,9 +1,15 @@
+// Copyright (c) FRC 2053.
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License file in the root of this project
+
 #pragma once
 
-#include <str/Gains.h>
-#include <frc/system/plant/DCMotor.h>
-#include <units/base.h>
 #include <frc/filter/SlewRateLimiter.h>
+#include <frc/system/plant/DCMotor.h>
+#include <str/Gains.h>
+#include <units/base.h>
+
+#include <string>
 
 namespace str {
 struct SwerveModuleConstants {
@@ -26,7 +32,7 @@ struct SwerveModulePhysical {
   const frc::DCMotor steerMotor;
   const units::scalar_t couplingRatio;
   const units::meter_t wheelRadius;
-  //Used for sim only
+  // Used for sim only
   const units::volt_t driveFrictionVoltage;
   const units::volt_t steerFrictionVoltage;
 };
@@ -38,7 +44,7 @@ struct SwerveModuleSteerGains {
   str::gains::radial::turn_amp_ka_unit_t kA;
   str::gains::radial::turn_amp_kv_unit_t kV;
   units::ampere_t kS;
-  str::gains::radial::turn_amp_kp_unit_t kP;  
+  str::gains::radial::turn_amp_kp_unit_t kP;
   str::gains::radial::turn_amp_ki_unit_t kI;
   str::gains::radial::turn_amp_kd_unit_t kD;
 };
@@ -47,7 +53,7 @@ struct SwerveModuleDriveGains {
   str::gains::radial::turn_amp_ka_unit_t kA;
   str::gains::radial::turn_amp_kv_unit_t kV;
   units::ampere_t kS;
-  str::gains::radial::turn_amp_kp_unit_t kP;  
+  str::gains::radial::turn_amp_kp_unit_t kP;
   str::gains::radial::turn_amp_ki_unit_t kI;
   str::gains::radial::turn_amp_kd_unit_t kD;
 };
@@ -57,6 +63,7 @@ struct WheelRadiusCharData {
   units::radian_t accumGyroYaw;
   std::array<units::radian_t, 4> startWheelPositions;
   units::meter_t effectiveWheelRadius = 0_m;
-  frc::SlewRateLimiter<units::radians_per_second> omegaLimiter{1_rad_per_s / 1_s};
+  frc::SlewRateLimiter<units::radians_per_second> omegaLimiter{1_rad_per_s /
+                                                               1_s};
 };
-}
+} // namespace str
