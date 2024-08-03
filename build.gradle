@@ -97,3 +97,69 @@ model {
         }
     }
 }
+
+tasks.register("writeBranchName") {
+   // Define an output stream to write to instead of terminal
+   def stdout = new ByteArrayOutputStream()
+
+   // Execute the git command
+   exec {
+      commandLine "git", "rev-parse", "--abbrev-ref", "HEAD"
+      // Write to the output stream instead of terminal
+      standardOutput = stdout
+   }
+
+   // Parse the output into a string
+   def branch = stdout.toString().trim()
+
+   // Create a new file
+   new File(
+      // Join project directory and deploy directory
+      projectDir.toString() + "/src/main/deploy",
+      // File name to write to
+      "branch.txt"
+   ).text = branch // Set the contents of the file to the variable branch
+}
+
+tasks.register("writeCommitHash") {
+   def stdout = new ByteArrayOutputStream()
+
+   exec {
+     commandLine "git", "rev-parse", "--short", "HEAD"
+     standardOutput = stdout
+   }
+
+   def commitHash = stdout.toString().trim()
+
+   new File(
+      projectDir.toString() + "/src/main/deploy",
+      "commit.txt"
+   ).text = commitHash
+}
+
+deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn(writeCommitHash)
+deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn(writeBranchName)
+
+if (project.hasProperty("asan")) {
+  nativeUtils.platformConfigs.named("linuxx86-64").configure {
+    it.cppCompiler.args.add('-g3')
+    it.cppCompiler.args.add('-fsanitize=address')
+    it.linker.args.add('-fsanitize=address')
+  }
+}
+
+if (project.hasProperty("tsan")) {
+  nativeUtils.platformConfigs.named("linuxx86-64").configure {
+    it.cppCompiler.args.add('-g3')
+    it.cppCompiler.args.add('-fsanitize=thread')
+    it.linker.args.add('-fsanitize=thread')
+  }
+}
+
+if (project.hasProperty("ubsan")) {
+  nativeUtils.platformConfigs.named("linuxx86-64").configure {
+    it.cppCompiler.args.add('-g3')
+    it.cppCompiler.args.add('-fsanitize=undefined')
+    it.linker.args.add('-fsanitize=undefined')
+  }
+}
