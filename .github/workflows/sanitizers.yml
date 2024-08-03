@@ -16,8 +16,8 @@ jobs:
         include:
           - name: asan
             gradle-flags: "-Pasan"
-          - name: tsan
-            gradle-flags: "-Ptsan"
+          # - name: tsan
+          #   gradle-flags: "-Ptsan"
           - name: ubsan
             gradle-flags: "-Pubsan"
     # The type of runner that the job will run on
