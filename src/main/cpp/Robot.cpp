@@ -9,7 +9,10 @@
 #include <frc/simulation/RoboRioSim.h>
 #include <frc2/command/CommandScheduler.h>
 
+#include "str/DataUtils.h"
+
 void Robot::RobotInit() {
+  str::DataUtils::LogGitInfo();
   frc2::CommandScheduler::GetInstance().SetPeriod(consts::LOOP_PERIOD);
   frc::DataLogManager::Start();
   frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
