@@ -89,6 +89,8 @@ SwerveSubsystem &RobotContainer::GetSwerveSubsystem() {
   return swerveSubsystem;
 }
 
+PivotSubsystem &RobotContainer::GetPivotSubsystem() { return pivotSubsystem; }
+
 str::Vision &RobotContainer::GetVision() { return vision; }
 
 str::NoteVisualizer &RobotContainer::GetNoteVisualizer() {

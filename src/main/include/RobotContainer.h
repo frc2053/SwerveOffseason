@@ -10,6 +10,7 @@
 #include "Autos.h"
 #include "str/NoteVisualizer.h"
 #include "str/Vision.h"
+#include "subsystems/PivotSubsystem.h"
 #include "subsystems/SwerveSubsystem.h"
 
 class RobotContainer {
@@ -19,6 +20,7 @@ public:
   frc2::Command *GetAutonomousCommand();
 
   SwerveSubsystem &GetSwerveSubsystem();
+  PivotSubsystem &GetPivotSubsystem();
   str::Vision &GetVision();
   str::NoteVisualizer &GetNoteVisualizer();
 
@@ -30,5 +32,7 @@ private:
   str::Vision vision;
   str::NoteVisualizer noteVisualizer;
 
-  Autos autos{swerveSubsystem};
+  PivotSubsystem pivotSubsystem;
+
+  Autos autos{swerveSubsystem, pivotSubsystem};
 };
