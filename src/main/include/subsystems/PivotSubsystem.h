@@ -20,6 +20,13 @@ public:
    */
   void Periodic() override;
 
+  void GoToAngle(units::radian_t targetAngle);
+
+  units::radian_t GetAngle();
+  units::radian_t GetTargetAngle();
+
+  bool AtTargetAngle();
+
 private:
   bool ConfigurePivotMotors();
   bool ConfigurePivotEncoder();
@@ -31,4 +38,14 @@ private:
       consts::pivot::can_ids::RIGHT_PIVOT};
   ctre::phoenix6::hardware::CANcoder pivotEncoder{
       consts::pivot::can_ids::PIVOT_ENCODER};
+
+  ctre::phoenix6::StatusSignal<units::turn_t> pivotPositionSignal =
+      pivotLeft.GetPosition();
+  ctre::phoenix6::StatusSignal<units::turns_per_second_t> pivotVelocitySignal =
+      pivotLeft.GetVelocity();
+
+  ctre::phoenix6::controls::MotionMagicTorqueCurrentFOC pivotAngleSetter{0_rad};
+
+  units::radian_t currentPivotAngle = 0_rad;
+  units::radian_t targetedPivotAngle = 0_rad;
 };

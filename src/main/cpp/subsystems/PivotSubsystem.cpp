@@ -4,13 +4,34 @@
 
 #include "subsystems/PivotSubsystem.h"
 
+#include <units/math.h>
+
 PivotSubsystem::PivotSubsystem() {
   ConfigurePivotMotors();
   ConfigurePivotEncoder();
 }
 
+void PivotSubsystem::GoToAngle(units::radian_t targetAngle) {
+  targetedPivotAngle = targetAngle;
+  pivotLeft.SetControl(pivotAngleSetter.WithPosition(targetedPivotAngle));
+}
+
+units::radian_t PivotSubsystem::GetAngle() { return currentPivotAngle; }
+
+units::radian_t PivotSubsystem::GetTargetAngle() { return targetedPivotAngle; }
+
+bool PivotSubsystem::AtTargetAngle() {
+  return units::math::fabs(GetAngle() - GetTargetAngle()) < 1_deg;
+}
+
 // This method will be called once per scheduler run
-void PivotSubsystem::Periodic() {}
+void PivotSubsystem::Periodic() {
+  ctre::phoenix6::BaseStatusSignal::WaitForAll(0_s, pivotPositionSignal,
+                                               pivotVelocitySignal);
+  currentPivotAngle =
+      ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(
+          pivotPositionSignal, pivotVelocitySignal);
+}
 
 bool PivotSubsystem::ConfigurePivotMotors() {
   ctre::phoenix6::configs::TalonFXConfiguration pivotConfig{};
@@ -24,7 +45,8 @@ bool PivotSubsystem::ConfigurePivotMotors() {
   pivotSlotConfig.kP = consts::pivot::gains::kP.value();
   pivotSlotConfig.kI = consts::pivot::gains::kI.value();
   pivotSlotConfig.kD = consts::pivot::gains::kD.value();
-  pivotSlotConfig.GravityType = ctre::phoenix6::signals::GravityTypeValue::Arm_Cosine;
+  pivotSlotConfig.GravityType =
+      ctre::phoenix6::signals::GravityTypeValue::Arm_Cosine;
   pivotSlotConfig.kG = consts::pivot::gains::kG.value();
   pivotConfig.Slot0 = pivotSlotConfig;
 
@@ -87,4 +109,9 @@ bool PivotSubsystem::ConfigurePivotEncoder() {
   return configResult.IsOK();
 }
 
-void PivotSubsystem::ConfigureControlSignals() {}
+void PivotSubsystem::ConfigureControlSignals() {
+  pivotPositionSignal.SetUpdateFrequency(100_Hz);
+  pivotVelocitySignal.SetUpdateFrequency(100_Hz);
+  ctre::phoenix6::hardware::ParentDevice::OptimizeBusUtilizationForAll(
+      pivotEncoder, pivotLeft, pivotRight);
+}
