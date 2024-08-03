@@ -9,6 +9,7 @@
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
 #include <units/base.h>
 #include <units/velocity.h>
+#include "str/Gains.h"
 
 namespace consts {
 namespace swerve {
