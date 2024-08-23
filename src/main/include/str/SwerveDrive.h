@@ -83,20 +83,6 @@ private:
       consts::swerve::gains::MK4I_STEER_KS_V,
   };
 
-  SwerveModulePhysical swervePhysicalBack{
-      consts::swerve::physical::STEER_GEARING_MK4N,
-      consts::swerve::physical::DRIVE_GEARING,
-      consts::swerve::current_limits::SUPPLY_CURRENT_LIMIT,
-      consts::swerve::current_limits::STEER_TORQUE_CURRENT_LIMIT,
-      consts::swerve::current_limits::SLIP_CURRENT_LIMIT,
-      consts::swerve::physical::DRIVE_MOTOR,
-      consts::swerve::physical::STEER_MOTOR,
-      consts::swerve::physical::COUPLING_RATIO,
-      consts::swerve::physical::WHEEL_RADIUS,
-      consts::swerve::gains::DRIVE_KS_V,
-      consts::swerve::gains::MK4N_STEER_KS_V,
-  };
-
   SwerveModuleSteerGains steerGainsMk4i{
       consts::swerve::gains::MK4I_STEER_CRUISE_VEL,
       consts::swerve::gains::MK4I_STEER_MOTION_MAGIC_KA,
@@ -107,18 +93,6 @@ private:
       consts::swerve::gains::MK4I_STEER_KP,
       consts::swerve::gains::MK4I_STEER_KI,
       consts::swerve::gains::MK4I_STEER_KD,
-  };
-
-  SwerveModuleSteerGains steerGainsMk4n{
-      consts::swerve::gains::MK4N_STEER_CRUISE_VEL,
-      consts::swerve::gains::MK4N_STEER_MOTION_MAGIC_KA,
-      consts::swerve::gains::MK4N_STEER_MOTION_MAGIC_KV,
-      consts::swerve::gains::MK4N_STEER_KA,
-      consts::swerve::gains::MK4N_STEER_KV,
-      consts::swerve::gains::MK4N_STEER_KS,
-      consts::swerve::gains::MK4N_STEER_KP,
-      consts::swerve::gains::MK4N_STEER_KI,
-      consts::swerve::gains::MK4N_STEER_KD,
   };
 
   SwerveModuleDriveGains driveGains{
@@ -151,7 +125,7 @@ private:
                                      consts::swerve::physical::BL_ENC_OFFSET,
                                      consts::swerve::physical::BL_DRIVE_INVERT,
                                      consts::swerve::physical::BL_STEER_INVERT},
-          swervePhysicalBack, steerGainsMk4n, driveGains},
+          swervePhysicalFront, steerGainsMk4i, driveGains},
       SwerveModule{
           str::SwerveModuleConstants{"BR", consts::swerve::can_ids::BR_STEER,
                                      consts::swerve::can_ids::BR_DRIVE,
@@ -159,7 +133,7 @@ private:
                                      consts::swerve::physical::BR_ENC_OFFSET,
                                      consts::swerve::physical::BR_DRIVE_INVERT,
                                      consts::swerve::physical::BR_STEER_INVERT},
-          swervePhysicalBack, steerGainsMk4n, driveGains}};
+          swervePhysicalFront, steerGainsMk4i, driveGains}};
 
   ctre::phoenix6::hardware::Pigeon2 imu{consts::swerve::can_ids::IMU, "*"};
   ctre::phoenix6::sim::Pigeon2SimState &imuSimState = imu.GetSimState();

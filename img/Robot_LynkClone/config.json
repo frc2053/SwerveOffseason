@@ -1,0 +1,162 @@
+{
+    "name": "LynkClone",
+    "rotations": [
+        {
+            "axis": "x",
+            "degrees": 90
+        },
+        {
+            "axis": "y",
+            "degrees": 0
+        },
+        {
+            "axis": "z",
+            "degrees": 90
+        }
+    ],
+    "position": [
+        0,
+        0,
+        0
+    ],
+    "cameras": [
+        {
+            "name": "fl_cam",
+            "rotations": [
+                {
+                    "axis": "y",
+                    "degrees": -28.125
+                },
+                {
+                    "axis": "z",
+                    "degrees": 30.0
+                }
+            ],
+            "position": [
+                0.2852,
+                0.172055,
+                0.20955
+            ],
+            "resolution": [
+                1600,
+                1200
+            ],
+            "fov": 75
+        },
+        {
+            "name": "fr_cam",
+            "rotations": [
+                {
+                    "axis": "y",
+                    "degrees": -28.125
+                },
+                {
+                    "axis": "z",
+                    "degrees": -30.0
+                }
+            ],
+            "position": [
+                0.2852,
+                -0.172055,
+                0.20955
+            ],
+            "resolution": [
+                1600,
+                1200
+            ],
+            "fov": 75
+        },
+        {
+            "name": "bl_cam",
+            "rotations": [
+                {
+                    "axis": "y",
+                    "degrees": -28.125
+                },
+                {
+                    "axis": "z",
+                    "degrees": 150
+                }
+            ],
+            "position": [
+                -0.2852,
+                0.172055,
+                0.20955
+            ],
+            "resolution": [
+                1600,
+                1200
+            ],
+            "fov": 75
+        },
+        {
+            "name": "br_cam",
+            "rotations": [
+                {
+                    "axis": "y",
+                    "degrees": -28.125
+                },
+                {
+                    "axis": "z",
+                    "degrees": -150
+                }
+            ],
+            "position": [
+                -0.2852,
+                -0.172055,
+                0.20955
+            ],
+            "resolution": [
+                1600,
+                1200
+            ],
+            "fov": 75
+        },
+        {
+            "name": "note_cam",
+            "rotations": [
+                {
+                    "axis": "y",
+                    "degrees": 20
+                },
+                {
+                    "axis": "z",
+                    "degrees": 180
+                }
+            ],
+            "position": [
+                -0.397887,
+                0,
+                0.239706
+            ],
+            "resolution": [
+                640,
+                480
+            ],
+            "fov": 90
+        }
+    ],
+    "components": [
+        {
+            "zeroedRotations": [
+                {
+                    "axis": "x",
+                    "degrees": 0
+                },
+                {
+                    "axis": "y",
+                    "degrees": 0
+                },
+                {
+                    "axis": "z",
+                    "degrees": 0
+                }
+            ],
+            "zeroedPosition": [
+                0,
+                0,
+                0
+            ]
+        }
+    ]
+}

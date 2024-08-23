@@ -19,6 +19,7 @@ public:
   frc2::Command *GetAutonomousCommand();
 
   SwerveSubsystem &GetSwerveSubsystem();
+  ShooterSubsystem &GetShooterSubsystem();
   str::Vision &GetVision();
   str::NoteVisualizer &GetNoteVisualizer();
 
@@ -27,8 +28,9 @@ private:
   frc2::CommandXboxController controller{0};
 
   SwerveSubsystem swerveSubsystem;
+  ShooterSubsystem shooterSubsystem;
   str::Vision vision;
   str::NoteVisualizer noteVisualizer;
 
-  Autos autos{swerveSubsystem};
+  Autos autos{swerveSubsystem, shooterSubsystem};
 };

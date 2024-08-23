@@ -11,7 +11,7 @@
 namespace consts {
 
 inline constexpr units::second_t LOOP_PERIOD = 1 / 50_Hz;
-inline constexpr units::second_t SWERVE_ODOM_LOOP_PERIOD = 1 / 50_Hz;
+inline constexpr units::second_t SWERVE_ODOM_LOOP_PERIOD = 1 / 250_Hz;
 
 namespace yearSpecific {
 inline const frc::AprilTagFieldLayout aprilTagLayout =

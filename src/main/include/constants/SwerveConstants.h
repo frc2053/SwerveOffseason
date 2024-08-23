@@ -76,12 +76,12 @@ inline constexpr frc::DCMotor STEER_MOTOR = frc::DCMotor::Falcon500FOC(1);
 inline constexpr units::meter_t WHEEL_RADIUS = 2_in;
 
 // Distance between center of drive wheels
-inline constexpr units::meter_t WHEELBASE_WIDTH = 22.75_in;
-inline constexpr units::meter_t WHEELBASE_LENGTH = 22.75_in;
+inline constexpr units::meter_t WHEELBASE_WIDTH = 21.75_in;
+inline constexpr units::meter_t WHEELBASE_LENGTH = 15.75_in;
 
 // Total outside frame size
-inline constexpr units::meter_t DRIVEBASE_WIDTH = 28_in;
-inline constexpr units::meter_t DRIVEBASE_LENGTH = 28_in;
+inline constexpr units::meter_t DRIVEBASE_WIDTH = 27.440000_in;
+inline constexpr units::meter_t DRIVEBASE_LENGTH = 27_in;
 
 // 3/4 in plywood + 2.5 in diameter pool noodles + 1/8 slop
 inline constexpr units::meter_t BUMPER_THICKNESS = .75_in + 2.5_in + .125_in;

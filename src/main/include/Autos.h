@@ -9,11 +9,13 @@
 #include <frc2/command/Commands.h>
 #include <pathplanner/lib/auto/NamedCommands.h>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
+#include <subsystems/ShooterSubsystem.h>
 #include <subsystems/SwerveSubsystem.h>
 
 class Autos {
 public:
-  explicit Autos(SwerveSubsystem &swerveSub) : swerveSub(swerveSub) {
+  explicit Autos(SwerveSubsystem &swerveSub, ShooterSubsystem &shooterSub)
+      : swerveSub(swerveSub), shooterSub(shooterSub) {
     pathplanner::NamedCommands::registerCommand(
         "Shoot", frc2::cmd::Print("Shooting Note"));
 
@@ -49,6 +51,7 @@ private:
   frc::SendableChooser<AutoSelector> autoChooser;
 
   SwerveSubsystem &swerveSub;
+  ShooterSubsystem &shooterSub;
 
   frc2::CommandPtr selectCommand{frc2::cmd::None()};
 };

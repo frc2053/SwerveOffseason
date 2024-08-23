@@ -89,6 +89,10 @@ SwerveSubsystem &RobotContainer::GetSwerveSubsystem() {
   return swerveSubsystem;
 }
 
+ShooterSubsystem &RobotContainer::GetShooterSubsystem() {
+  return shooterSubsystem;
+}
+
 str::Vision &RobotContainer::GetVision() { return vision; }
 
 str::NoteVisualizer &RobotContainer::GetNoteVisualizer() {
