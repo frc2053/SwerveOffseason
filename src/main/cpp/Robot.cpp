@@ -8,6 +8,7 @@
 #include <frc/DriverStation.h>
 #include <frc/simulation/RoboRioSim.h>
 #include <frc2/command/CommandScheduler.h>
+#include "frc/Alert.h"
 
 #include "str/DataUtils.h"
 
