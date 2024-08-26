@@ -148,7 +148,7 @@ void SwerveSubsystem::LoadChoreoTrajectories() {
            frc::filesystem::GetDeployDirectory() + "/choreo/")) {
     std::string fileName = entry.path().stem().string();
     fmt::print("Loaded choreo trajectory: {}\n", fileName);
-    pathMap[fileName] = choreolib::Choreo::GetTrajectory(fileName);
+    //pathMap[fileName] = choreolib::Choreo::GetTrajectory(fileName);
   }
 }
 
