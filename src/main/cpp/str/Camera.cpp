@@ -23,9 +23,8 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
           nt->GetDoubleTopic(cameraName + "StdDevsRot").Publish()) {
   photonEstimator = std::make_unique<photon::PhotonPoseEstimator>(
       consts::yearSpecific::aprilTagLayout,
-      photon::PoseStrategy::MULTI_TAG_PNP_ON_COPROCESSOR,
-      std::move(photon::PhotonCamera(cameraName)), robotToCamera);
-  camera = photonEstimator->GetCamera();
+      photon::PoseStrategy::MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamera);
+  camera = std::make_unique<photon::PhotonCamera>(cameraName);
   camera->SetVersionCheckEnabled(false);
   photonEstimator->SetMultiTagFallbackStrategy(
       photon::PoseStrategy::LOWEST_AMBIGUITY);
@@ -52,7 +51,7 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
 }
 
 photon::PhotonPipelineResult Camera::GetLatestResult() {
-  return camera->GetLatestResult();
+  return latestResult;
 }
 
 std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
@@ -60,28 +59,21 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
     return std::nullopt;
   }
 
-  auto visionEst = photonEstimator->Update();
-  units::second_t latestTimestamp = camera->GetLatestResult().GetTimestamp();
+  std::optional<photon::EstimatedRobotPose> visionEst;
 
-  // FIXME: waiting on wpilib for fix
-  // account for issue with NT sync not working correctly.
-  units::second_t now = frc::Timer::GetFPGATimestamp();
-  if (latestTimestamp > now) {
-    latestTimestamp = now;
-  }
+  for(const auto& result : camera->GetAllUnreadResults()) {
+    visionEst = photonEstimator->Update(result);
 
-  bool newResult =
-      units::math::abs(latestTimestamp - lastEstTimestamp) > 1e-5_s;
-  if (visionEst.has_value()) {
-    posePub.Set(visionEst.value().estimatedPose.ToPose2d());
-  } else {
-    if (newResult) {
+    if(visionEst.has_value()) {
+      posePub.Set(visionEst.value().estimatedPose.ToPose2d());
+    }
+    else {
       posePub.Set({});
     }
+
+    latestResult = result;
   }
-  if (newResult) {
-    lastEstTimestamp = latestTimestamp;
-  }
+
   return visionEst;
 }
 

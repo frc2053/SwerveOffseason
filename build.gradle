@@ -4,6 +4,10 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2024.3.2"
 }
 
+repositories {
+    mavenLocal()
+}
+
 wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
 wpi.versions.wpilibVersion = '2025.+'

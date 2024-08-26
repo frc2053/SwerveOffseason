@@ -49,8 +49,8 @@ private:
   frc::LinearSystem<1, 1, 1> shooterPlant{frc::LinearSystemId::FlywheelSystem(
       consts::shooter::physical::SHOOTER_MOTOR, consts::shooter::physical::FLYWHEEL_MOI, consts::shooter::physical::SHOOTER_RATIO)};
 
-  frc::sim::FlywheelSim topFlywheelSim{shooterPlant, consts::shooter::physical::SHOOTER_MOTOR, consts::shooter::physical::SHOOTER_RATIO};
-  frc::sim::FlywheelSim bottomFlywheelSim{shooterPlant, consts::shooter::physical::SHOOTER_MOTOR, consts::shooter::physical::SHOOTER_RATIO};
+  frc::sim::FlywheelSim topFlywheelSim{shooterPlant, consts::shooter::physical::SHOOTER_MOTOR};
+  frc::sim::FlywheelSim bottomFlywheelSim{shooterPlant, consts::shooter::physical::SHOOTER_MOTOR};
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Shooter")};

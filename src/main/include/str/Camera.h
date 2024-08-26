@@ -31,11 +31,12 @@ public:
 private:
   bool simulate;
   std::unique_ptr<photon::PhotonPoseEstimator> photonEstimator;
-  std::shared_ptr<photon::PhotonCamera> camera;
+  std::unique_ptr<photon::PhotonCamera> camera;
   std::unique_ptr<photon::VisionSystemSim> visionSim;
   std::unique_ptr<photon::SimCameraProperties> cameraProps;
   std::shared_ptr<photon::PhotonCameraSim> cameraSim;
-  units::second_t lastEstTimestamp{0_s};
+
+  photon::PhotonPipelineResult latestResult;
 
   Eigen::Matrix<double, 3, 1> singleTagDevs;
   Eigen::Matrix<double, 3, 1> multiTagDevs;
