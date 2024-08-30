@@ -11,8 +11,12 @@
 #include <frc/system/plant/LinearSystemId.h>
 #include <networktables/DoubleTopic.h>
 #include <networktables/NetworkTableInstance.h>
-
+#include <frc2/command/button/Trigger.h>
+#include <networktables/BooleanTopic.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
+#include <frc/controller/PIDController.h>
 #include "constants/ShooterConstants.h"
+#include <frc2/command/sysid/SysIdRoutine.h>
 
 class ShooterSubsystem : public frc2::SubsystemBase {
 public:
@@ -23,9 +27,26 @@ public:
    */
   void Periodic() override;
   void SimulationPeriodic() override;
-  bool IsUpToSpeed();
+
+  frc2::CommandPtr RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset);
+  frc2::CommandPtr TopWheelSysIdQuasistatic(frc2::sysid::Direction direction);
+  frc2::CommandPtr TopWheelSysIdDynamic(frc2::sysid::Direction direction);
+  frc2::CommandPtr BottomWheelSysIdQuasistatic(frc2::sysid::Direction direction);
+  frc2::CommandPtr BottomWheelSysIdDynamic(frc2::sysid::Direction direction);
+
+  const frc2::Trigger& UpToSpeed() const { return upToSpeedTrigger; };
 
 private:
+
+  void UpdateNTEntries();
+
+  bool IsUpToSpeed() {
+    return (units::math::abs(topWheelVelocitySetpoint - currentTopWheelVelocity) < consts::shooter::gains::VEL_TOLERANCE) &&
+    (units::math::abs(bottomWheelVelocitySetpoint - currentBottomWheelVelocity) < consts::shooter::gains::VEL_TOLERANCE);
+  };
+  frc2::Trigger upToSpeedTrigger{[this] { return IsUpToSpeed(); }};
+
+
   bool ConfigureShooterMotors(bool invertBottom, bool invertTop,
                               units::scalar_t shooterGearing,
                               units::ampere_t supplyCurrentLimit,
@@ -35,13 +56,18 @@ private:
   ctre::phoenix6::hardware::TalonFX topWheelMotor{consts::shooter::can_ids::TOP_SHOOTER, "*"};
   ctre::phoenix6::hardware::TalonFX bottomWheelMotor{consts::shooter::can_ids::BOTTOM_SHOOTER, "*"};
 
+  ctre::phoenix6::StatusSignal<units::turn_t> topMotorPosSig = topWheelMotor.GetPosition();
   ctre::phoenix6::StatusSignal<units::turns_per_second_t> topMotorVelSig = topWheelMotor.GetVelocity();
   ctre::phoenix6::StatusSignal<units::volt_t> topMotorVoltageSig = topWheelMotor.GetMotorVoltage();
-  ctre::phoenix6::controls::VoltageOut topMotorSetter{0_V};
+  ctre::phoenix6::controls::VoltageOut topMotorVoltageSetter{0_V};
 
+  ctre::phoenix6::StatusSignal<units::turn_t> bottomMotorPosSig = bottomWheelMotor.GetPosition();
   ctre::phoenix6::StatusSignal<units::turns_per_second_t> bottomMotorVelSig = bottomWheelMotor.GetVelocity();
   ctre::phoenix6::StatusSignal<units::volt_t> bottomMotorVoltageSig = bottomWheelMotor.GetMotorVoltage();
-  ctre::phoenix6::controls::VoltageOut bottomMotorSetter{0_V};
+  ctre::phoenix6::controls::VoltageOut bottomMotorVoltageSetter{0_V};
+
+  ctre::phoenix6::controls::CoastOut coastSetter{};
+
 
   ctre::phoenix6::sim::TalonFXSimState &topMotorSim = topWheelMotor.GetSimState();
   ctre::phoenix6::sim::TalonFXSimState &bottomMotorSim = bottomWheelMotor.GetSimState();
@@ -51,6 +77,52 @@ private:
 
   frc::sim::FlywheelSim topFlywheelSim{shooterPlant, consts::shooter::physical::SHOOTER_MOTOR};
   frc::sim::FlywheelSim bottomFlywheelSim{shooterPlant, consts::shooter::physical::SHOOTER_MOTOR};
+
+  frc::SimpleMotorFeedforward<units::turns> topWheelFF{
+    consts::shooter::gains::SHOOTER_KS, consts::shooter::gains::SHOOTER_KV, consts::shooter::gains::SHOOTER_KA};
+
+  frc::SimpleMotorFeedforward<units::turns> bottomWheelFF{
+    consts::shooter::gains::SHOOTER_KS, consts::shooter::gains::SHOOTER_KV, consts::shooter::gains::SHOOTER_KA};
+
+  frc::PIDController topWheelPID{
+    consts::shooter::gains::SHOOTER_KP.value(), consts::shooter::gains::SHOOTER_KI.value(), consts::shooter::gains::SHOOTER_KD.value()
+  };
+
+  frc::PIDController bottomWheelPID{
+    consts::shooter::gains::SHOOTER_KP.value(), consts::shooter::gains::SHOOTER_KI.value(), consts::shooter::gains::SHOOTER_KD.value()
+  };
+
+  frc2::sysid::SysIdRoutine topWheelSysIdRoutine{
+    frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
+    frc2::sysid::Mechanism{
+      [this](units::volt_t driveVoltage) {
+        topWheelMotor.SetControl(topMotorVoltageSetter.WithOutput(driveVoltage));
+      },
+      [this](frc::sysid::SysIdRoutineLog* log) {
+        log->Motor("top-shooter-wheel")
+            .voltage(topMotorVoltageSig.GetValue())
+            .position(currentTopWheelPosition)
+            .velocity(currentTopWheelVelocity);
+      },
+      this
+    }
+  };
+
+  frc2::sysid::SysIdRoutine bottomWheelSysIdRoutine{
+    frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
+    frc2::sysid::Mechanism{
+      [this](units::volt_t driveVoltage) {
+        bottomWheelMotor.SetControl(bottomMotorVoltageSetter.WithOutput(driveVoltage));
+      },
+      [this](frc::sysid::SysIdRoutineLog* log) {
+        log->Motor("bottom-shooter-wheel")
+            .voltage(bottomMotorVoltageSig.GetValue())
+            .position(currentBottomWheelPosition)
+            .velocity(currentBottomWheelVelocity);
+      },
+      this
+    }
+  };
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Shooter")};
@@ -71,9 +143,15 @@ private:
   nt::DoublePublisher bottomWheelSetpointPub{
     nt->GetDoubleTopic("BottomWheelSetpointRPM").Publish()
   };
+  nt::BooleanPublisher isUpToSpeedPub{
+    nt->GetBooleanTopic("IsUpToSpeed").Publish()
+  };
 
-  units::radians_per_second_t topWheelVelocitySetpoint{0_rpm};
-  units::radians_per_second_t bottomWheelVelocitySetpoint{0_rpm};
-  units::radians_per_second_t currentTopWheelVelocity{0_rpm};
-  units::radians_per_second_t currentBottomWheelVelocity{0_rpm};
+  units::turns_per_second_t topWheelVelocitySetpoint{0_rpm};
+  units::turns_per_second_t bottomWheelVelocitySetpoint{0_rpm};
+  units::turn_t currentTopWheelPosition{0_rad};
+  units::turn_t currentBottomWheelPosition{0_rad};
+  units::turns_per_second_t currentTopWheelVelocity{0_rpm};
+  units::turns_per_second_t currentBottomWheelVelocity{0_rpm};
+  bool runningSysid{false};
 };

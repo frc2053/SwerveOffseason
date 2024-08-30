@@ -4,6 +4,7 @@
 
 #include "subsystems/ShooterSubsystem.h"
 #include "constants/Constants.h"
+#include <frc2/command/Commands.h>
 
 ShooterSubsystem::ShooterSubsystem() {
   ConfigureShooterMotors(consts::shooter::physical::BOTTOM_INVERT,
@@ -14,22 +15,68 @@ ShooterSubsystem::ShooterSubsystem() {
   ConfigureMotorSignals();
 }
 
+frc2::CommandPtr ShooterSubsystem::RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset) {
+    return frc2::cmd::Run([this, preset] {
+        switch(preset()) {
+            case consts::shooter::PRESET_SPEEDS::AMP:
+                topWheelVelocitySetpoint = consts::shooter::AMP_SPEEDS.topSpeed;
+                bottomWheelVelocitySetpoint = consts::shooter::AMP_SPEEDS.bottomSpeed;
+                break;
+            case consts::shooter::PRESET_SPEEDS::OFF:
+                topWheelVelocitySetpoint = 0_rpm;
+                bottomWheelVelocitySetpoint = 0_rpm;
+                break;
+            default:
+                topWheelVelocitySetpoint = 0_rpm;
+                bottomWheelVelocitySetpoint = 0_rpm;
+                break;
+        }
+    }, {this}).Until([this] { return IsUpToSpeed(); });
+}
+
 // This method will be called once per scheduler run
 void ShooterSubsystem::Periodic() {
-    ctre::phoenix::StatusCode shooterWaitResult = ctre::phoenix6::BaseStatusSignal::RefreshAll({&topMotorVelSig, &topMotorVoltageSig, &bottomMotorVelSig, &bottomMotorVoltageSig});
+    ctre::phoenix::StatusCode shooterWaitResult = ctre::phoenix6::BaseStatusSignal::RefreshAll({
+        &topMotorPosSig, 
+        &topMotorVelSig, 
+        &topMotorVoltageSig,
+        &bottomMotorPosSig,
+        &bottomMotorVelSig, 
+        &bottomMotorVoltageSig
+    });
 
     if(!shooterWaitResult.IsOK()) {
         fmt::print("Error grabbing shooter signals! Details: {}\n", shooterWaitResult.GetName());
     }
 
+    currentTopWheelPosition = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(topMotorPosSig, topMotorVelSig);
+    currentBottomWheelPosition = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(bottomMotorPosSig, bottomMotorVelSig);
+
     currentBottomWheelVelocity = bottomMotorVelSig.GetValue();
     currentTopWheelVelocity = topMotorVelSig.GetValue();
 
-    topWheelMotor.SetControl(topMotorSetter.WithOutput(10_V));
-    bottomWheelMotor.SetControl(bottomMotorSetter.WithOutput(10_V));
+    units::volt_t topFFVolts = topWheelFF.Calculate(topWheelVelocitySetpoint);
+    units::volt_t bottomFFVolts = bottomWheelFF.Calculate(bottomWheelVelocitySetpoint);
 
-    bottomWheelVelocityPub.Set(currentBottomWheelVelocity.convert<units::revolutions_per_minute>().value());
-    topWheelVelocityPub.Set(currentTopWheelVelocity.convert<units::revolutions_per_minute>().value());
+    units::volt_t topPIDOutput = units::volt_t{topWheelPID.Calculate(currentTopWheelVelocity.value(), topWheelVelocitySetpoint.value())};
+    units::volt_t bottomPIDOutput = units::volt_t{bottomWheelPID.Calculate(currentTopWheelVelocity.value(), topWheelVelocitySetpoint.value())};
+
+    if(!runningSysid) {
+        if(topWheelVelocitySetpoint == 0_rpm) {
+            topWheelMotor.SetControl(coastSetter);
+        }
+        else {
+            topWheelMotor.SetControl(topMotorVoltageSetter.WithOutput(topFFVolts + topPIDOutput));
+        }
+        if(bottomWheelVelocitySetpoint == 0_rpm) {
+            bottomWheelMotor.SetControl(coastSetter);
+        }
+        else {
+            bottomWheelMotor.SetControl(bottomMotorVoltageSetter.WithOutput(bottomFFVolts + bottomPIDOutput));
+        }
+    }
+
+    UpdateNTEntries();
 }
 
 void ShooterSubsystem::SimulationPeriodic() {
@@ -46,9 +93,14 @@ void ShooterSubsystem::SimulationPeriodic() {
     bottomMotorSim.SetRotorVelocity(bottomFlywheelSim.GetAngularVelocity());
 }
 
-bool ShooterSubsystem::IsUpToSpeed() {
-    return (units::math::abs(topWheelVelocitySetpoint - currentTopWheelVelocity) < consts::shooter::gains::VEL_TOLERANCE) &&
-    (units::math::abs(bottomWheelVelocitySetpoint - currentBottomWheelVelocity) < consts::shooter::gains::VEL_TOLERANCE);
+void ShooterSubsystem::UpdateNTEntries() {
+    topWheelSetpointPub.Set(topWheelVelocitySetpoint.convert<units::revolutions_per_minute>().value());
+    bottomWheelSetpointPub.Set(bottomWheelVelocitySetpoint.convert<units::revolutions_per_minute>().value());
+
+    bottomWheelVelocityPub.Set(currentBottomWheelVelocity.convert<units::revolutions_per_minute>().value());
+    topWheelVelocityPub.Set(currentTopWheelVelocity.convert<units::revolutions_per_minute>().value());
+
+    isUpToSpeedPub.Set(UpToSpeed().Get());
 }
 
 bool ShooterSubsystem::ConfigureShooterMotors(
@@ -56,15 +108,6 @@ bool ShooterSubsystem::ConfigureShooterMotors(
     units::ampere_t supplyCurrentLimit, units::ampere_t statorCurrentLimit) {
 
   ctre::phoenix6::configs::TalonFXConfiguration shooterConfig{};
-  ctre::phoenix6::configs::Slot0Configs shooterSlotConfig{};
-
-  shooterSlotConfig.kV = consts::shooter::gains::SHOOTER_KV.value();
-  shooterSlotConfig.kA = consts::shooter::gains::SHOOTER_KA.value();
-  shooterSlotConfig.kS = consts::shooter::gains::SHOOTER_KS.value();
-  shooterSlotConfig.kP = consts::shooter::gains::SHOOTER_KP.value();
-  shooterSlotConfig.kI = consts::shooter::gains::SHOOTER_KI.value();
-  shooterSlotConfig.kD = consts::shooter::gains::SHOOTER_KD.value();
-  shooterConfig.Slot0 = shooterSlotConfig;
 
   shooterConfig.MotorOutput.NeutralMode =
       ctre::phoenix6::signals::NeutralModeValue::Coast;
@@ -100,14 +143,17 @@ bool ShooterSubsystem::ConfigureShooterMotors(
 }
 
 bool ShooterSubsystem::ConfigureMotorSignals() {
-  topMotorSetter.UpdateFreqHz = 0_Hz;
-  bottomMotorSetter.UpdateFreqHz = 0_Hz;
+  topMotorVoltageSetter.UpdateFreqHz = 0_Hz;
+  bottomMotorVoltageSetter.UpdateFreqHz = 0_Hz;
+  coastSetter.UpdateFreqHz = 0_Hz;
 
   //Double the rio update rate? Not sure what is optimal here
   units::hertz_t updateRate = 1.0 / (consts::LOOP_PERIOD * 2.0);
 
+  topMotorPosSig.SetUpdateFrequency(updateRate);
   topMotorVelSig.SetUpdateFrequency(updateRate);
   topMotorVoltageSig.SetUpdateFrequency(updateRate);
+  bottomMotorPosSig.SetUpdateFrequency(updateRate);
   bottomMotorVelSig.SetUpdateFrequency(updateRate);
   bottomMotorVoltageSig.SetUpdateFrequency(updateRate);
 
@@ -124,4 +170,20 @@ bool ShooterSubsystem::ConfigureMotorSignals() {
   }
 
   return optimizeTopMotor.IsOK() && optimizeBottomMotor.IsOK();
+}
+
+frc2::CommandPtr ShooterSubsystem::TopWheelSysIdQuasistatic(frc2::sysid::Direction direction) {
+  return topWheelSysIdRoutine.Quasistatic(direction).BeforeStarting([this] { runningSysid = true; }).AndThen([this] { runningSysid = false; });
+}
+
+frc2::CommandPtr ShooterSubsystem::TopWheelSysIdDynamic(frc2::sysid::Direction direction) {
+  return topWheelSysIdRoutine.Dynamic(direction).BeforeStarting([this] { runningSysid = true; }).AndThen([this] { runningSysid = false; });;
+}
+
+frc2::CommandPtr ShooterSubsystem::BottomWheelSysIdQuasistatic(frc2::sysid::Direction direction) {
+  return bottomWheelSysIdRoutine.Quasistatic(direction).BeforeStarting([this] { runningSysid = true; }).AndThen([this] { runningSysid = false; });
+}
+
+frc2::CommandPtr ShooterSubsystem::BottomWheelSysIdDynamic(frc2::sysid::Direction direction) {
+  return bottomWheelSysIdRoutine.Dynamic(direction).BeforeStarting([this] { runningSysid = true; }).AndThen([this] { runningSysid = false; });;
 }

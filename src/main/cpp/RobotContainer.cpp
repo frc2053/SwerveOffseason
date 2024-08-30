@@ -49,14 +49,27 @@ void RobotContainer::ConfigureBindings() {
   // controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kForward));
   // controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kReverse));
 
-  controller.A().WhileTrue(swerveSubsystem.SysIdSteerMk4nQuasistaticTorque(
-      frc2::sysid::Direction::kForward));
-  controller.B().WhileTrue(swerveSubsystem.SysIdSteerMk4nQuasistaticTorque(
-      frc2::sysid::Direction::kReverse));
-  controller.X().WhileTrue(swerveSubsystem.SysIdSteerMk4nDynamicTorque(
-      frc2::sysid::Direction::kForward));
-  controller.Y().WhileTrue(swerveSubsystem.SysIdSteerMk4nDynamicTorque(
-      frc2::sysid::Direction::kReverse));
+  controller.A().WhileTrue(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::AMP; }));
+  controller.A().OnFalse(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+
+  // controller.A().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kForward));
+  // controller.B().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kReverse));
+  // controller.X().WhileTrue(shooterSubsystem.TopWheelSysIdDynamic(frc2::sysid::Direction::kForward));
+  // controller.Y().WhileTrue(shooterSubsystem.TopWheelSysIdDynamic(frc2::sysid::Direction::kReverse));
+
+  // (controller.A() && controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdQuasistatic(frc2::sysid::Direction::kForward));
+  // (controller.B() && controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdQuasistatic(frc2::sysid::Direction::kReverse));
+  // (controller.X() && controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdDynamic(frc2::sysid::Direction::kForward));
+  // (controller.Y() && controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdDynamic(frc2::sysid::Direction::kReverse));
+
+  // controller.A().WhileTrue(swerveSubsystem.SysIdSteerMk4nQuasistaticTorque(
+  //     frc2::sysid::Direction::kForward));
+  // controller.B().WhileTrue(swerveSubsystem.SysIdSteerMk4nQuasistaticTorque(
+  //     frc2::sysid::Direction::kReverse));
+  // controller.X().WhileTrue(swerveSubsystem.SysIdSteerMk4nDynamicTorque(
+  //     frc2::sysid::Direction::kForward));
+  // controller.Y().WhileTrue(swerveSubsystem.SysIdSteerMk4nDynamicTorque(
+  //     frc2::sysid::Direction::kReverse));
 
   // controller.A().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kReverse));

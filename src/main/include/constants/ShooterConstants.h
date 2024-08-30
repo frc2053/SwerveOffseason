@@ -7,6 +7,7 @@
 #include <frc/system/plant/DCMotor.h>
 #include <units/base.h>
 #include <units/velocity.h>
+#include <wpi/interpolating_map.h>
 
 #include "str/Gains.h"
 
@@ -34,18 +35,34 @@ inline constexpr frc::DCMotor SHOOTER_MOTOR = frc::DCMotor::Falcon500(1);
 inline constexpr units::meter_t WHEEL_RADIUS = 2_in;
 
 //From onshape doc
-static constexpr units::kilogram_square_meter_t FLYWHEEL_MOI = 62.564007 * 1_in * 1_in * 1_lb;
+inline constexpr units::kilogram_square_meter_t FLYWHEEL_MOI = 5.01 * 1_in * 1_in * 1_lb;
 } // namespace physical
 
 namespace gains {
-inline constexpr units::radians_per_second_t VEL_TOLERANCE = 10_rpm;
-inline constexpr str::gains::radial::turn_volt_ka_unit_t SHOOTER_KA{0};
-inline constexpr str::gains::radial::turn_amp_kv_unit_t SHOOTER_KV{0};
-inline constexpr units::ampere_t SHOOTER_KS{0};
-inline constexpr units::volt_t SHOOTER_KS_V{0};
-inline constexpr str::gains::radial::turn_amp_kp_unit_t SHOOTER_KP{0};
-inline constexpr str::gains::radial::turn_amp_ki_unit_t SHOOTER_KI{0};
-inline constexpr str::gains::radial::turn_amp_kd_unit_t SHOOTER_KD{0};
+inline constexpr units::turns_per_second_t VEL_TOLERANCE = 2_rpm;
+inline constexpr str::gains::radial::turn_volt_ka_unit_t SHOOTER_KA{0.021356};
+inline constexpr str::gains::radial::turn_volt_kv_unit_t SHOOTER_KV{0.11227};
+inline constexpr units::volt_t SHOOTER_KS{0.02364};
+inline constexpr str::gains::radial::turn_volt_kp_unit_t SHOOTER_KP{0.047275};
+inline constexpr str::gains::radial::turn_volt_ki_unit_t SHOOTER_KI{0};
+inline constexpr str::gains::radial::turn_volt_kd_unit_t SHOOTER_KD{0};
 } // namespace gains
+
+struct ShooterSpeeds {
+    units::turns_per_second_t topSpeed;
+    units::turns_per_second_t bottomSpeed;
+};
+
+inline constexpr ShooterSpeeds AMP_SPEEDS{3000_rpm, 2000_rpm};
+
+static wpi::interpolating_map<units::meter_t, ShooterSpeeds> SHOOTER_LUT;
+
+enum class PRESET_SPEEDS {
+    OFF,
+    AMP,
+    SPEAKER_DIST,
+    SUBWOOFER,
+    PASS
+};
 } // namespace shooter
 } // namespace consts
