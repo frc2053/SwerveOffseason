@@ -4,6 +4,7 @@
 
 #include <units/math.h>
 #include <wpi/json.h>
+#include <iostream>
 
 using namespace choreolib;
 
@@ -107,5 +108,5 @@ void choreolib::to_json(wpi::json& json, const ChoreoTrajectory& traj) {
 }
 
 void choreolib::from_json(const wpi::json& json, ChoreoTrajectory& traj) {
-  traj.SetSamples(json.at("samples").get<std::vector<ChoreoTrajectoryState>>());
+  traj.SetSamples(json.at("traj").at("samples").at(0).get<std::vector<ChoreoTrajectoryState>>());
 }

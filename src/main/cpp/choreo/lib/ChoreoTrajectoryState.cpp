@@ -101,33 +101,33 @@ void choreolib::to_json(wpi::json& json,
   std::transform(trajState.moduleForcesY.begin(), trajState.moduleForcesY.end(),
                  fy.begin(), [](units::newton_t x) { return x.value(); });
 
-  json = wpi::json{{"timestamp", trajState.timestamp.value()},
+  json = wpi::json{{"t", trajState.timestamp.value()},
                    {"x", trajState.x.value()},
                    {"y", trajState.y.value()},
                    {"heading", trajState.heading.value()},
-                   {"velocityX", trajState.velocityX.value()},
-                   {"velocityY", trajState.velocityY.value()},
-                   {"angularVelocity", trajState.angularVelocity.value()},
-                   {"moduleForcesX", fx},
-                   {"moduleForcesY", fy}};
+                   {"vx", trajState.velocityX.value()},
+                   {"vy", trajState.velocityY.value()},
+                   {"omega", trajState.angularVelocity.value()},
+                   {"fx", fx},
+                   {"fy", fy}};
 }
 
 void choreolib::from_json(const wpi::json& json,
                           ChoreoTrajectoryState& trajState) {
-  trajState.timestamp = units::second_t{json.at("timestamp").get<double>()};
+  trajState.timestamp = units::second_t{json.at("t").get<double>()};
   trajState.x = units::meter_t{json.at("x").get<double>()};
   trajState.y = units::meter_t{json.at("y").get<double>()};
   trajState.heading = units::radian_t{json.at("heading").get<double>()};
   trajState.velocityX =
-      units::meters_per_second_t{json.at("velocityX").get<double>()};
+      units::meters_per_second_t{json.at("vx").get<double>()};
   trajState.velocityY =
-      units::meters_per_second_t{json.at("velocityY").get<double>()};
+      units::meters_per_second_t{json.at("vy").get<double>()};
   trajState.angularVelocity =
-      units::radians_per_second_t{json.at("angularVelocity").get<double>()};
+      units::radians_per_second_t{json.at("omega").get<double>()};
 
   // these probably get optimized out anyways, but wanted to reduce accesses
-  const auto& fx = json.at("moduleForcesX");
-  const auto& fy = json.at("moduleForcesY");
+  const auto& fx = json.at("fx");
+  const auto& fy = json.at("fy");
   for (int i = 0; i < 4; ++i) {
     trajState.moduleForcesX[i] = units::newton_t{fx.at(i).get<double>()};
     trajState.moduleForcesY[i] = units::newton_t{fy.at(i).get<double>()};
