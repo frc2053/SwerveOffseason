@@ -30,12 +30,12 @@ inline constexpr bool INVERT_MOTOR = false;
 
 inline constexpr units::scalar_t INTAKE_RATIO = (24.0 / 16.0);
 
-inline constexpr frc::DCMotor SHOOTER_MOTOR = frc::DCMotor::Falcon500(1);
+inline constexpr frc::DCMotor INTAKE_MOTOR = frc::DCMotor::Falcon500(1);
 
 inline constexpr units::meter_t WHEEL_RADIUS = 1_in;
 
 //From onshape doc
-inline constexpr units::kilogram_square_meter_t FLYWHEEL_MOI = 12.350445 * 1_in * 1_in * 1_lb;
+inline constexpr units::kilogram_square_meter_t INTAKE_MOI = 12.350445 * 1_in * 1_in * 1_lb;
 } // namespace physical
 } // namespace intake
 } // namespace consts

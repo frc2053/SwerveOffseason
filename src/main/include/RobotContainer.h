@@ -20,6 +20,7 @@ public:
 
   SwerveSubsystem &GetSwerveSubsystem();
   ShooterSubsystem &GetShooterSubsystem();
+  IntakeSubsystem &GetIntakeSubsystem();
   str::Vision &GetVision();
   str::NoteVisualizer &GetNoteVisualizer();
 
@@ -29,8 +30,9 @@ private:
 
   SwerveSubsystem swerveSubsystem;
   ShooterSubsystem shooterSubsystem;
+  IntakeSubsystem intakeSubsystem;
   str::Vision vision;
   str::NoteVisualizer noteVisualizer;
 
-  Autos autos{swerveSubsystem, shooterSubsystem};
+  Autos autos{swerveSubsystem, shooterSubsystem, intakeSubsystem};
 };

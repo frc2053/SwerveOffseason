@@ -62,15 +62,6 @@ void RobotContainer::ConfigureBindings() {
   // (controller.X() && controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdDynamic(frc2::sysid::Direction::kForward));
   // (controller.Y() && controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdDynamic(frc2::sysid::Direction::kReverse));
 
-  // controller.A().WhileTrue(swerveSubsystem.SysIdSteerMk4nQuasistaticTorque(
-  //     frc2::sysid::Direction::kForward));
-  // controller.B().WhileTrue(swerveSubsystem.SysIdSteerMk4nQuasistaticTorque(
-  //     frc2::sysid::Direction::kReverse));
-  // controller.X().WhileTrue(swerveSubsystem.SysIdSteerMk4nDynamicTorque(
-  //     frc2::sysid::Direction::kForward));
-  // controller.Y().WhileTrue(swerveSubsystem.SysIdSteerMk4nDynamicTorque(
-  //     frc2::sysid::Direction::kReverse));
-
   // controller.A().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kReverse));
   // controller.X().WhileTrue(swerveSubsystem.SysIdSteerMk4iDynamicTorque(frc2::sysid::Direction::kForward));
@@ -104,6 +95,10 @@ SwerveSubsystem &RobotContainer::GetSwerveSubsystem() {
 
 ShooterSubsystem &RobotContainer::GetShooterSubsystem() {
   return shooterSubsystem;
+}
+
+IntakeSubsystem &RobotContainer::GetIntakeSubsystem() {
+  return intakeSubsystem;
 }
 
 str::Vision &RobotContainer::GetVision() { return vision; }

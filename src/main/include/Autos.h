@@ -11,11 +11,12 @@
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
 #include <subsystems/ShooterSubsystem.h>
 #include <subsystems/SwerveSubsystem.h>
+#include <subsystems/IntakeSubsystem.h>
 
 class Autos {
 public:
-  explicit Autos(SwerveSubsystem &swerveSub, ShooterSubsystem &shooterSub)
-      : swerveSub(swerveSub), shooterSub(shooterSub) {
+  explicit Autos(SwerveSubsystem &swerveSub, ShooterSubsystem &shooterSub, IntakeSubsystem &intakeSub)
+      : swerveSub(swerveSub), shooterSub(shooterSub), intakeSub(intakeSub) {
     pathplanner::NamedCommands::registerCommand(
         "Shoot", frc2::cmd::Print("Shooting Note"));
 
@@ -52,6 +53,7 @@ private:
 
   SwerveSubsystem &swerveSub;
   ShooterSubsystem &shooterSub;
+  IntakeSubsystem &intakeSub;
 
   frc2::CommandPtr selectCommand{frc2::cmd::None()};
 };
