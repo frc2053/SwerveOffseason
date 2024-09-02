@@ -37,5 +37,11 @@ inline constexpr units::meter_t WHEEL_RADIUS = 1_in;
 //From onshape doc
 inline constexpr units::kilogram_square_meter_t INTAKE_MOI = 12.350445 * 1_in * 1_in * 1_lb;
 } // namespace physical
+
+namespace gains {
+inline constexpr units::ampere_t NOTE_SPIKE_THRESHOLD = 100_A;
+inline constexpr units::volt_t NOTE_INTAKE_VOLTAGE = 10_V;
+inline constexpr units::volt_t NOTE_EJECT_VOLTAGE = -5_V;
+}
 } // namespace intake
 } // namespace consts

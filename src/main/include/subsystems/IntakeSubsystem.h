@@ -13,6 +13,8 @@
 #include <ctre/phoenix6/TalonFX.hpp>
 #include <frc/system/plant/LinearSystemId.h>
 #include <frc/simulation/FlywheelSim.h>
+#include <frc/filter/Debouncer.h>
+#include <frc2/command/CommandPtr.h>
 
 class IntakeSubsystem : public frc2::SubsystemBase {
  public:
@@ -22,7 +24,11 @@ class IntakeSubsystem : public frc2::SubsystemBase {
    * Will be called periodically whenever the CommandScheduler runs.
    */
   void Periodic() override;
+  void SimulationPeriodic() override;
+  bool TouchingNote();
 
+  frc2::CommandPtr IntakeNote();
+  frc2::CommandPtr PoopNote();
 
  private:
   void UpdateNTEntries();
@@ -46,4 +52,23 @@ class IntakeSubsystem : public frc2::SubsystemBase {
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Intake")};
+  nt::DoublePublisher intakeWheelMotorVoltagePub{
+    nt->GetDoubleTopic("IntakeWheelMotorVoltage").Publish()
+  };
+  nt::DoublePublisher intakeWheelMotorVoltageSetpointPub{
+    nt->GetDoubleTopic("IntakeWheelMotorVoltageSetpoint").Publish()
+  };
+  nt::DoublePublisher intakeWheelTorqueCurrentPub{
+    nt->GetDoubleTopic("IntakeWheelMotorTorqueCurrent").Publish()
+  };
+  nt::DoublePublisher touchingNotePub{
+    nt->GetDoubleTopic("TouchingNote").Publish()
+  };
+
+  frc::Debouncer intakeSpikeDebouncer{.25_s, frc::Debouncer::kFalling};
+  bool isTouchingNote{false};
+
+  units::volt_t intakeWheelVoltageSetpoint{0_V};
+  units::volt_t currentIntakeWheelVoltage{0_V};
+  units::ampere_t intakeWheelTorqueCurrent{0_A};
 };

@@ -5,6 +5,7 @@
 #include "subsystems/IntakeSubsystem.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "constants/Constants.h"
+#include <frc2/command/Commands.h>
 
 IntakeSubsystem::IntakeSubsystem() {
     SetName("IntakeSubsystem");
@@ -13,8 +14,56 @@ IntakeSubsystem::IntakeSubsystem() {
     frc::SmartDashboard::PutData(this);
 }
 
+bool IntakeSubsystem::TouchingNote() {
+  return isTouchingNote;
+}
+
+frc2::CommandPtr IntakeSubsystem::IntakeNote() {
+  return frc2::cmd::RunEnd([this] {
+    intakeWheelVoltageSetpoint = consts::intake::gains::NOTE_INTAKE_VOLTAGE;
+  }, [this] {
+    intakeWheelVoltageSetpoint = 0_V;
+  }, {this});
+}
+
+frc2::CommandPtr IntakeSubsystem::PoopNote() {
+  return frc2::cmd::RunEnd([this] {
+    intakeWheelVoltageSetpoint = consts::intake::gains::NOTE_EJECT_VOLTAGE;
+  }, [this] {
+    intakeWheelVoltageSetpoint = 0_V;
+  }, {this});
+}
+
 // This method will be called once per scheduler run
-void IntakeSubsystem::Periodic() {}
+void IntakeSubsystem::Periodic() {
+  ctre::phoenix::StatusCode shooterWaitResult = ctre::phoenix6::BaseStatusSignal::RefreshAll({
+    &intakeMotorVoltageSig, 
+    &intakeMotorTorqueCurrentSig
+  });
+
+  currentIntakeWheelVoltage = intakeMotorVoltageSig.GetValue();
+  intakeWheelTorqueCurrent = intakeMotorTorqueCurrentSig.GetValue();
+
+  isTouchingNote = intakeSpikeDebouncer.Calculate(intakeWheelTorqueCurrent > consts::intake::gains::NOTE_SPIKE_THRESHOLD);
+
+  intakeMotor.SetControl(intakeMotorVoltageSetter.WithOutput(intakeWheelVoltageSetpoint));
+
+  UpdateNTEntries();
+}
+
+void IntakeSubsystem::UpdateNTEntries() {
+  intakeWheelMotorVoltagePub.Set(currentIntakeWheelVoltage.value());
+  intakeWheelMotorVoltageSetpointPub.Set(intakeWheelVoltageSetpoint.value());
+  intakeWheelTorqueCurrentPub.Set(intakeWheelTorqueCurrent.value());
+  touchingNotePub.Set(isTouchingNote);
+}
+
+void IntakeSubsystem::SimulationPeriodic() {
+    intakeMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
+    intakeSim.SetInputVoltage(intakeMotorSim.GetMotorVoltage());
+    intakeSim.Update(consts::LOOP_PERIOD);
+    intakeMotorSim.SetRotorVelocity(intakeSim.GetAngularVelocity());
+}
 
 bool IntakeSubsystem::ConfigureIntakeMotor(bool invert,
                             units::scalar_t intakeGearing,

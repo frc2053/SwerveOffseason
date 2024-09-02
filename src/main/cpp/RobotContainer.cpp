@@ -28,7 +28,7 @@ void RobotContainer::ConfigureBindings() {
       },
       true));
 
-  controller.LeftTrigger().WhileTrue(swerveSubsystem.AlignToAmp());
+  //controller.LeftTrigger().WhileTrue(swerveSubsystem.AlignToAmp());
   controller.LeftBumper().WhileTrue(swerveSubsystem.XPattern());
   controller.Back().WhileTrue(
       swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));
@@ -51,6 +51,9 @@ void RobotContainer::ConfigureBindings() {
 
   controller.A().WhileTrue(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::AMP; }));
   controller.A().OnFalse(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+
+  controller.LeftTrigger().WhileTrue(intakeSubsystem.IntakeNote());
+  controller.RightTrigger().WhileTrue(intakeSubsystem.PoopNote());
 
   // controller.A().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kReverse));
