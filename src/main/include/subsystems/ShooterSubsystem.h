@@ -126,11 +126,6 @@ private:
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Shooter")};
-  nt::DoublePublisher loopTimePub{
-      nt::NetworkTableInstance::GetDefault()
-          .GetTable("Metadata")
-          ->GetDoubleTopic("ShooterOdomLoopRate")
-          .Publish()};
   nt::DoublePublisher topWheelVelocityPub{
     nt->GetDoubleTopic("TopWheelVelocityRPM").Publish()
   };

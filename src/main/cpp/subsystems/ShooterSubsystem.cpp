@@ -5,6 +5,8 @@
 #include "subsystems/ShooterSubsystem.h"
 #include "constants/Constants.h"
 #include <frc2/command/Commands.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+
 
 ShooterSubsystem::ShooterSubsystem() {
   ConfigureShooterMotors(consts::shooter::physical::BOTTOM_INVERT,
@@ -13,6 +15,8 @@ ShooterSubsystem::ShooterSubsystem() {
                          consts::shooter::current_limits::SUPPLY_CURRENT_LIMIT,
                          consts::shooter::current_limits::STATOR_CURRENT_LIMIT);
   ConfigureMotorSignals();
+  SetName("ShooterSubsystem");
+  frc::SmartDashboard::PutData(this);
 }
 
 frc2::CommandPtr ShooterSubsystem::RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset) {

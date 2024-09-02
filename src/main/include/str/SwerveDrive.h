@@ -152,17 +152,10 @@ private:
       modulePositions, frc::Pose2d{}};
 
   units::radian_t yawLatencyComped;
-  units::second_t lastDriveLoopTime;
-  units::second_t lastSimLoopTime;
   frc::Rotation2d lastSimAngle;
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("SwerveDrive")};
-  nt::DoublePublisher loopTimePub{
-      nt::NetworkTableInstance::GetDefault()
-          .GetTable("Metadata")
-          ->GetDoubleTopic("SwerveDriveOdomLoopRate")
-          .Publish()};
   nt::BooleanPublisher isSlippingPub{
       nt->GetBooleanTopic("IsSlipping").Publish()};
   nt::StructArrayPublisher<frc::SwerveModuleState> desiredStatesPub{

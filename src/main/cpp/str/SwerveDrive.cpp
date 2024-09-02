@@ -72,10 +72,6 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel,
                         units::meters_per_second_t yVel,
                         units::radians_per_second_t omega, bool fieldRelative,
                         bool openLoop) {
-  units::second_t now = frc::Timer::GetFPGATimestamp();
-  units::second_t loopTime = now - lastDriveLoopTime;
-  loopTimePub.Set((1 / loopTime).value());
-
   frc::ChassisSpeeds speedsToSend;
   if (fieldRelative) {
     speedsToSend = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
@@ -86,14 +82,12 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel,
     speedsToSend.omega = omega;
   }
 
-  speedsToSend = frc::ChassisSpeeds::Discretize(speedsToSend, loopTime);
+  speedsToSend = frc::ChassisSpeeds::Discretize(speedsToSend, consts::LOOP_PERIOD);
 
   SetModuleStates(
       consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend),
       true, openLoop,
       ConvertModuleForcesToTorqueCurrent(xModuleForce, yModuleForce));
-
-  lastDriveLoopTime = now;
 }
 
 frc::ChassisSpeeds SwerveDrive::GetRobotRelativeSpeeds() const {
@@ -190,14 +184,11 @@ void SwerveDrive::UpdateNTEntries() {
 }
 
 void SwerveDrive::SimulationPeriodic() {
-  units::second_t now = frc::Timer::GetFPGATimestamp();
-  units::second_t loopTime = now - lastSimLoopTime;
-
   std::array<frc::SwerveModuleState, 4> simState;
   int i = 0;
   for (auto &swerveModule : modules) {
     simState[i] = swerveModule.UpdateSimulation(
-        loopTime, frc::RobotController::GetBatteryVoltage());
+        consts::LOOP_PERIOD, frc::RobotController::GetBatteryVoltage());
     i++;
   }
 
@@ -205,12 +196,10 @@ void SwerveDrive::SimulationPeriodic() {
 
   units::radians_per_second_t omega =
       consts::swerve::physical::KINEMATICS.ToChassisSpeeds(simState).omega;
-  units::radian_t angleChange = omega * loopTime;
+  units::radian_t angleChange = omega * consts::LOOP_PERIOD;
 
   lastSimAngle = lastSimAngle + frc::Rotation2d{angleChange};
   imuSimState.SetRawYaw(lastSimAngle.Degrees());
-
-  lastSimLoopTime = now;
 }
 
 units::ampere_t SwerveDrive::GetSimulatedCurrentDraw() const {
