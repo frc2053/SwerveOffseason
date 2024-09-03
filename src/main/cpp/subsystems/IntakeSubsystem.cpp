@@ -62,7 +62,7 @@ void IntakeSubsystem::SimulationPeriodic() {
     intakeMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
     intakeSim.SetInputVoltage(intakeMotorSim.GetMotorVoltage());
     intakeSim.Update(consts::LOOP_PERIOD);
-    intakeMotorSim.SetRotorVelocity(intakeSim.GetAngularVelocity());
+    intakeMotorSim.SetRotorVelocity(intakeSim.GetAngularVelocity() * consts::intake::physical::INTAKE_RATIO);
 }
 
 bool IntakeSubsystem::ConfigureIntakeMotor(bool invert,

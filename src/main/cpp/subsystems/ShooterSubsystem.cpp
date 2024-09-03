@@ -93,8 +93,8 @@ void ShooterSubsystem::SimulationPeriodic() {
     topFlywheelSim.Update(consts::LOOP_PERIOD);
     bottomFlywheelSim.Update(consts::LOOP_PERIOD);
 
-    topMotorSim.SetRotorVelocity(topFlywheelSim.GetAngularVelocity());
-    bottomMotorSim.SetRotorVelocity(bottomFlywheelSim.GetAngularVelocity());
+    topMotorSim.SetRotorVelocity(topFlywheelSim.GetAngularVelocity() * consts::shooter::physical::SHOOTER_RATIO);
+    bottomMotorSim.SetRotorVelocity(bottomFlywheelSim.GetAngularVelocity() * consts::shooter::physical::SHOOTER_RATIO);
 }
 
 void ShooterSubsystem::UpdateNTEntries() {
