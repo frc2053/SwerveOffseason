@@ -60,6 +60,8 @@ public:
   frc2::CommandPtr SysIdDriveQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdDriveDynamicVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr WheelRadius(frc2::sysid::Direction dir);
+  frc2::CommandPtr TuneSteerPID(std::function<bool()> isDone);
+
 
 private:
   void SetupPathplanner();

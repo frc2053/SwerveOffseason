@@ -6,6 +6,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "constants/Constants.h"
 #include <frc2/command/Commands.h>
+#include <frc/DataLogManager.h>
 
 IntakeSubsystem::IntakeSubsystem() {
     SetName("IntakeSubsystem");
@@ -88,8 +89,8 @@ bool IntakeSubsystem::ConfigureIntakeMotor(bool invert,
   ctre::phoenix::StatusCode intakeConfigResult =
       intakeMotor.GetConfigurator().Apply(intakeConfig);
 
-  fmt::print("Configured intake motor. Result was: {}\n",
-             intakeConfigResult.GetName());
+  frc::DataLogManager::Log(fmt::format("Configured intake motor. Result was: {}\n",
+             intakeConfigResult.GetName()));
 
   return intakeConfigResult.IsOK();
 }
@@ -107,7 +108,7 @@ bool IntakeSubsystem::ConfigureMotorSignals() {
   ctre::phoenix::StatusCode optimizeIntakeMotor =
       intakeMotor.OptimizeBusUtilization();
   if (optimizeIntakeMotor.IsOK()) {
-    fmt::print("Optimized bus signals for intake motor\n");
+    frc::DataLogManager::Log("Optimized bus signals for intake motor\n");
   }
 
   return optimizeIntakeMotor.IsOK();

@@ -5,6 +5,7 @@
 #include "str/SwerveModule.h"
 
 #include <frc/MathUtil.h>
+#include <frc/DataLogManager.h>
 
 using namespace str;
 
@@ -26,15 +27,15 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants,
   if (!ConfigureSteerMotor(constants.invertSteer, physicalAttrib.steerGearing,
                            physicalAttrib.steerTorqueCurrentLimit,
                            physicalAttrib.steerTorqueCurrentLimit)) {
-    fmt::print("ERROR: Failed to configure steer motor!");
+    frc::DataLogManager::Log("ERROR: Failed to configure steer motor!");
   }
   if (!ConfigureDriveMotor(constants.invertDrive,
                            physicalAttrib.driveSupplySideLimit,
                            physicalAttrib.slipCurrent)) {
-    fmt::print("ERROR: Failed to configure drive motor!");
+    frc::DataLogManager::Log("ERROR: Failed to configure drive motor!");
   }
   if (!ConfigureSteerEncoder(constants.steerEncoderOffset)) {
-    fmt::print("ERROR: Failed to configure steer encoder!");
+    frc::DataLogManager::Log("ERROR: Failed to configure steer encoder!");
   }
   ConfigureControlSignals();
 }
@@ -96,9 +97,9 @@ frc::SwerveModulePosition SwerveModule::GetCurrentPosition(bool refresh) {
             steerPositionSig, steerVelocitySig, steerVoltageSig);
 
     if (!moduleSignalStatus.IsOK()) {
-      fmt::print("Error refreshing {} module signal in GetCurrentPosition()! "
+      frc::DataLogManager::Log(fmt::format("Error refreshing {} module signal in GetCurrentPosition()! "
                  "Error was: {}\n",
-                 moduleName, moduleSignalStatus.GetName());
+                 moduleName, moduleSignalStatus.GetName()));
     }
   }
 
@@ -136,9 +137,9 @@ units::radian_t SwerveModule::GetOutputShaftTurns() {
                                                    driveVelocitySig);
 
   if (!moduleSignalStatus.IsOK()) {
-    fmt::print("Error refreshing {} module signal in GetDriveMotorTurns()! "
+    frc::DataLogManager::Log(fmt::format("Error refreshing {} module signal in GetDriveMotorTurns()! "
                "Error was: {}\n",
-               moduleName, moduleSignalStatus.GetName());
+               moduleName, moduleSignalStatus.GetName()));
   }
 
   units::radian_t latencyCompDrivePos =
@@ -211,8 +212,8 @@ bool SwerveModule::ConfigureSteerMotor(bool invertSteer,
   ctre::phoenix::StatusCode configResult =
       steerMotor.GetConfigurator().Apply(steerConfig);
 
-  fmt::print("Configured steer motor on module {}. Result was: {}\n",
-             moduleName, configResult.GetName());
+  frc::DataLogManager::Log(fmt::format("Configured steer motor on module {}. Result was: {}\n",
+             moduleName, configResult.GetName()));
 
   return configResult.IsOK();
 }
@@ -252,8 +253,8 @@ bool SwerveModule::ConfigureDriveMotor(bool invertDrive,
   ctre::phoenix::StatusCode configResult =
       driveMotor.GetConfigurator().Apply(driveConfig);
 
-  fmt::print("Configured drive motor on module {}. Result was: {}\n",
-             moduleName, configResult.GetName());
+  frc::DataLogManager::Log(fmt::format("Configured drive motor on module {}. Result was: {}\n",
+             moduleName, configResult.GetName()));
 
   return configResult.IsOK();
 }
@@ -268,8 +269,8 @@ bool SwerveModule::ConfigureSteerEncoder(units::turn_t encoderOffset) {
   ctre::phoenix::StatusCode configResult =
       steerEncoder.GetConfigurator().Apply(encoderConfig);
 
-  fmt::print("Configured steer encoder on module {}. Result was: {}\n",
-             moduleName, configResult.GetName());
+  frc::DataLogManager::Log(fmt::format("Configured steer encoder on module {}. Result was: {}\n",
+             moduleName, configResult.GetName()));
 
   return configResult.IsOK();
 }
@@ -292,12 +293,12 @@ bool SwerveModule::OptimizeBusSignals() {
   ctre::phoenix::StatusCode optimizeDriveResult =
       driveMotor.OptimizeBusUtilization();
   if (optimizeDriveResult.IsOK()) {
-    fmt::print("Optimized bus signals for {} drive motor\n", moduleName);
+    frc::DataLogManager::Log(fmt::format("Optimized bus signals for {} drive motor\n", moduleName));
   }
   ctre::phoenix::StatusCode optimizeSteerResult =
       steerMotor.OptimizeBusUtilization();
   if (optimizeSteerResult.IsOK()) {
-    fmt::print("Optimized bus signals for {} steer motor\n", moduleName);
+    frc::DataLogManager::Log(fmt::format("Optimized bus signals for {} steer motor\n", moduleName));
   }
   return optimizeDriveResult.IsOK() && optimizeSteerResult.IsOK();
 }
@@ -306,6 +307,44 @@ std::string SwerveModule::GetName() const { return moduleName; }
 
 units::ampere_t SwerveModule::GetSimulatedCurrentDraw() const {
   return moduleSim.GetDriveCurrentDraw() + moduleSim.GetSteerCurrentDraw();
+}
+
+void SwerveModule::SetSteerGains(str::SwerveModuleSteerGains newGains) {
+  steerGains = newGains;
+  ctre::phoenix6::configs::Slot0Configs steerSlotConfig{};
+  steerSlotConfig.kV = steerGains.kV.value();
+  steerSlotConfig.kA = steerGains.kA.value();
+  steerSlotConfig.kS = steerGains.kS.value();
+  steerSlotConfig.kP = steerGains.kP.value();
+  steerSlotConfig.kI = steerGains.kI.value();
+  steerSlotConfig.kD = steerGains.kD.value();
+  ctre::phoenix::StatusCode status =
+      steerMotor.GetConfigurator().Apply(steerSlotConfig);
+  if (!status.IsOK()) {
+    frc::DataLogManager::Log(
+        fmt::format("Swerve Steer Motor was unable to set new gains! "
+                    "Error: {}, More Info: {}",
+                    status.GetName(), status.GetDescription()));
+  }
+}
+
+void SwerveModule::SetDriveGains(str::SwerveModuleDriveGains newGains) {
+  driveGains = newGains;
+  ctre::phoenix6::configs::Slot0Configs driveSlotConfig{};
+  driveSlotConfig.kV = driveGains.kV.value();
+  driveSlotConfig.kA = driveGains.kA.value();
+  driveSlotConfig.kS = driveGains.kS.value();
+  driveSlotConfig.kP = driveGains.kP.value();
+  driveSlotConfig.kI = driveGains.kI.value();
+  driveSlotConfig.kD = driveGains.kD.value();
+  ctre::phoenix::StatusCode status =
+      driveMotor.GetConfigurator().Apply(driveSlotConfig);
+  if (!status.IsOK()) {
+    frc::DataLogManager::Log(
+        fmt::format("Swerve Drive Motor was unable to set new gains! "
+                    "Error: {}, More Info: {}",
+                    status.GetName(), status.GetDescription()));
+  }
 }
 
 void SwerveModule::SetSteerToTorque(units::volt_t voltsToSend) {

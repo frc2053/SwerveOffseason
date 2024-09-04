@@ -11,6 +11,7 @@
 #include <networktables/DoubleTopic.h>
 #include <networktables/StructArrayTopic.h>
 #include <networktables/StructTopic.h>
+#include "str/struct/SwerveHelperStruct.h"
 
 #include <memory>
 #include <string>
@@ -175,5 +176,7 @@ private:
       nt->GetStructTopic<frc::Pose2d>("PoseEstimatorPose").Publish()};
   nt::StructPublisher<frc::Pose2d> lookaheadPub{
       nt->GetStructTopic<frc::Pose2d>("LookaheadPose").Publish()};
+  nt::StructEntry<str::SwerveModuleSteerGains> steerGainsEntry{
+      nt->GetStructTopic<str::SwerveModuleSteerGains>("SteerGains").GetEntry(steerGainsMk4i)};
 };
 } // namespace str

@@ -6,6 +6,7 @@
 
 #include "constants/Constants.h"
 #include "str/Math.h"
+#include <frc/DataLogManager.h>
 
 using namespace str;
 
@@ -34,7 +35,7 @@ SwerveDrive::SwerveDrive() {
           .value();
 
   if (!imu.GetConfigurator().Apply(imuConfig).IsOK()) {
-    fmt::print("Failed to configure IMU!\n");
+    frc::DataLogManager::Log("Failed to configure IMU!\n");
   }
 
   allSignals[allSignals.size() - 2] = &imu.GetYaw();
@@ -46,12 +47,12 @@ SwerveDrive::SwerveDrive() {
 
   for (auto &mod : modules) {
     if (!mod.OptimizeBusSignals()) {
-      fmt::print("Failed to optimize bus signals for {}\n", mod.GetName());
+      frc::DataLogManager::Log(fmt::format("Failed to optimize bus signals for {}\n", mod.GetName()));
     }
   }
 
   if (!imu.OptimizeBusUtilization().IsOK()) {
-    fmt::print("Failed to optimize bus signals for imu!\n");
+    frc::DataLogManager::Log("Failed to optimize bus signals for imu!\n");
   }
 }
 
@@ -145,7 +146,7 @@ void SwerveDrive::AddVisionMeasurement(const frc::Pose2d &visionMeasurement,
     poseEstimator.AddVisionMeasurement(visionMeasurement, timestamp,
                                        newStdDevs);
   } else {
-    fmt::print(
+    frc::DataLogManager::Log(
         "WARNING: Vision pose was outside of field! Not adding to estimator!");
   }
 }
@@ -156,8 +157,8 @@ void SwerveDrive::UpdateSwerveOdom() {
           2.0 / (1 / consts::SWERVE_ODOM_LOOP_PERIOD), allSignals);
 
   // if(!status.IsOK()) {
-  //   fmt::print("Error updating swerve odom! Error was: {}\n",
-  //   status.GetName());
+  //   frc::DataLogManager::Log(fmt::format("Error updating swerve odom! Error was: {}\n",
+  //   status.GetName()));
   // }
 
   int i = 0;
@@ -181,6 +182,7 @@ void SwerveDrive::UpdateNTEntries() {
   lookaheadPub.Set(GetPredictedPose(1_s, 1_s));
   estimatorPub.Set(GetPose());
   isSlippingPub.Set(IsSlipping());
+  steerGainsEntry.Set(steerGainsMk4i);
 }
 
 void SwerveDrive::SimulationPeriodic() {

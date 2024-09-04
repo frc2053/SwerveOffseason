@@ -8,8 +8,8 @@
 #include <frc/system/plant/DCMotor.h>
 #include <str/Gains.h>
 #include <units/base.h>
-
 #include <string>
+#include <str/Units.h>
 
 namespace str {
 struct SwerveModuleConstants {
@@ -47,6 +47,18 @@ struct SwerveModuleSteerGains {
   str::gains::radial::turn_amp_kp_unit_t kP;
   str::gains::radial::turn_amp_ki_unit_t kI;
   str::gains::radial::turn_amp_kd_unit_t kD;
+
+  bool operator==(const SwerveModuleSteerGains& rhs) const {
+    return units::essentiallyEqual(kA, rhs.kA, 1e-6) &&
+           units::essentiallyEqual(kV, rhs.kV, 1e-6) &&
+           units::essentiallyEqual(kS, rhs.kS, 1e-6) &&
+           units::essentiallyEqual(kP, rhs.kP, 1e-6) &&
+           units::essentiallyEqual(kI, rhs.kI, 1e-6) &&
+           units::essentiallyEqual(kD, rhs.kD, 1e-6);
+  }
+  bool operator!=(const SwerveModuleSteerGains& rhs) const {
+    return !operator==(rhs);
+  }
 };
 
 struct SwerveModuleDriveGains {
@@ -56,6 +68,18 @@ struct SwerveModuleDriveGains {
   str::gains::radial::turn_amp_kp_unit_t kP;
   str::gains::radial::turn_amp_ki_unit_t kI;
   str::gains::radial::turn_amp_kd_unit_t kD;
+
+  bool operator==(const SwerveModuleDriveGains& rhs) const {
+    return units::essentiallyEqual(kA, rhs.kA, 1e-6) &&
+           units::essentiallyEqual(kV, rhs.kV, 1e-6) &&
+           units::essentiallyEqual(kS, rhs.kS, 1e-6) &&
+           units::essentiallyEqual(kP, rhs.kP, 1e-6) &&
+           units::essentiallyEqual(kI, rhs.kI, 1e-6) &&
+           units::essentiallyEqual(kD, rhs.kD, 1e-6);
+  }
+  bool operator!=(const SwerveModuleDriveGains& rhs) const {
+    return !operator==(rhs);
+  }
 };
 
 struct WheelRadiusCharData {

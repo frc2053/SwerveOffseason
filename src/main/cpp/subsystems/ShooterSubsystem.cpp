@@ -6,6 +6,7 @@
 #include "constants/Constants.h"
 #include <frc2/command/Commands.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/DataLogManager.h>
 
 
 ShooterSubsystem::ShooterSubsystem() {
@@ -50,7 +51,7 @@ void ShooterSubsystem::Periodic() {
     });
 
     if(!shooterWaitResult.IsOK()) {
-        fmt::print("Error grabbing shooter signals! Details: {}\n", shooterWaitResult.GetName());
+        frc::DataLogManager::Log(fmt::format("Error grabbing shooter signals! Details: {}\n", shooterWaitResult.GetName()));
     }
 
     currentTopWheelPosition = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(topMotorPosSig, topMotorVelSig);
@@ -129,8 +130,8 @@ bool ShooterSubsystem::ConfigureShooterMotors(
   ctre::phoenix::StatusCode topConfigResult =
       topWheelMotor.GetConfigurator().Apply(shooterConfig);
 
-  fmt::print("Configured top shooter motor. Result was: {}\n",
-             topConfigResult.GetName());
+  frc::DataLogManager::Log(fmt::format("Configured top shooter motor. Result was: {}\n",
+             topConfigResult.GetName()));
 
   shooterConfig.MotorOutput.Inverted =
       invertBottom
@@ -140,8 +141,8 @@ bool ShooterSubsystem::ConfigureShooterMotors(
   ctre::phoenix::StatusCode bottomConfigResult =
       bottomWheelMotor.GetConfigurator().Apply(shooterConfig);
 
-  fmt::print("Configured bottom shooter motor. Result was: {}\n",
-             bottomConfigResult.GetName());
+  frc::DataLogManager::Log(fmt::format("Configured bottom shooter motor. Result was: {}\n",
+             bottomConfigResult.GetName()));
 
   return bottomConfigResult.IsOK() && topConfigResult.IsOK();
 }
@@ -164,13 +165,13 @@ bool ShooterSubsystem::ConfigureMotorSignals() {
   ctre::phoenix::StatusCode optimizeTopMotor =
       topWheelMotor.OptimizeBusUtilization();
   if (optimizeTopMotor.IsOK()) {
-    fmt::print("Optimized bus signals for top shooter motor\n");
+    frc::DataLogManager::Log("Optimized bus signals for top shooter motor\n");
   }
 
   ctre::phoenix::StatusCode optimizeBottomMotor =
       bottomWheelMotor.OptimizeBusUtilization();
   if (optimizeBottomMotor.IsOK()) {
-    fmt::print("Optimized bus signals for bottom shooter motor\n");
+    frc::DataLogManager::Log("Optimized bus signals for bottom shooter motor\n");
   }
 
   return optimizeTopMotor.IsOK() && optimizeBottomMotor.IsOK();

@@ -11,6 +11,7 @@
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <str/ChoreoSwerveCommandWithForce.h>
 #include <str/DriverstationUtils.h>
+#include <frc/DataLogManager.h>
 
 #include "constants/Constants.h"
 
@@ -149,7 +150,7 @@ void SwerveSubsystem::LoadChoreoTrajectories() {
     std::string fileName = entry.path().stem().string();
     if(fileName != "choreo") {
       pathMap[fileName] = choreolib::Choreo::GetTrajectory(fileName);
-      fmt::print("Loaded choreo trajectory: {}\n", fileName);
+      frc::DataLogManager::Log(fmt::format("Loaded choreo trajectory: {}\n", fileName));
     }
   }
 }
@@ -427,11 +428,19 @@ frc2::CommandPtr SwerveSubsystem::WheelRadius(frc2::sysid::Direction dir) {
                  },
                  [this] {
                    swerveDrive.Drive(0_mps, 0_mps, 0_rad_per_s, true);
-                   fmt::print("WHEEL RADIUS: {}\n\n\n\n\n",
+                   frc::DataLogManager::Log(fmt::format("WHEEL RADIUS: {}\n\n\n\n\n",
                               wheelRadData.effectiveWheelRadius
                                   .convert<units::inches>()
-                                  .value());
+                                  .value()));
                  },
                  {this}))
       .WithName("Wheel Radius Calculation");
+}
+
+frc2::CommandPtr SwerveSubsystem::TuneSteerPID(std::function<bool()> isDone) {
+  return frc2::cmd::Sequence(
+    frc2::cmd::RunOnce([this] {
+      
+    })
+  );
 }
