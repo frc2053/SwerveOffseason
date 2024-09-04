@@ -19,27 +19,22 @@
 
 #include <utility>
 
-#include <frc/geometry/Transform3d.h>
-#include <wpi/SmallVector.h>
-
-#include "PnpResult.h"
-#include "photon/dataflow/structures/Packet.h"
-#include "photon/struct/MultiTargetPNPResultStruct.h"
+#include "photon/struct/PhotonPipelineMetadataStruct.h"
 
 namespace photon {
-class MultiTargetPNPResult : public MultiTargetPNPResult_PhotonStruct {
-  using Base = MultiTargetPNPResult_PhotonStruct;
+class PhotonPipelineMetadata : public PhotonPipelineMetadata_PhotonStruct {
+  using Base = PhotonPipelineMetadata_PhotonStruct;
 
  public:
-  explicit MultiTargetPNPResult(Base&& data) : Base(data) {}
+  explicit PhotonPipelineMetadata(Base&& data) : Base(data) {}
 
   template <typename... Args>
-  explicit MultiTargetPNPResult(Args&&... args)
+  explicit PhotonPipelineMetadata(Args&&... args)
       : Base{std::forward<Args>(args)...} {}
 
-  friend bool operator==(MultiTargetPNPResult const&,
-                         MultiTargetPNPResult const&) = default;
+  friend bool operator==(PhotonPipelineMetadata const&,
+                         PhotonPipelineMetadata const&) = default;
 };
 }  // namespace photon
 
-#include "photon/serde/MultiTargetPNPResultSerde.h"
+#include "photon/serde/PhotonPipelineMetadataSerde.h"

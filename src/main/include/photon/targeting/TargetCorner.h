@@ -15,31 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 #include <utility>
 
-#include <frc/geometry/Transform3d.h>
-#include <wpi/SmallVector.h>
+#include "photon/struct/TargetCornerStruct.h"
 
-#include "PnpResult.h"
-#include "photon/dataflow/structures/Packet.h"
-#include "photon/struct/MultiTargetPNPResultStruct.h"
+#pragma once
 
 namespace photon {
-class MultiTargetPNPResult : public MultiTargetPNPResult_PhotonStruct {
-  using Base = MultiTargetPNPResult_PhotonStruct;
+class TargetCorner : public TargetCorner_PhotonStruct {
+  using Base = TargetCorner_PhotonStruct;
 
  public:
-  explicit MultiTargetPNPResult(Base&& data) : Base(data) {}
+  explicit TargetCorner(Base&& data) : Base(data) {}
 
   template <typename... Args>
-  explicit MultiTargetPNPResult(Args&&... args)
-      : Base{std::forward<Args>(args)...} {}
+  explicit TargetCorner(Args&&... args) : Base{std::forward<Args>(args)...} {}
 
-  friend bool operator==(MultiTargetPNPResult const&,
-                         MultiTargetPNPResult const&) = default;
+  friend bool operator==(TargetCorner const&, TargetCorner const&) = default;
 };
 }  // namespace photon
 
-#include "photon/serde/MultiTargetPNPResultSerde.h"
+#include "photon/serde/TargetCornerSerde.h"

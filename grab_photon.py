@@ -11,11 +11,15 @@ folders = [
     "photon-lib/src/main/native/cpp",
     "photon-lib/src/main/native/include",
     "photon-targeting/src/main/native/cpp",
-    "photon-targeting/src/main/native/include"
+    "photon-targeting/src/main/native/include",
+    "photon-targeting/src/generated/main/native/cpp",
+    "photon-targeting/src/generated/main/native/include"
 ]
 
 # Destination directories (change these to your project's subdirectories)
 destinations = [
+    "src/main/cpp",
+    "src/main/include",
     "src/main/cpp",
     "src/main/include",
     "src/main/cpp",

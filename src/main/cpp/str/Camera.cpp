@@ -35,7 +35,7 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
       visionSim->AddAprilTags(consts::yearSpecific::aprilTagLayout);
       cameraProps = std::make_unique<photon::SimCameraProperties>();
 
-      cameraProps->SetCalibration(1600, 1200, frc::Rotation2d{90_deg});
+      cameraProps->SetCalibration(1600, 1200, frc::Rotation2d{75_deg});
       cameraProps->SetCalibError(.35, .10);
       cameraProps->SetFPS(45_Hz);
       cameraProps->SetAvgLatency(20_ms);
