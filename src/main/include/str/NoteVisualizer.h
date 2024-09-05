@@ -28,6 +28,7 @@ struct FlyingNote {
   NoteVelocity initialVelocity{};
   NoteVelocity currentVelocity{};
   frc::Pose3d currentPose{};
+  bool shouldClean{false};
 };
 
 class NoteVisualizer {
@@ -42,6 +43,7 @@ public:
 private:
   void UpdateLaunchedNotes(units::second_t loopTime);
   void ProjectileMotion(FlyingNote &note, units::second_t loopTime);
+  void CleanUp();
 
   units::second_t lastLoopTime;
 

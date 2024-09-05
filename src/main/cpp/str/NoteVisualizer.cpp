@@ -43,6 +43,7 @@ void NoteVisualizer::LaunchNote(frc::Pose3d currentRobotPose,
 
   launchedNotes.emplace_back(noteToAdd);
   launchedNotePoses.emplace_back(noteToAdd.currentPose);
+  fmt::print("Meow\n");
 }
 
 void NoteVisualizer::Periodic() {
@@ -50,6 +51,7 @@ void NoteVisualizer::Periodic() {
   units::second_t loopTime = now - lastLoopTime;
 
   UpdateLaunchedNotes(loopTime);
+  CleanUp();
 
   stagedNotesPub.Set(initialNoteLocations);
   launchedNotesPub.Set(launchedNotePoses);
@@ -63,6 +65,21 @@ void NoteVisualizer::UpdateLaunchedNotes(units::second_t loopTime) {
   for (auto &note : launchedNotes) {
     ProjectileMotion(note, loopTime);
     launchedNotePoses[i] = note.currentPose;
+    i++;
+  }
+}
+
+void NoteVisualizer::CleanUp() {
+  int i = 0;
+  for(auto mit = launchedNotes.begin(); mit != launchedNotes.end(); )
+  {   
+    if(mit->shouldClean) {
+      mit = launchedNotes.erase(mit);
+      launchedNotePoses.erase(launchedNotePoses.begin() + i);
+    }
+    else {
+      mit++;
+    }
     i++;
   }
 }
@@ -86,6 +103,7 @@ void NoteVisualizer::ProjectileMotion(FlyingNote &note,
     note.currentVelocity.xVel = 0_mps;
     note.currentVelocity.yVel = 0_mps;
     note.currentVelocity.zVel = 0_mps;
+    note.shouldClean = true;
   }
 
   note.currentPose = newPose;

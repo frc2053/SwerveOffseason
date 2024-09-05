@@ -28,19 +28,19 @@ void RobotContainer::ConfigureBindings() {
       },
       true));
 
-  //controller.LeftTrigger().WhileTrue(swerveSubsystem.AlignToAmp());
-  controller.LeftBumper().WhileTrue(swerveSubsystem.XPattern());
-  controller.Back().WhileTrue(
-      swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));
-  controller.Start().WhileTrue(
-      swerveSubsystem.WheelRadius(frc2::sysid::Direction::kForward));
+  controller.LeftTrigger().WhileTrue(swerveSubsystem.AlignToAmp());
+  // controller.LeftBumper().WhileTrue(swerveSubsystem.XPattern());
+  // controller.Back().WhileTrue(
+  //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));
+  // controller.Start().WhileTrue(
+  //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kForward));
 
   controller.A().OnTrue(frc2::cmd::RunOnce([this] {
     noteVisualizer.LaunchNote(
         frc::Pose3d{swerveSubsystem.GetRobotPose()},
         swerveSubsystem.GetRobotRelativeSpeed(),
-        frc::Transform3d{frc::Translation3d{0_m, 0_m, 12_in},
-                         frc::Rotation3d{0_deg, -30_deg, 0_deg}},
+        frc::Transform3d{frc::Translation3d{-4_in, 0_in, 13_in},
+                         frc::Rotation3d{0_deg, -50_deg, 0_deg}},
         41.71_fps);
   }));
 
@@ -49,14 +49,14 @@ void RobotContainer::ConfigureBindings() {
   // controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kForward));
   // controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kReverse));
 
-  controller.POVDown().OnTrue(swerveSubsystem.TuneSteerPID([this] { return controller.Start().Get(); }));
-  controller.POVUp().OnTrue(swerveSubsystem.TuneDrivePID([this] { return controller.Start().Get(); }));
+  // controller.POVDown().OnTrue(swerveSubsystem.TuneSteerPID([this] { return controller.Start().Get(); }));
+  // controller.POVUp().OnTrue(swerveSubsystem.TuneDrivePID([this] { return controller.Start().Get(); }));
 
-  controller.A().WhileTrue(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::AMP; }));
-  controller.A().OnFalse(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+  // controller.A().WhileTrue(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::AMP; }));
+  // controller.A().OnFalse(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
-  controller.LeftTrigger().WhileTrue(intakeSubsystem.IntakeNote());
-  controller.RightTrigger().WhileTrue(intakeSubsystem.PoopNote());
+  // controller.LeftTrigger().WhileTrue(intakeSubsystem.IntakeNote());
+  // controller.RightTrigger().WhileTrue(intakeSubsystem.PoopNote());
 
   // controller.A().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kReverse));
