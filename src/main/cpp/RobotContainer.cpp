@@ -49,6 +49,8 @@ void RobotContainer::ConfigureBindings() {
   // controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kForward));
   // controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kReverse));
 
+  controller.POVDown().OnTrue(swerveSubsystem.TuneSteerPID([this] { return controller.Start().Get(); }));
+
   controller.A().WhileTrue(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::AMP; }));
   controller.A().OnFalse(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 

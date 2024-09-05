@@ -182,7 +182,6 @@ void SwerveDrive::UpdateNTEntries() {
   lookaheadPub.Set(GetPredictedPose(1_s, 1_s));
   estimatorPub.Set(GetPose());
   isSlippingPub.Set(IsSlipping());
-  steerGainsEntry.Set(steerGainsMk4i);
 }
 
 void SwerveDrive::SimulationPeriodic() {
@@ -336,4 +335,14 @@ bool SwerveDrive::IsSlipping() {
         return a.speed < b.speed;
       });
   return (maxIt->speed / minIt->speed) > slipCoeff;
+}
+
+str::SwerveModuleSteerGains SwerveDrive::GetSteerGains() const {
+  return modules[0].GetSteerGains();
+}
+
+void SwerveDrive::SetSteerGains(str::SwerveModuleSteerGains newGains) {
+  for(int i = 0; i < 4; i++) {
+    modules[i].SetSteerGains(newGains);
+  }
 }

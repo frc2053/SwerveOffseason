@@ -328,6 +328,10 @@ void SwerveModule::SetSteerGains(str::SwerveModuleSteerGains newGains) {
   }
 }
 
+str::SwerveModuleSteerGains SwerveModule::GetSteerGains() const {
+  return steerGains;
+}
+
 void SwerveModule::SetDriveGains(str::SwerveModuleDriveGains newGains) {
   driveGains = newGains;
   ctre::phoenix6::configs::Slot0Configs driveSlotConfig{};

@@ -47,6 +47,7 @@ public:
   void SetDriveToVoltage(units::volt_t voltsToSend);
   void SetSteerGains(str::SwerveModuleSteerGains newGains);
   void SetDriveGains(str::SwerveModuleDriveGains newGains);
+  str::SwerveModuleSteerGains GetSteerGains() const;
 
 private:
   bool ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing,

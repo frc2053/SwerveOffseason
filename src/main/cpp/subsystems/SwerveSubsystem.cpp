@@ -438,9 +438,58 @@ frc2::CommandPtr SwerveSubsystem::WheelRadius(frc2::sysid::Direction dir) {
 }
 
 frc2::CommandPtr SwerveSubsystem::TuneSteerPID(std::function<bool()> isDone) {
+  std::string tablePrefix = "SwerveDrive/steerGains/";
   return frc2::cmd::Sequence(
-    frc2::cmd::RunOnce([this] {
-      
-    })
-  );
+      frc2::cmd::RunOnce(
+          [tablePrefix, this] {
+            frc::SmartDashboard::PutNumber(tablePrefix + "setpoint", 0);
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "mmCruiseVel", consts::swerve::gains::MK4I_STEER_CRUISE_VEL.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "mmKA", consts::swerve::gains::MK4I_STEER_MOTION_MAGIC_KA.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "mmKV", consts::swerve::gains::MK4I_STEER_MOTION_MAGIC_KV.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kA", consts::swerve::gains::MK4I_STEER_KA.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kV", consts::swerve::gains::MK4I_STEER_KV.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kS", consts::swerve::gains::MK4I_STEER_KS.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kP", consts::swerve::gains::MK4I_STEER_KP.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kI", consts::swerve::gains::MK4I_STEER_KI.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kD", consts::swerve::gains::MK4I_STEER_KD.value());
+            frc::SwerveModuleState zeroState{0_mps, frc::Rotation2d{0_rad}};
+            swerveDrive.SetModuleStates({zeroState,zeroState,zeroState,zeroState});
+          },
+          {this}),
+      frc2::cmd::Run(
+          [this, tablePrefix] {
+            str::SwerveModuleSteerGains newGains{
+                units::turns_per_second_t{frc::SmartDashboard::GetNumber(tablePrefix + "mmCruiseVel", 0)},
+                str::gains::radial::turn_volt_ka_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "mmKA", 0)},
+                str::gains::radial::turn_volt_kv_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "mmKV", 0)},
+                str::gains::radial::turn_amp_ka_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
+                str::gains::radial::turn_amp_kv_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kV", 0)},
+                units::ampere_t{frc::SmartDashboard::GetNumber(tablePrefix + "kS", 0)},
+                str::gains::radial::turn_amp_kp_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0)},
+                str::gains::radial::turn_amp_ki_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0)},
+                str::gains::radial::turn_amp_kd_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0)}
+            };
+
+            if (newGains != swerveDrive.GetSteerGains()) {
+              for (int i = 0; i < 4; i++) {
+                swerveDrive.SetSteerGains(newGains);
+              }
+            }
+
+            for (int i = 0; i < 4; i++) {
+              frc::SwerveModuleState state{0_mps, frc::Rotation2d{units::degree_t{frc::SmartDashboard::GetNumber(tablePrefix + "setpoint", 0)}}};
+              swerveDrive.SetModuleStates({state, state, state, state});
+            }
+          },
+          {this})
+          .Until(isDone));
 }

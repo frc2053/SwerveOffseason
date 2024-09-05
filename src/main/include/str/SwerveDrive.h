@@ -11,7 +11,6 @@
 #include <networktables/DoubleTopic.h>
 #include <networktables/StructArrayTopic.h>
 #include <networktables/StructTopic.h>
-#include "str/struct/SwerveHelperStruct.h"
 
 #include <memory>
 #include <string>
@@ -62,6 +61,9 @@ public:
   void LogMk4iSteerVoltage(frc::sysid::SysIdRoutineLog *log);
   void LogMk4nSteerVoltage(frc::sysid::SysIdRoutineLog *log);
   void LogDriveVoltage(frc::sysid::SysIdRoutineLog *log);
+
+  str::SwerveModuleSteerGains GetSteerGains() const;
+  void SetSteerGains(str::SwerveModuleSteerGains newGains);
 
 private:
   std::array<units::ampere_t, 4> ConvertModuleForcesToTorqueCurrent(
@@ -176,7 +178,5 @@ private:
       nt->GetStructTopic<frc::Pose2d>("PoseEstimatorPose").Publish()};
   nt::StructPublisher<frc::Pose2d> lookaheadPub{
       nt->GetStructTopic<frc::Pose2d>("LookaheadPose").Publish()};
-  nt::StructEntry<str::SwerveModuleSteerGains> steerGainsEntry{
-      nt->GetStructTopic<str::SwerveModuleSteerGains>("SteerGains").GetEntry(steerGainsMk4i)};
 };
 } // namespace str
