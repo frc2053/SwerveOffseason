@@ -107,6 +107,10 @@ IntakeSubsystem &RobotContainer::GetIntakeSubsystem() {
   return intakeSubsystem;
 }
 
+FeederSubsystem &RobotContainer::GetFeederSubsystem() {
+  return feederSubsystem;
+}
+
 str::Vision &RobotContainer::GetVision() { return vision; }
 
 str::NoteVisualizer &RobotContainer::GetNoteVisualizer() {

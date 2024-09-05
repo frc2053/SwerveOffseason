@@ -11,6 +11,7 @@
 #include "str/NoteVisualizer.h"
 #include "str/Vision.h"
 #include "subsystems/SwerveSubsystem.h"
+#include "subsystems/FeederSubsystem.h"
 
 class RobotContainer {
 public:
@@ -21,6 +22,7 @@ public:
   SwerveSubsystem &GetSwerveSubsystem();
   ShooterSubsystem &GetShooterSubsystem();
   IntakeSubsystem &GetIntakeSubsystem();
+  FeederSubsystem &GetFeederSubsystem();
   str::Vision &GetVision();
   str::NoteVisualizer &GetNoteVisualizer();
 
@@ -31,8 +33,9 @@ private:
   SwerveSubsystem swerveSubsystem;
   ShooterSubsystem shooterSubsystem;
   IntakeSubsystem intakeSubsystem;
+  FeederSubsystem feederSubsystem;
   str::Vision vision;
   str::NoteVisualizer noteVisualizer;
 
-  Autos autos{swerveSubsystem, shooterSubsystem, intakeSubsystem};
+  Autos autos{swerveSubsystem, shooterSubsystem, intakeSubsystem, feederSubsystem};
 };
