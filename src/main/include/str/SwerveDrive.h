@@ -64,6 +64,8 @@ public:
 
   str::SwerveModuleSteerGains GetSteerGains() const;
   void SetSteerGains(str::SwerveModuleSteerGains newGains);
+  str::SwerveModuleDriveGains GetDriveGains() const;
+  void SetDriveGains(str::SwerveModuleDriveGains newGains);
 
 private:
   std::array<units::ampere_t, 4> ConvertModuleForcesToTorqueCurrent(

@@ -346,3 +346,13 @@ void SwerveDrive::SetSteerGains(str::SwerveModuleSteerGains newGains) {
     modules[i].SetSteerGains(newGains);
   }
 }
+
+str::SwerveModuleDriveGains SwerveDrive::GetDriveGains() const {
+  return modules[0].GetDriveGains();
+}
+
+void SwerveDrive::SetDriveGains(str::SwerveModuleDriveGains newGains) {
+  for(int i = 0; i < 4; i++) {
+    modules[i].SetDriveGains(newGains);
+  }
+}

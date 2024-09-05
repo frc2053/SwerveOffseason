@@ -61,6 +61,7 @@ public:
   frc2::CommandPtr SysIdDriveDynamicVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr WheelRadius(frc2::sysid::Direction dir);
   frc2::CommandPtr TuneSteerPID(std::function<bool()> isDone);
+  frc2::CommandPtr TuneDrivePID(std::function<bool()> isDone);
 
 
 private:

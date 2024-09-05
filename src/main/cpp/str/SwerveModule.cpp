@@ -318,18 +318,41 @@ void SwerveModule::SetSteerGains(str::SwerveModuleSteerGains newGains) {
   steerSlotConfig.kP = steerGains.kP.value();
   steerSlotConfig.kI = steerGains.kI.value();
   steerSlotConfig.kD = steerGains.kD.value();
-  ctre::phoenix::StatusCode status =
+
+  ctre::phoenix6::configs::MotionMagicConfigs steerMMConfig{};
+
+  steerMMConfig.MotionMagicCruiseVelocity =
+      steerGains.motionMagicCruiseVel.value();
+  steerMMConfig.MotionMagicExpo_kV =
+      steerGains.motionMagicExpoKv.value();
+  steerMMConfig.MotionMagicExpo_kA =
+      steerGains.motionMagicExpoKa.value();
+
+  ctre::phoenix::StatusCode statusGains =
       steerMotor.GetConfigurator().Apply(steerSlotConfig);
-  if (!status.IsOK()) {
+  if (!statusGains.IsOK()) {
     frc::DataLogManager::Log(
         fmt::format("Swerve Steer Motor was unable to set new gains! "
                     "Error: {}, More Info: {}",
-                    status.GetName(), status.GetDescription()));
+                    statusGains.GetName(), statusGains.GetDescription()));
+  }
+
+  ctre::phoenix::StatusCode statusMM =
+      steerMotor.GetConfigurator().Apply(steerMMConfig);
+  if (!statusMM.IsOK()) {
+    frc::DataLogManager::Log(
+        fmt::format("Swerve Steer Motor was unable to set new motion magic config! "
+                    "Error: {}, More Info: {}",
+                    statusMM.GetName(), statusMM.GetDescription()));
   }
 }
 
 str::SwerveModuleSteerGains SwerveModule::GetSteerGains() const {
   return steerGains;
+}
+
+str::SwerveModuleDriveGains SwerveModule::GetDriveGains() const {
+  return driveGains;
 }
 
 void SwerveModule::SetDriveGains(str::SwerveModuleDriveGains newGains) {
