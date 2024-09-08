@@ -1,19 +1,10 @@
 {
+ "name":"choreo",
  "version":"v2025.0.0",
+ "type":"Swerve",
  "variables":{
-  "expressions":{
-   "name":{
-    "unit":"Meter",
-    "var":["pose.x()",0.0]
-   }
-  },
-  "poses":{
-   "pose":{
-    "x":["0 m",0.0],
-    "y":["0 m",0.0],
-    "heading":["0 rad",0.0]
-   }
-  }
+  "expressions":{},
+  "poses":{}
  },
  "config":{
   "modules":[
@@ -25,7 +16,7 @@
   "inertia":["4.81980680872867 kg m ^ 2",4.81980680872867],
   "gearing":["5.357142",5.357142],
   "radius":["2 in",0.0508],
-  "vmax":["4640 RPM",485.8996637552213],
+  "vmax":["485.89966375522135 rad / s",485.8996637552213],
   "tmax":["0.6 N m",0.6],
   "bumper":{
    "front":["0.352425 m",0.352425],
@@ -33,5 +24,6 @@
    "back":["0.504825 m",0.504825],
    "right":["0.434213 m",0.434213]
   }
- }
+ },
+ "generationFeatures":[]
 }
