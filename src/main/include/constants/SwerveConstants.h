@@ -15,20 +15,20 @@
 namespace consts {
 namespace swerve {
 namespace can_ids {
-inline constexpr int FL_STEER = 2;
-inline constexpr int FL_DRIVE = 3;
+inline constexpr int FL_DRIVE = 2;
+inline constexpr int FL_STEER = 3;
 inline constexpr int FL_ENC = 4;
 
-inline constexpr int FR_STEER = 5;
-inline constexpr int FR_DRIVE = 6;
+inline constexpr int FR_DRIVE = 5;
+inline constexpr int FR_STEER = 6;
 inline constexpr int FR_ENC = 7;
 
-inline constexpr int BL_STEER = 8;
-inline constexpr int BL_DRIVE = 9;
+inline constexpr int BL_DRIVE = 8;
+inline constexpr int BL_STEER = 9;
 inline constexpr int BL_ENC = 10;
 
-inline constexpr int BR_STEER = 11;
-inline constexpr int BR_DRIVE = 12;
+inline constexpr int BR_DRIVE = 11;
+inline constexpr int BR_STEER = 12;
 inline constexpr int BR_ENC = 13;
 
 inline constexpr int IMU = 14;
@@ -46,7 +46,7 @@ inline constexpr units::radian_t IMU_ROLL_OFFSET = -0.4168_deg;
 inline constexpr units::radian_t IMU_PITCH_OFFSET = -89.879_deg;
 inline constexpr units::radian_t IMU_YAW_OFFSET = 89.9885_deg;
 
-inline constexpr units::turn_t FL_ENC_OFFSET = -0.008789_tr;
+inline constexpr units::turn_t FL_ENC_OFFSET = 0.008789_tr;
 inline constexpr units::turn_t FR_ENC_OFFSET = -0.303223_tr;
 inline constexpr units::turn_t BL_ENC_OFFSET = -0.141357_tr;
 inline constexpr units::turn_t BR_ENC_OFFSET = 0.214111_tr;

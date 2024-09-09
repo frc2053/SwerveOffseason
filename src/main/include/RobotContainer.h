@@ -20,10 +20,10 @@ public:
   frc2::Command *GetAutonomousCommand();
 
   SwerveSubsystem &GetSwerveSubsystem();
-  ShooterSubsystem &GetShooterSubsystem();
-  IntakeSubsystem &GetIntakeSubsystem();
-  FeederSubsystem &GetFeederSubsystem();
-  str::Vision &GetVision();
+  //ShooterSubsystem &GetShooterSubsystem();
+  //IntakeSubsystem &GetIntakeSubsystem();
+  //FeederSubsystem &GetFeederSubsystem();
+  //str::Vision &GetVision();
   str::NoteVisualizer &GetNoteVisualizer();
 
 private:
@@ -31,11 +31,11 @@ private:
   frc2::CommandXboxController controller{0};
 
   SwerveSubsystem swerveSubsystem;
-  ShooterSubsystem shooterSubsystem;
-  IntakeSubsystem intakeSubsystem;
-  FeederSubsystem feederSubsystem;
-  str::Vision vision;
+  //ShooterSubsystem shooterSubsystem;
+  //IntakeSubsystem intakeSubsystem;
+  //FeederSubsystem feederSubsystem;
+  //str::Vision vision;
   str::NoteVisualizer noteVisualizer;
 
-  Autos autos{swerveSubsystem, shooterSubsystem, intakeSubsystem, feederSubsystem};
+  //Autos autos{swerveSubsystem, shooterSubsystem, intakeSubsystem, feederSubsystem};
 };

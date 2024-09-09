@@ -26,7 +26,7 @@ void RobotContainer::ConfigureBindings() {
         return frc::ApplyDeadband<double>(-controller.GetRightX(), .1) *
                consts::swerve::physical::DRIVE_MAX_ROT_SPEED;
       },
-      true));
+      true, true));
 
   controller.LeftTrigger().WhileTrue(swerveSubsystem.AlignToAmp());
   // controller.LeftBumper().WhileTrue(swerveSubsystem.XPattern());
@@ -92,26 +92,27 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::Command *RobotContainer::GetAutonomousCommand() {
-  return autos.GetSelectedCommand();
+  return nullptr;
+  //return autos.GetSelectedCommand();
 }
 
 SwerveSubsystem &RobotContainer::GetSwerveSubsystem() {
   return swerveSubsystem;
 }
 
-ShooterSubsystem &RobotContainer::GetShooterSubsystem() {
-  return shooterSubsystem;
-}
+// ShooterSubsystem &RobotContainer::GetShooterSubsystem() {
+//   return shooterSubsystem;
+// }
 
-IntakeSubsystem &RobotContainer::GetIntakeSubsystem() {
-  return intakeSubsystem;
-}
+// IntakeSubsystem &RobotContainer::GetIntakeSubsystem() {
+//   return intakeSubsystem;
+// }
 
-FeederSubsystem &RobotContainer::GetFeederSubsystem() {
-  return feederSubsystem;
-}
+// FeederSubsystem &RobotContainer::GetFeederSubsystem() {
+//   return feederSubsystem;
+// }
 
-str::Vision &RobotContainer::GetVision() { return vision; }
+//str::Vision &RobotContainer::GetVision() { return vision; }
 
 str::NoteVisualizer &RobotContainer::GetNoteVisualizer() {
   return noteVisualizer;
