@@ -42,24 +42,24 @@ inline constexpr units::ampere_t SLIP_CURRENT_LIMIT = 180_A;
 
 namespace physical {
 
-inline constexpr units::radian_t IMU_ROLL_OFFSET = 0_rad;
-inline constexpr units::radian_t IMU_PITCH_OFFSET = 0_rad;
-inline constexpr units::radian_t IMU_YAW_OFFSET = 0_rad;
+inline constexpr units::radian_t IMU_ROLL_OFFSET = -0.4168_deg;
+inline constexpr units::radian_t IMU_PITCH_OFFSET = -89.879_deg;
+inline constexpr units::radian_t IMU_YAW_OFFSET = 89.9885_deg;
 
-inline constexpr units::turn_t FL_ENC_OFFSET = 0.25_tr;
-inline constexpr units::turn_t FR_ENC_OFFSET = 0.25_tr;
-inline constexpr units::turn_t BL_ENC_OFFSET = 0.25_tr;
-inline constexpr units::turn_t BR_ENC_OFFSET = 0.25_tr;
+inline constexpr units::turn_t FL_ENC_OFFSET = -0.008789_tr;
+inline constexpr units::turn_t FR_ENC_OFFSET = -0.303223_tr;
+inline constexpr units::turn_t BL_ENC_OFFSET = -0.141357_tr;
+inline constexpr units::turn_t BR_ENC_OFFSET = 0.214111_tr;
 
-inline constexpr bool FL_STEER_INVERT = false;
-inline constexpr bool FR_STEER_INVERT = false;
-inline constexpr bool BL_STEER_INVERT = false;
-inline constexpr bool BR_STEER_INVERT = false;
+inline constexpr bool FL_STEER_INVERT = true;
+inline constexpr bool FR_STEER_INVERT = true;
+inline constexpr bool BL_STEER_INVERT = true;
+inline constexpr bool BR_STEER_INVERT = true;
 
 inline constexpr bool FL_DRIVE_INVERT = false;
-inline constexpr bool FR_DRIVE_INVERT = false;
+inline constexpr bool FR_DRIVE_INVERT = true;
 inline constexpr bool BL_DRIVE_INVERT = false;
-inline constexpr bool BR_DRIVE_INVERT = false;
+inline constexpr bool BR_DRIVE_INVERT = true;
 
 inline constexpr units::scalar_t STEER_GEARING_MK4I =
     (50.0 / 14.0) * (60.0 / 10.0);
@@ -70,7 +70,7 @@ inline constexpr units::scalar_t DRIVE_GEARING =
     (50.0 / 16.0) * (16.0 / 28.0) * (45.0 / 15.0);
 inline constexpr units::scalar_t COUPLING_RATIO = (50.0 / 16.0);
 
-inline constexpr frc::DCMotor DRIVE_MOTOR = frc::DCMotor::KrakenX60FOC(1);
+inline constexpr frc::DCMotor DRIVE_MOTOR = frc::DCMotor::Falcon500FOC(1);
 inline constexpr frc::DCMotor STEER_MOTOR = frc::DCMotor::Falcon500FOC(1);
 
 inline constexpr units::meter_t WHEEL_RADIUS = 2_in;
@@ -122,13 +122,13 @@ inline constexpr str::gains::radial::turn_volt_ka_unit_t
     MK4I_STEER_MOTION_MAGIC_KA{.1};
 inline constexpr str::gains::radial::turn_volt_kv_unit_t
     MK4I_STEER_MOTION_MAGIC_KV{.12 * physical::STEER_GEARING_MK4I.value()};
-inline constexpr str::gains::radial::turn_amp_ka_unit_t MK4I_STEER_KA{.5};
+inline constexpr str::gains::radial::turn_amp_ka_unit_t MK4I_STEER_KA{0};
 inline constexpr str::gains::radial::turn_amp_kv_unit_t MK4I_STEER_KV{0};
-inline constexpr units::ampere_t MK4I_STEER_KS{19.018};
+inline constexpr units::ampere_t MK4I_STEER_KS{0};
 inline constexpr units::volt_t MK4I_STEER_KS_V{.1};
-inline constexpr str::gains::radial::turn_amp_kp_unit_t MK4I_STEER_KP{1000};
+inline constexpr str::gains::radial::turn_amp_kp_unit_t MK4I_STEER_KP{300};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t MK4I_STEER_KI{0};
-inline constexpr str::gains::radial::turn_amp_kd_unit_t MK4I_STEER_KD{50};
+inline constexpr str::gains::radial::turn_amp_kd_unit_t MK4I_STEER_KD{20.654};
 
 inline constexpr units::radians_per_second_t MK4N_STEER_CRUISE_VEL =
     physical::STEER_MOTOR.freeSpeed / physical::STEER_GEARING_MK4N;
