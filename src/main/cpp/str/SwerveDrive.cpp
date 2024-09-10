@@ -54,6 +54,8 @@ SwerveDrive::SwerveDrive() {
   if (!imu.OptimizeBusUtilization().IsOK()) {
     frc::DataLogManager::Log("Failed to optimize bus signals for imu!\n");
   }
+
+  lastOdomUpdateTime = frc::Timer::GetFPGATimestamp();
 }
 
 void SwerveDrive::ResetPose(const frc::Pose2d &resetPose) {
@@ -173,6 +175,10 @@ void SwerveDrive::UpdateSwerveOdom() {
           imu.GetYaw(), imu.GetAngularVelocityZWorld());
   poseEstimator.Update(frc::Rotation2d{yawLatencyComped}, modulePositions);
   odom.Update(frc::Rotation2d{yawLatencyComped}, modulePositions);
+
+  units::second_t now = frc::Timer::GetFPGATimestamp();
+  odomUpdateRate =  1.0 / (now - lastOdomUpdateTime);
+  lastOdomUpdateTime = now;
 }
 
 void SwerveDrive::UpdateNTEntries() {
@@ -182,6 +188,7 @@ void SwerveDrive::UpdateNTEntries() {
   lookaheadPub.Set(GetPredictedPose(1_s, 1_s));
   estimatorPub.Set(GetPose());
   isSlippingPub.Set(IsSlipping());
+  odomUpdateRatePub.Set(odomUpdateRate.value());
 }
 
 void SwerveDrive::SimulationPeriodic() {

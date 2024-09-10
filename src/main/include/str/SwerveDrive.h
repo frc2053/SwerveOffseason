@@ -159,6 +159,9 @@ private:
   units::radian_t yawLatencyComped;
   frc::Rotation2d lastSimAngle;
 
+  units::second_t lastOdomUpdateTime;
+  units::hertz_t odomUpdateRate;
+
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("SwerveDrive")};
   nt::BooleanPublisher isSlippingPub{
@@ -180,5 +183,7 @@ private:
       nt->GetStructTopic<frc::Pose2d>("PoseEstimatorPose").Publish()};
   nt::StructPublisher<frc::Pose2d> lookaheadPub{
       nt->GetStructTopic<frc::Pose2d>("LookaheadPose").Publish()};
+  nt::DoublePublisher odomUpdateRatePub{
+      nt->GetDoubleTopic("OdomUpdateRate").Publish()};
 };
 } // namespace str
