@@ -43,7 +43,7 @@ private:
 
   units::second_t lastTotalLoopTime;
   nt::DoublePublisher loopTimePub{nt::NetworkTableInstance::GetDefault()
-                                      .GetTable("Metadata")
+                                      .GetTable("Looptime")
                                       ->GetDoubleTopic("RobotPeriodicLoopRate")
                                       .Publish()};
 };

@@ -23,19 +23,17 @@
             "/SwerveDrive/DesiredStates/0/angle",
             "/SwerveDrive/CurrentStates/0/angle",
             "/photonvision/fl_cam",
-            "/SwerveDrive/PoseEstimatorPose",
             "/Vision",
             "/Vision/fl_camPoseEstimation",
             "/Vision/fl_camPoseEstimation/translation",
             "/Vision/fl_camPoseEstimation/rotation",
             "/NoteVisualizer/LaunchedNotes",
-            "/SwerveDrive",
-            "/SwerveDrive/CurrentStates",
-            "/SwerveDrive/DesiredStates"
+            "/Looptime",
+            "/SwerveDrive"
           ]
         },
         "tabs": {
-          "selected": 5,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -88,6 +86,43 @@
                 }
               },
               "title": "Line Graph"
+            },
+            {
+              "type": 1,
+              "legendHeight": 0.3,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/SwerveDrive/OdomUpdateRate",
+                      "color": "#2b66a2",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/Looptime/RobotPeriodicLoopRate",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": []
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": []
+                }
+              },
+              "title": "LoopTimes"
             },
             {
               "type": 4,
@@ -195,14 +230,14 @@
                 "cameraIndex": -2,
                 "orbitFov": 75,
                 "cameraPosition": [
-                  0.0948801836520725,
-                  3.2238861086067025,
-                  0.2469499751943985
+                  -1.254779207666439,
+                  1.1543753381354955,
+                  -1.363798873502108
                 ],
                 "cameraTarget": [
-                  0.094882990675214,
-                  0.41078572113049105,
-                  0.24694978849037907
+                  -0.5847603655034967,
+                  0.03279712077260952,
+                  0.10329671958816641
                 ]
               },
               "title": "3D Field"
@@ -281,30 +316,25 @@
               "title": "Swerve"
             },
             {
-              "type": 1,
-              "legendHeight": 0.3,
-              "legends": {
-                "left": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": []
-                },
-                "discrete": {
-                  "fields": []
-                },
-                "right": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": []
-                }
+              "type": 8,
+              "uuid": "w26fbqu418htpvs39zw8oddzts9aym4o",
+              "fields": [],
+              "listFields": [],
+              "options": {
+                "ids": [
+                  0,
+                  1,
+                  2
+                ],
+                "layouts": [
+                  "Xbox Controller (White)",
+                  "Xbox Controller (Blue)",
+                  "None"
+                ]
               },
-              "title": "Line Graph"
+              "configHidden": false,
+              "visualizer": null,
+              "title": "Joysticks"
             }
           ]
         }
