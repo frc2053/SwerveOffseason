@@ -42,6 +42,7 @@ inline constexpr units::ampere_t SLIP_CURRENT_LIMIT = 180_A;
 
 namespace physical {
 
+#ifdef __FRC_ROBORIO__
 inline constexpr units::radian_t IMU_ROLL_OFFSET = -0.4168_deg;
 inline constexpr units::radian_t IMU_PITCH_OFFSET = -89.879_deg;
 inline constexpr units::radian_t IMU_YAW_OFFSET = 89.9885_deg;
@@ -60,6 +61,27 @@ inline constexpr bool FL_DRIVE_INVERT = false;
 inline constexpr bool FR_DRIVE_INVERT = true;
 inline constexpr bool BL_DRIVE_INVERT = false;
 inline constexpr bool BR_DRIVE_INVERT = true;
+#else
+inline constexpr units::radian_t IMU_ROLL_OFFSET = 0_deg;
+inline constexpr units::radian_t IMU_PITCH_OFFSET = 0_deg;
+inline constexpr units::radian_t IMU_YAW_OFFSET = 0_deg;
+
+inline constexpr units::turn_t FL_ENC_OFFSET = .25_tr;
+inline constexpr units::turn_t FR_ENC_OFFSET = .25_tr;
+inline constexpr units::turn_t BL_ENC_OFFSET = .25_tr;
+inline constexpr units::turn_t BR_ENC_OFFSET = .25_tr;
+
+inline constexpr bool FL_STEER_INVERT = false;
+inline constexpr bool FR_STEER_INVERT = false;
+inline constexpr bool BL_STEER_INVERT = false;
+inline constexpr bool BR_STEER_INVERT = false;
+
+inline constexpr bool FL_DRIVE_INVERT = false;
+inline constexpr bool FR_DRIVE_INVERT = false;
+inline constexpr bool BL_DRIVE_INVERT = false;
+inline constexpr bool BR_DRIVE_INVERT = false;
+#endif
+
 
 inline constexpr units::scalar_t STEER_GEARING_MK4I =
     (50.0 / 14.0) * (60.0 / 10.0);

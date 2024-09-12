@@ -11,8 +11,11 @@
 #include "frc/Alert.h"
 
 #include "str/DataUtils.h"
+#include "frc/Threads.h"
 
 void Robot::RobotInit() {
+  //DANGEROUS MAKE SURE CODE DOESN'T BLOCK!!!
+  frc::SetCurrentThreadPriority(true, 15);
   str::DataUtils::LogGitInfo();
   frc2::CommandScheduler::GetInstance().SetPeriod(consts::LOOP_PERIOD);
   frc::DataLogManager::Start();
