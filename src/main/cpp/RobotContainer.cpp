@@ -52,8 +52,8 @@ void RobotContainer::ConfigureBindings() {
   // controller.POVDown().OnTrue(swerveSubsystem.TuneSteerPID([this] { return controller.Start().Get(); }));
   // controller.POVUp().OnTrue(swerveSubsystem.TuneDrivePID([this] { return controller.Start().Get(); }));
 
-  // controller.A().WhileTrue(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::AMP; }));
-  // controller.A().OnFalse(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+  controller.A().WhileTrue(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::AMP; }));
+  controller.A().OnFalse(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
   // controller.LeftTrigger().WhileTrue(intakeSubsystem.IntakeNote());
   // controller.RightTrigger().WhileTrue(intakeSubsystem.PoopNote());
@@ -92,25 +92,24 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::Command *RobotContainer::GetAutonomousCommand() {
-  return nullptr;
-  //return autos.GetSelectedCommand();
+  return autos.GetSelectedCommand();
 }
 
 SwerveSubsystem &RobotContainer::GetSwerveSubsystem() {
   return swerveSubsystem;
 }
 
-// ShooterSubsystem &RobotContainer::GetShooterSubsystem() {
-//   return shooterSubsystem;
-// }
+ShooterSubsystem &RobotContainer::GetShooterSubsystem() {
+  return shooterSubsystem;
+}
 
-// IntakeSubsystem &RobotContainer::GetIntakeSubsystem() {
-//   return intakeSubsystem;
-// }
+IntakeSubsystem &RobotContainer::GetIntakeSubsystem() {
+  return intakeSubsystem;
+}
 
-// FeederSubsystem &RobotContainer::GetFeederSubsystem() {
-//   return feederSubsystem;
-// }
+FeederSubsystem &RobotContainer::GetFeederSubsystem() {
+  return feederSubsystem;
+}
 
 //str::Vision &RobotContainer::GetVision() { return vision; }
 
