@@ -4,17 +4,17 @@
 
 #include "Robot.h"
 
+#include "frc/Alert.h"
 #include <frc/DataLogManager.h>
 #include <frc/DriverStation.h>
 #include <frc/simulation/RoboRioSim.h>
 #include <frc2/command/CommandScheduler.h>
-#include "frc/Alert.h"
 
-#include "str/DataUtils.h"
 #include "frc/Threads.h"
+#include "str/DataUtils.h"
 
 void Robot::RobotInit() {
-  //DANGEROUS MAKE SURE CODE DOESN'T BLOCK!!!
+  // DANGEROUS MAKE SURE CODE DOESN'T BLOCK!!!
   frc::SetCurrentThreadPriority(true, 15);
   str::DataUtils::LogGitInfo();
   frc2::CommandScheduler::GetInstance().SetPeriod(consts::LOOP_PERIOD);
@@ -29,9 +29,13 @@ void Robot::RobotPeriodic() {
   units::second_t loopTime = now - lastTotalLoopTime;
   loopTimePub.Set((1 / loopTime).value());
 
+  m_container.GetNoteVisualizer().DisplayRobotNote(
+      m_container.GetFeederSubsystem().HasNote(),
+      m_container.GetSwerveSubsystem().GetRobotPose());
+
   frc2::CommandScheduler::GetInstance().Run();
   m_container.GetNoteVisualizer().Periodic();
-  //UpdateVision();
+  // UpdateVision();
 
   lastTotalLoopTime = now;
 }
@@ -42,7 +46,8 @@ void Robot::UpdateVision() {
   // int i = 0;
   // for (const auto &est : visionEstimates) {
   //   if (est.has_value()) {
-  //     // m_container.GetSwerveSubsystem().AddVisionMeasurement(est.value().estimatedPose.ToPose2d(),
+  //     //
+  //     m_container.GetSwerveSubsystem().AddVisionMeasurement(est.value().estimatedPose.ToPose2d(),
   //     // est.value().timestamp, stdDevs[i].value());
   //   }
   //   i++;

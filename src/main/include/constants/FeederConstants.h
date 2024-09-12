@@ -6,10 +6,10 @@
 
 #include <frc/system/plant/DCMotor.h>
 #include <units/base.h>
-#include <units/velocity.h>
-#include <wpi/interpolating_map.h>
 #include <units/dimensionless.h>
 #include <units/moment_of_inertia.h>
+#include <units/velocity.h>
+#include <wpi/interpolating_map.h>
 
 #include "str/Gains.h"
 
@@ -18,6 +18,10 @@ namespace feeder {
 namespace can_ids {
 inline constexpr int FEEDER = 18;
 } // namespace can_ids
+
+namespace ports {
+inline constexpr int NOTE_SENSOR_PORT = 2;
+}
 
 namespace current_limits {
 inline constexpr units::ampere_t SUPPLY_CURRENT_LIMIT = 60_A;
@@ -34,13 +38,15 @@ inline constexpr frc::DCMotor FEEDER_MOTOR = frc::DCMotor::Falcon500(1);
 
 inline constexpr units::meter_t WHEEL_RADIUS = 1_in;
 
-//From onshape doc
-inline constexpr units::kilogram_square_meter_t FEEDER_MOI = 5.332702 * 1_in * 1_in * 1_lb;
+// From onshape doc
+inline constexpr units::kilogram_square_meter_t FEEDER_MOI =
+    5.332702 * 1_in * 1_in * 1_lb;
 } // namespace physical
 
 namespace gains {
 inline constexpr units::volt_t NOTE_FEED_VOLTAGE = 10_V;
 inline constexpr units::volt_t NOTE_EJECT_VOLTAGE = -5_V;
-}
+inline constexpr units::second_t NOTE_SENSOR_DEBOUNCE_TIME = 0.1_s;
+} // namespace gains
 } // namespace feeder
 } // namespace consts

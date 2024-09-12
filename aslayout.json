@@ -28,12 +28,12 @@
             "/Vision/fl_camPoseEstimation/translation",
             "/Vision/fl_camPoseEstimation/rotation",
             "/NoteVisualizer/LaunchedNotes",
-            "/Looptime",
-            "/SwerveDrive"
+            "/NoteVisualizer/RobotNote",
+            "/Feeder"
           ]
         },
         "tabs": {
-          "selected": 1,
+          "selected": 4,
           "tabs": [
             {
               "type": 0,
@@ -85,7 +85,163 @@
                   ]
                 }
               },
-              "title": "Line Graph"
+              "title": "SwerveStates"
+            },
+            {
+              "type": 1,
+              "legendHeight": 0.3,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/Shooter/BottomWheelSetpointRPM",
+                      "color": "#2b66a2",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/Shooter/BottomWheelVelocityRPM",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": [
+                    {
+                      "key": "NT:/Shooter/IsUpToSpeed",
+                      "color": "#af2437",
+                      "show": true
+                    }
+                  ]
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/Shooter/TopWheelSetpointRPM",
+                      "color": "#80588e",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/Shooter/TopWheelVelocityRPM",
+                      "color": "#e48b32",
+                      "show": true
+                    }
+                  ]
+                }
+              },
+              "title": "Shooter"
+            },
+            {
+              "type": 1,
+              "legendHeight": 0.3,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/Intake/IntakeWheelMotorVoltage",
+                      "color": "#2b66a2",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/Intake/IntakeWheelMotorVoltageSetpoint",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": [
+                    {
+                      "key": "NT:/Intake/TouchingNote",
+                      "color": "#af2437",
+                      "show": true
+                    }
+                  ]
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/Intake/IntakeWheelMotorTorqueCurrent",
+                      "color": "#80588e",
+                      "show": true
+                    }
+                  ]
+                }
+              },
+              "title": "Intake"
+            },
+            {
+              "type": 1,
+              "legendHeight": 0.3,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/Feeder/FeederWheelMotorVoltage",
+                      "color": "#2b66a2",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/Feeder/FeederWheelMotorVoltageSetpoint",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": [
+                    {
+                      "key": "NT:/Feeder/HasNote",
+                      "color": "#af2437",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/Feeder/NoteSensorDebouncer",
+                      "color": "#80588e",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/Feeder/NoteSensorRaw",
+                      "color": "#e48b32",
+                      "show": true
+                    }
+                  ]
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": []
+                }
+              },
+              "title": "Feeder"
             },
             {
               "type": 1,
@@ -230,14 +386,14 @@
                 "cameraIndex": -2,
                 "orbitFov": 75,
                 "cameraPosition": [
-                  -1.254779207666439,
-                  1.1543753381354955,
-                  -1.363798873502108
+                  0.08623348528695257,
+                  0.5998697534989375,
+                  -0.7545002972223496
                 ],
                 "cameraTarget": [
-                  -0.5847603655034967,
-                  0.03279712077260952,
-                  0.10329671958816641
+                  -0.04282162569237003,
+                  0.20970807149456866,
+                  -0.09115626728717241
                 ]
               },
               "title": "3D Field"
@@ -265,6 +421,12 @@
                     "key": "NT:/Vision/fl_camPoseEstimation",
                     "sourceTypeIndex": 1,
                     "sourceType": "Pose2d"
+                  },
+                  {
+                    "type": "Trajectory",
+                    "key": "NT:/PathPlanner/activePath",
+                    "sourceTypeIndex": 0,
+                    "sourceType": 5
                   }
                 ]
               ],

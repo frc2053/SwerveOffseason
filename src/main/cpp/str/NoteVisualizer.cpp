@@ -3,6 +3,9 @@
 // the MIT License file in the root of this project
 
 #include "str/NoteVisualizer.h"
+#include "frc/geometry/Pose3d.h"
+#include "frc/geometry/Rotation3d.h"
+#include "frc/geometry/Transform3d.h"
 
 #include <frc/Timer.h>
 #include <units/acceleration.h>
@@ -43,7 +46,6 @@ void NoteVisualizer::LaunchNote(frc::Pose3d currentRobotPose,
 
   launchedNotes.emplace_back(noteToAdd);
   launchedNotePoses.emplace_back(noteToAdd.currentPose);
-  fmt::print("Meow\n");
 }
 
 void NoteVisualizer::Periodic() {
@@ -60,6 +62,16 @@ void NoteVisualizer::Periodic() {
   lastLoopTime = now;
 }
 
+void NoteVisualizer::DisplayRobotNote(bool hasNote,
+                                      const frc::Pose2d &robotPosition) {
+  if (hasNote) {
+    robotNote = frc::Pose3d{robotPosition.X() - 6_in, robotPosition.Y(), 10_in,
+                            frc::Rotation3d{0_deg, -50_deg, 0_deg}};
+  } else {
+    robotNote = frc::Pose3d{};
+  }
+}
+
 void NoteVisualizer::UpdateLaunchedNotes(units::second_t loopTime) {
   int i = 0;
   for (auto &note : launchedNotes) {
@@ -71,13 +83,11 @@ void NoteVisualizer::UpdateLaunchedNotes(units::second_t loopTime) {
 
 void NoteVisualizer::CleanUp() {
   int i = 0;
-  for(auto mit = launchedNotes.begin(); mit != launchedNotes.end(); )
-  {   
-    if(mit->shouldClean) {
+  for (auto mit = launchedNotes.begin(); mit != launchedNotes.end();) {
+    if (mit->shouldClean) {
       mit = launchedNotes.erase(mit);
       launchedNotePoses.erase(launchedNotePoses.begin() + i);
-    }
-    else {
+    } else {
       mit++;
     }
     i++;

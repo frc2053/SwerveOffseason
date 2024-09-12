@@ -3,39 +3,52 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/FeederSubsystem.h"
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/DataLogManager.h>
 #include "constants/Constants.h"
+#include <frc/DataLogManager.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 FeederSubsystem::FeederSubsystem() {
-    SetName("FeederSubsystem");
-    ConfigureFeederMotor(consts::feeder::physical::INVERT_MOTOR, consts::feeder::physical::FEEDER_RATIO, consts::feeder::current_limits::SUPPLY_CURRENT_LIMIT, consts::feeder::current_limits::STATOR_CURRENT_LIMIT);
-    ConfigureMotorSignals();
-    frc::SmartDashboard::PutData(this);
+  SetName("FeederSubsystem");
+  ConfigureFeederMotor(consts::feeder::physical::INVERT_MOTOR,
+                       consts::feeder::physical::FEEDER_RATIO,
+                       consts::feeder::current_limits::SUPPLY_CURRENT_LIMIT,
+                       consts::feeder::current_limits::STATOR_CURRENT_LIMIT);
+  ConfigureMotorSignals();
+  frc::SmartDashboard::PutData(this);
 }
 
 // This method will be called once per scheduler run
 void FeederSubsystem::Periodic() {
-    UpdateNTEntries();
+  noteSensorRawVal = noteSensor.Get();
+  noteSensorDebouced = noteSensorDebouncer.Calculate(noteSensorRawVal);
+  if (noteSensorDebouced) {
+    hasNote = true;
+  } else {
+    hasNote = false;
+  }
+  UpdateNTEntries();
 }
 
 void FeederSubsystem::SimulationPeriodic() {
-    feederMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
-    feederSim.SetInputVoltage(feederMotorSim.GetMotorVoltage());
-    feederSim.Update(consts::LOOP_PERIOD);
-    feederMotorSim.SetRotorVelocity(feederSim.GetAngularVelocity() * consts::feeder::physical::FEEDER_RATIO);
+  feederMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
+  feederSim.SetInputVoltage(feederMotorSim.GetMotorVoltage());
+  feederSim.Update(consts::LOOP_PERIOD);
+  feederMotorSim.SetRotorVelocity(feederSim.GetAngularVelocity() *
+                                  consts::feeder::physical::FEEDER_RATIO);
 }
 
 void FeederSubsystem::UpdateNTEntries() {
   feederWheelMotorVoltagePub.Set(currentFeederWheelVoltage.value());
   feederWheelMotorVoltageSetpointPub.Set(feederWheelVoltageSetpoint.value());
+  noteSensorRawValPub.Set(noteSensorRawVal);
+  noteSensorDeboucerPub.Set(noteSensorDebouced);
   hasNotePub.Set(hasNote);
 }
 
 bool FeederSubsystem::ConfigureFeederMotor(bool invert,
-                            units::scalar_t intakeGearing,
-                            units::ampere_t supplyCurrentLimit,
-                            units::ampere_t statorCurrentLimit) {
+                                           units::scalar_t intakeGearing,
+                                           units::ampere_t supplyCurrentLimit,
+                                           units::ampere_t statorCurrentLimit) {
 
   ctre::phoenix6::configs::TalonFXConfiguration feederConfig{};
 
@@ -55,21 +68,20 @@ bool FeederSubsystem::ConfigureFeederMotor(bool invert,
   ctre::phoenix::StatusCode feederConfigResult =
       feederMotor.GetConfigurator().Apply(feederConfig);
 
-  frc::DataLogManager::Log(fmt::format("Configured feeder motor. Result was: {}\n",
-             feederConfigResult.GetName()));
+  frc::DataLogManager::Log(
+      fmt::format("Configured feeder motor. Result was: {}\n",
+                  feederConfigResult.GetName()));
 
   return feederConfigResult.IsOK();
 }
 
-
 bool FeederSubsystem::ConfigureMotorSignals() {
   feederMotorVoltageSetter.UpdateFreqHz = 0_Hz;
 
-  //Double the rio update rate? Not sure what is optimal here
+  // Double the rio update rate? Not sure what is optimal here
   units::hertz_t updateRate = 1.0 / (consts::LOOP_PERIOD * 2.0);
 
   feederMotorVoltageSig.SetUpdateFrequency(updateRate);
-  feederMotorTorqueCurrentSig.SetUpdateFrequency(updateRate);
 
   ctre::phoenix::StatusCode optimizeFeederMotor =
       feederMotor.OptimizeBusUtilization();
@@ -79,3 +91,5 @@ bool FeederSubsystem::ConfigureMotorSignals() {
 
   return optimizeFeederMotor.IsOK();
 }
+
+bool FeederSubsystem::HasNote() const { return hasNote; }
