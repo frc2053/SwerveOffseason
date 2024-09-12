@@ -6,6 +6,7 @@
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Transform3d.h"
+#include "frc/geometry/Translation3d.h"
 
 #include <frc/Timer.h>
 #include <units/acceleration.h>
@@ -65,8 +66,10 @@ void NoteVisualizer::Periodic() {
 void NoteVisualizer::DisplayRobotNote(bool hasNote,
                                       const frc::Pose2d &robotPosition) {
   if (hasNote) {
-    robotNote = frc::Pose3d{robotPosition.X() - 6_in, robotPosition.Y(), 10_in,
-                            frc::Rotation3d{0_deg, -50_deg, 0_deg}};
+    frc::Pose3d robotPose = frc::Pose3d(robotPosition);
+    robotNote = robotPose.TransformBy(
+        frc::Transform3d(frc::Translation3d(-6_in, 0_in, 10_in),
+                         frc::Rotation3d(0_deg, -50_deg, 0_deg)));
   } else {
     robotNote = frc::Pose3d{};
   }
