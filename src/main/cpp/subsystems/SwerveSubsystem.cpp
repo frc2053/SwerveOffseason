@@ -252,21 +252,9 @@ SwerveSubsystem::PIDToPose(std::function<frc::Pose2d()> goalPose) {
 
 frc2::CommandPtr SwerveSubsystem::AlignToAmp() {
   // If we are close enough to the amp, just pid there
-  return frc2::cmd::Either(
-             PIDToPose([this] {
-               return frc::Pose2d{GetAmpLocation(), frc::Rotation2d{90_deg}};
-             }),
-             frc2::cmd::Sequence(
-                 pathplanner::AutoBuilder::pathfindToPoseFlipped(
-                     frc::Pose2d{GetFrontAmpLocation(),
-                                 frc::Rotation2d{90_deg}},
-                     consts::swerve::pathplanning::constraints, 3_fps),
-                 PIDToPose([this] {
-                   return frc::Pose2d{GetAmpLocation(),
-                                      frc::Rotation2d{90_deg}};
-                 })),
-             [this] { return IsNearAmp(); })
-      .WithName("AlignToAmp");
+  return PIDToPose([this] {
+        return frc::Pose2d{GetAmpLocation(), frc::Rotation2d{90_deg}};
+  }).WithName("AlignToAmp");
 }
 
 frc2::CommandPtr
