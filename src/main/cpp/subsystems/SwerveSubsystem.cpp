@@ -177,6 +177,43 @@ bool SwerveSubsystem::IsNearAmp() {
          consts::yearSpecific::closeToAmpDistance;
 }
 
+frc2::CommandPtr SwerveSubsystem::NoteAssist(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<frc::Pose2d()> notePose) {
+  return frc2::cmd::Sequence(
+             frc2::cmd::RunOnce(
+                 [this, notePose] {
+                   frc::Pose2d currentPose = GetRobotPose();
+                   frc::ChassisSpeeds currentSpeeds = GetFieldRelativeSpeed();
+                   thetaController.Reset(currentPose.Rotation().Radians(),
+                                         currentSpeeds.omega);
+                   thetaController.EnableContinuousInput(
+                       units::radian_t{-std::numbers::pi},
+                       units::radian_t{std::numbers::pi});
+                   thetaController.SetGoal(notePose().Rotation().Radians());
+                   thetaController.SetTolerance(
+                       consts::swerve::pathplanning::rotationalPIDTolerance,
+                       consts::swerve::pathplanning::rotationalVelPIDTolerance);
+                   pidPoseSetpointPub.Set(notePose());
+                 },
+                 {this})
+                 .WithName("NoteAssist Init"),
+             frc2::cmd::Run(
+                 [this, notePose, xVel, yVel] {
+                   frc::Pose2d currentPose = GetRobotPose();
+
+                   frc::Translation2d diff = currentPose.Translation() - notePose().Translation();
+                   thetaController.SetGoal(units::math::atan2(diff.Y(), diff.X()));
+
+                   units::radians_per_second_t thetaSpeed{
+                       thetaController.Calculate(
+                           currentPose.Rotation().Radians())};
+
+                   swerveDrive.Drive(xVel(), yVel(), thetaSpeed, true);
+                 },
+                 {this})
+                 .WithName("NoteAssist Run"))
+      .WithName("NoteAssist");
+}
+
 void SwerveSubsystem::CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote, std::optional<units::radian_t> angleToNote) {
   frc::Pose3d robotPose = frc::Pose3d{GetRobotPose()};
   if(!angleToNote.has_value() || !distanceToNote.has_value()) {
@@ -194,6 +231,7 @@ void SwerveSubsystem::CalculateFoundNotePose(std::optional<units::meter_t> dista
 }
 
 frc::Pose2d SwerveSubsystem::GetFoundNotePose() const {
+
   return latestNotePose;
 }
 
@@ -253,7 +291,7 @@ SwerveSubsystem::PIDToPose(std::function<frc::Pose2d()> goalPose) {
                    yPoseController.SetGoal(goalPose().Y());
                    thetaController.SetGoal(goalPose().Rotation().Radians());
                    pidPoseSetpointPub.Set(goalPose());
-                   
+
                    units::meters_per_second_t xSpeed{xPoseController.Calculate(
                        currentPose.Translation().X())};
                    units::meters_per_second_t ySpeed{yPoseController.Calculate(

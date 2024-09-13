@@ -30,9 +30,20 @@ void RobotContainer::ConfigureBindings() {
 
   controller.LeftTrigger().WhileTrue(swerveSubsystem.AlignToAmp());
   controller.LeftBumper().WhileTrue(
-    swerveSubsystem.PIDToPose([this] {
-      return swerveSubsystem.GetFoundNotePose();
-    })
+    swerveSubsystem.NoteAssist(
+      [this] {
+        return str::NegateIfRed(
+            frc::ApplyDeadband<double>(-controller.GetLeftY(), .1) *
+            consts::swerve::physical::DRIVE_MAX_SPEED);
+      }, 
+      [this] {
+        return str::NegateIfRed(
+            frc::ApplyDeadband<double>(-controller.GetLeftX(), .1) *
+            consts::swerve::physical::DRIVE_MAX_SPEED);
+      },
+      [this] {
+        return swerveSubsystem.GetFoundNotePose();
+      })
   );
   // controller.Back().WhileTrue(
   //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));

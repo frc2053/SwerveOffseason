@@ -65,6 +65,8 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
           CreateTorusVertices(14_in, 1_in, 5, 5)};
       visionSim->AddVisionTargets({photon::VisionTargetSim{
           frc::Pose3d{14_ft, 14_ft, 0_ft, frc::Rotation3d{}},
+          notePlaceHolder}, photon::VisionTargetSim{
+          frc::Pose3d{5_ft, 2_ft, 0_ft, frc::Rotation3d{}},
           notePlaceHolder}});
     }
   }
