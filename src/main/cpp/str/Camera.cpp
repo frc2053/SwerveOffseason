@@ -5,7 +5,9 @@
 #include "str/Camera.h"
 
 #include <frc/RobotBase.h>
+#include <optional>
 #include <vector>
+#include "constants/VisionConstants.h"
 
 #include "constants/Constants.h"
 #include "frc/geometry/Pose3d.h"
@@ -42,7 +44,12 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
       visionSim->AddAprilTags(consts::yearSpecific::aprilTagLayout);
       cameraProps = std::make_unique<photon::SimCameraProperties>();
 
-      cameraProps->SetCalibration(1600, 1200, frc::Rotation2d{75_deg});
+      if(cameraName == consts::vision::NOTE_CAM_NAME) {
+        cameraProps->SetCalibration(640, 480, frc::Rotation2d{75_deg});
+      }
+      else {
+        cameraProps->SetCalibration(1600, 1200, frc::Rotation2d{75_deg});
+      }
       cameraProps->SetCalibError(.35, .10);
       cameraProps->SetFPS(45_Hz);
       cameraProps->SetAvgLatency(20_ms);
@@ -55,12 +62,65 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
       cameraSim->EnableDrawWireframe(true);
 
       photon::TargetModel notePlaceHolder{
-          CreateTorusVertices(14_in, 1_in, 30, 30)};
+          CreateTorusVertices(14_in, 1_in, 5, 5)};
       visionSim->AddVisionTargets({photon::VisionTargetSim{
           frc::Pose3d{14_ft, 14_ft, 0_ft, frc::Rotation3d{}},
           notePlaceHolder}});
     }
   }
+}
+
+std::optional<units::meter_t> Camera::GetDistanceToNote() {
+  double max_area = 0;
+  double max_width = 0;
+  double best_yaw = 0;
+  double pixelToRad = 20;
+  bool didReadData = false;
+  for (const auto &result : camera->GetAllUnreadResults()) {
+    didReadData = true;
+    if (result.HasTargets()) {
+      for (const auto &target : result.GetTargets()) {
+        if (target.GetFiducialId() == -1) {
+          double width = 0;
+          double yaw = 0;
+          std::vector<photon::TargetCorner> corners =
+              target.GetDetectedCorners();
+          double minX = corners[0].x;
+          double maxX = corners[0].x;
+
+          for (const auto &corner : corners) {
+            minX = std::min(minX, corner.x);
+            maxX = std::max(maxX, corner.x);
+          }
+
+          width = maxX - minX;
+          yaw = target.GetYaw();
+
+          if(target.GetArea() > max_area) {
+            max_area = target.GetArea();
+            max_width = width;
+            best_yaw = yaw;
+          }
+        }
+      }
+    }
+  }
+  if(!didReadData) {
+    fmt::print("data not found!\n");
+  }
+  if (max_width != 0) {
+    angleToNote = std::make_optional(units::degree_t{best_yaw});
+    fmt::print("max width: {}\n", max_width);
+    units::meter_t dist = 14_in / units::math::tan(units::radian_t{max_width / (cameraProps->GetResWidth() / cameraProps->GetHorizFOV().Radians())});
+    return dist;
+  } else {
+    fmt::print("not found!\n");
+    return std::nullopt;
+  }
+}
+
+std::optional<units::radian_t> Camera::GetAngleToNote() {
+  return angleToNote;
 }
 
 photon::PhotonPipelineResult Camera::GetLatestResult() { return latestResult; }

@@ -39,4 +39,10 @@ void Vision::SimulationPeriodic(frc::Pose2d simRobotPose) {
   }
 }
 
-frc::Pose2d Vision::GetLargestNotePose() { return frc::Pose2d{}; }
+std::optional<units::meter_t> Vision::GetDistanceToNote() {
+  return noteCamera.GetDistanceToNote();
+}
+
+std::optional<units::radian_t> Vision::GetAngleToNote() {
+  return noteCamera.GetAngleToNote();
+}

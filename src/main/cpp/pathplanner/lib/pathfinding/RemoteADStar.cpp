@@ -47,15 +47,14 @@ RemoteADStar::RemoteADStar() {
 	const std::string filePath = frc::filesystem::GetDeployDirectory()
 			+ "/pathplanner/navgrid.json";
 
-	std::error_code error_code;
-	std::unique_ptr < wpi::MemoryBuffer > fileBuffer =
-			wpi::MemoryBuffer::GetFile(filePath, error_code);
+	wpi::expected<std::unique_ptr<wpi::MemoryBuffer>, std::error_code> fileBuffer =
+			wpi::MemoryBuffer::GetFile(filePath);
 
-	if (error_code) {
+	if (!fileBuffer.has_value()) {
 		FRC_ReportError(frc::err::Error,
 				"RemoteADStar failed to load navgrid. Pathfinding will not be functional.");
 	} else {
-		auto charBuffer = fileBuffer->GetCharBuffer();
+		auto charBuffer = fileBuffer.value()->GetCharBuffer();
 		m_navGridJsonPub.Set(std::string(charBuffer.begin(), charBuffer.end()));
 	}
 

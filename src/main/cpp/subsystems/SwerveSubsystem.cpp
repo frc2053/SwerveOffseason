@@ -3,6 +3,7 @@
 // the MIT License file in the root of this project
 
 #include "subsystems/SwerveSubsystem.h"
+#include "constants/VisionConstants.h"
 
 #include <choreo/lib/Choreo.h>
 #include <frc/Filesystem.h>
@@ -174,6 +175,23 @@ frc::Translation2d SwerveSubsystem::GetFrontAmpLocation() {
 bool SwerveSubsystem::IsNearAmp() {
   return GetRobotPose().Translation().Distance(GetAmpLocation()) <
          consts::yearSpecific::closeToAmpDistance;
+}
+
+frc::Pose2d SwerveSubsystem::CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote, std::optional<units::radian_t> angleToNote) {
+  frc::Pose3d robotPose = frc::Pose3d{GetRobotPose()};
+  units::meter_t dist = cachedNoteDist;
+  auto noteDistOpt = distanceToNote;
+  if(noteDistOpt.has_value()) {
+    dist = noteDistOpt.value();
+    cachedNoteDist = dist;
+  }
+  units::radian_t yaw = angleToNote.value_or(0_deg);
+  noteDistPub.Set(dist.value());
+  noteYawPub.Set(yaw.convert<units::degrees>().value());
+  frc::Transform3d camToNote{dist * units::math::cos(-yaw), dist * units::math::sin(-yaw), 0_m, frc::Rotation3d{0_rad, 0_rad, 0_rad}};
+  frc::Pose3d notePose = robotPose.TransformBy(consts::vision::ROBOT_TO_NOTE_CAM).TransformBy(camToNote);
+  foundNotePose.Set(frc::Pose3d{notePose.X(), notePose.Y(), 0_m, frc::Rotation3d{}});
+  return frc::Pose2d{notePose.X(), notePose.Y(), frc::Rotation2d{}};
 }
 
 frc2::CommandPtr

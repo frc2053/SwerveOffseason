@@ -27,13 +27,12 @@ LocalADStar::LocalADStar() : fieldLength(16.54), fieldWidth(8.02), nodeSize(
 	const std::string filePath = frc::filesystem::GetDeployDirectory()
 			+ "/pathplanner/navgrid.json";
 
-	std::error_code error_code;
-	std::unique_ptr < wpi::MemoryBuffer > fileBuffer =
-			wpi::MemoryBuffer::GetFile(filePath, error_code);
+	wpi::expected<std::unique_ptr<wpi::MemoryBuffer>, std::error_code> fileBuffer =
+			wpi::MemoryBuffer::GetFile(filePath);
 
-	if (!error_code) {
+	if (fileBuffer.has_value()) {
 		try {
-			wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
+			wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
 
 			nodeSize = json.at("nodeSizeMeters").get<double>();
 			wpi::json::const_reference grid = json.at("grid");

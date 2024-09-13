@@ -62,7 +62,7 @@ public:
   frc2::CommandPtr WheelRadius(frc2::sysid::Direction dir);
   frc2::CommandPtr TuneSteerPID(std::function<bool()> isDone);
   frc2::CommandPtr TuneDrivePID(std::function<bool()> isDone);
-
+  frc::Pose2d CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote, std::optional<units::radian_t> angleToNote);
 
 private:
   void SetupPathplanner();
@@ -70,6 +70,24 @@ private:
   frc::Translation2d GetAmpLocation();
   frc::Translation2d GetFrontAmpLocation();
   bool IsNearAmp();
+
+  units::meter_t cachedNoteDist;
+
+  nt::StructPublisher<frc::Pose3d> foundNotePose{
+    nt::NetworkTableInstance::GetDefault()
+    .GetTable("Vision")
+    ->GetStructTopic<frc::Pose3d>("FoundNotePose")
+    .Publish()};
+  nt::DoublePublisher noteDistPub{
+    nt::NetworkTableInstance::GetDefault()
+    .GetTable("Vision")
+    ->GetDoubleTopic("NoteDist")
+    .Publish()};
+  nt::DoublePublisher noteYawPub{
+    nt::NetworkTableInstance::GetDefault()
+    .GetTable("Vision")
+    ->GetDoubleTopic("NoteYaw")
+    .Publish()};
 
   frc::TrapezoidProfile<units::meters>::Constraints translationConstraints{
       consts::swerve::physical::DRIVE_MAX_SPEED,

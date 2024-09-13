@@ -114,15 +114,14 @@ std::shared_ptr<PathPlannerPath> PathPlannerPath::fromPathFile(
 	const std::string filePath = frc::filesystem::GetDeployDirectory()
 			+ "/pathplanner/paths/" + pathName + ".path";
 
-	std::error_code error_code;
-	std::unique_ptr < wpi::MemoryBuffer > fileBuffer =
-			wpi::MemoryBuffer::GetFile(filePath, error_code);
+	wpi::expected<std::unique_ptr<wpi::MemoryBuffer>, std::error_code> fileBuffer =
+			wpi::MemoryBuffer::GetFile(filePath);
 
-	if (fileBuffer == nullptr || error_code) {
+	if (!fileBuffer.has_value()) {
 		throw std::runtime_error("Cannot open file: " + filePath);
 	}
 
-	wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
+	wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
 
 	std::shared_ptr < PathPlannerPath > path = PathPlannerPath::fromJson(json);
 	PPLibTelemetry::registerHotReloadPath(pathName, path);
@@ -134,15 +133,14 @@ std::shared_ptr<PathPlannerPath> PathPlannerPath::fromChoreoTrajectory(
 	const std::string filePath = frc::filesystem::GetDeployDirectory()
 			+ "/choreo/" + trajectoryName + ".traj";
 
-	std::error_code error_code;
-	std::unique_ptr < wpi::MemoryBuffer > fileBuffer =
-			wpi::MemoryBuffer::GetFile(filePath, error_code);
+	wpi::expected<std::unique_ptr<wpi::MemoryBuffer>, std::error_code>fileBuffer =
+			wpi::MemoryBuffer::GetFile(filePath);
 
-	if (fileBuffer == nullptr || error_code) {
+	if (!fileBuffer.has_value()) {
 		throw std::runtime_error("Cannot open file: " + filePath);
 	}
 
-	wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
+	wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
 
 	std::vector < PathPlannerTrajectory::State > trajStates;
 	for (wpi::json::const_reference s : json.at("samples")) {

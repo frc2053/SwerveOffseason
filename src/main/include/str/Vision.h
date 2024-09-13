@@ -5,11 +5,13 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "constants/VisionConstants.h"
 #include "frc/geometry/Pose2d.h"
 #include "str/Camera.h"
+#include "units/length.h"
 
 namespace str {
 class Vision {
@@ -20,7 +22,8 @@ public:
   GetCameraEstimatedPoses();
   std::vector<std::optional<Eigen::Matrix<double, 3, 1>>> GetPoseStdDevs(
       const std::vector<std::optional<photon::EstimatedRobotPose>> &poses);
-  frc::Pose2d GetLargestNotePose();
+  std::optional<units::meter_t> GetDistanceToNote();
+  std::optional<units::radian_t> GetAngleToNote();
 
 private:
   std::array<Camera, 4> cameras{

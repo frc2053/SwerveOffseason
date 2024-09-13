@@ -39,6 +39,7 @@ void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
   m_container.GetNoteVisualizer().Periodic();
   UpdateVision();
+  m_container.GetSwerveSubsystem().CalculateFoundNotePose(m_container.GetVision().GetDistanceToNote(), m_container.GetVision().GetAngleToNote());
 
   lastTotalLoopTime = now;
 }

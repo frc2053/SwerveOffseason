@@ -29,6 +29,8 @@ public:
   photon::PhotonPipelineResult GetLatestResult();
   std::optional<photon::EstimatedRobotPose> GetEstimatedGlobalPose();
   Eigen::Matrix<double, 3, 1> GetEstimationStdDevs(frc::Pose2d estimatedPose);
+  std::optional<units::meter_t> GetDistanceToNote();
+  std::optional<units::radian_t> GetAngleToNote();
 
 private:
   bool simulate;
@@ -49,6 +51,11 @@ private:
   nt::DoublePublisher stdDevXPosePub;
   nt::DoublePublisher stdDevYPosePub;
   nt::DoublePublisher stdDevRotPosePub;
+
+  std::optional<units::radian_t> angleToNote;
+
+  units::radian_t cacheYaw = 0_rad;
+  units::meter_t cacheDist = 0_m;
 
   std::vector<frc::Translation3d>
   CreateTorusVertices(units::meter_t majorRadius, units::meter_t minorRadius,

@@ -4,7 +4,7 @@
 #include <frc/Filesystem.h>
 #include <wpi/MemoryBuffer.h>
 #include <hal/FRCUsageReporting.h>
-
+#include "wpi/expected"
 using namespace pathplanner;
 
 int PathPlannerAuto::m_instances = 0;
@@ -28,15 +28,14 @@ std::vector<std::shared_ptr<PathPlannerPath>> PathPlannerAuto::getPathGroupFromA
 	const std::string filePath = frc::filesystem::GetDeployDirectory()
 			+ "/pathplanner/autos/" + autoName + ".auto";
 
-	std::error_code error_code;
-	std::unique_ptr < wpi::MemoryBuffer > fileBuffer =
-			wpi::MemoryBuffer::GetFile(filePath, error_code);
+	wpi::expected<std::unique_ptr<wpi::MemoryBuffer>, std::error_code> fileBuffer =
+			wpi::MemoryBuffer::GetFile(filePath);
 
-	if (fileBuffer == nullptr || error_code) {
+	if (!fileBuffer.has_value()) {
 		throw std::runtime_error("Cannot open file: " + filePath);
 	}
 
-	wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
+	wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
 	bool choreoAuto = json.contains("choreoAuto")
 			&& json.at("choreoAuto").get<bool>();
 
@@ -47,15 +46,14 @@ frc::Pose2d PathPlannerAuto::getStartingPoseFromAutoFile(std::string autoName) {
 	const std::string filePath = frc::filesystem::GetDeployDirectory()
 			+ "/pathplanner/autos/" + autoName + ".auto";
 
-	std::error_code error_code;
-	std::unique_ptr < wpi::MemoryBuffer > fileBuffer =
-			wpi::MemoryBuffer::GetFile(filePath, error_code);
+	wpi::expected<std::unique_ptr<wpi::MemoryBuffer>, std::error_code> fileBuffer =
+			wpi::MemoryBuffer::GetFile(filePath);
 
-	if (fileBuffer == nullptr || error_code) {
+	if (!fileBuffer.has_value()) {
 		throw std::runtime_error("Cannot open file: " + filePath);
 	}
 
-	wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
+	wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
 
 	return AutoBuilder::getStartingPoseFromJson(json.at("startingPose"));
 }

@@ -22,14 +22,13 @@ ChoreoTrajectory Choreo::GetTrajectory(std::string_view trajName) {
   std::string trajFileName = fmt::format(
       "{}/choreo/{}.traj", frc::filesystem::GetDeployDirectory(), trajName);
 
-  std::error_code ec;
-  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
-      wpi::MemoryBuffer::GetFile(trajFileName, ec);
-  if (fileBuffer == nullptr || ec) {
+  wpi::expected<std::unique_ptr<wpi::MemoryBuffer>, std::error_code> fileBuffer =
+      wpi::MemoryBuffer::GetFile(trajFileName);
+  if (!fileBuffer.has_value()) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", trajFileName));
   }
 
-  wpi::json json = wpi::json::parse(fileBuffer->GetCharBuffer());
+  wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
 
   ChoreoTrajectory traj;
   choreolib::from_json(json, traj);
