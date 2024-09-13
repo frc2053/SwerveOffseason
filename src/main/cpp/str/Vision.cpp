@@ -3,6 +3,7 @@
 // the MIT License file in the root of this project
 
 #include "str/Vision.h"
+#include "frc/geometry/Pose2d.h"
 
 using namespace str;
 
@@ -34,5 +35,8 @@ Vision::GetCameraEstimatedPoses() {
 void Vision::SimulationPeriodic(frc::Pose2d simRobotPose) {
   for (auto &cam : cameras) {
     cam.SimPeriodic(simRobotPose);
+    noteCamera.SimPeriodic(simRobotPose);
   }
 }
+
+frc::Pose2d Vision::GetLargestNotePose() { return frc::Pose2d{}; }

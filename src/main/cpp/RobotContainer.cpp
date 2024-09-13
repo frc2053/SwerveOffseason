@@ -49,11 +49,15 @@ void RobotContainer::ConfigureBindings() {
   // controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kForward));
   // controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kReverse));
 
-  // controller.POVDown().OnTrue(swerveSubsystem.TuneSteerPID([this] { return controller.Start().Get(); }));
-  // controller.POVUp().OnTrue(swerveSubsystem.TuneDrivePID([this] { return controller.Start().Get(); }));
+  // controller.POVDown().OnTrue(swerveSubsystem.TuneSteerPID([this] { return
+  // controller.Start().Get(); }));
+  // controller.POVUp().OnTrue(swerveSubsystem.TuneDrivePID([this] { return
+  // controller.Start().Get(); }));
 
-  controller.A().WhileTrue(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::AMP; }));
-  controller.A().OnFalse(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+  controller.A().WhileTrue(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::AMP; }));
+  controller.A().OnFalse(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
   // controller.LeftTrigger().WhileTrue(intakeSubsystem.IntakeNote());
   // controller.RightTrigger().WhileTrue(intakeSubsystem.PoopNote());
@@ -63,10 +67,14 @@ void RobotContainer::ConfigureBindings() {
   // controller.X().WhileTrue(shooterSubsystem.TopWheelSysIdDynamic(frc2::sysid::Direction::kForward));
   // controller.Y().WhileTrue(shooterSubsystem.TopWheelSysIdDynamic(frc2::sysid::Direction::kReverse));
 
-  // (controller.A() && controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdQuasistatic(frc2::sysid::Direction::kForward));
-  // (controller.B() && controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdQuasistatic(frc2::sysid::Direction::kReverse));
-  // (controller.X() && controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdDynamic(frc2::sysid::Direction::kForward));
-  // (controller.Y() && controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdDynamic(frc2::sysid::Direction::kReverse));
+  // (controller.A() &&
+  // controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdQuasistatic(frc2::sysid::Direction::kForward));
+  // (controller.B() &&
+  // controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdQuasistatic(frc2::sysid::Direction::kReverse));
+  // (controller.X() &&
+  // controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdDynamic(frc2::sysid::Direction::kForward));
+  // (controller.Y() &&
+  // controller.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdDynamic(frc2::sysid::Direction::kReverse));
 
   // controller.A().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kReverse));
@@ -111,7 +119,7 @@ FeederSubsystem &RobotContainer::GetFeederSubsystem() {
   return feederSubsystem;
 }
 
-//str::Vision &RobotContainer::GetVision() { return vision; }
+str::Vision &RobotContainer::GetVision() { return vision; }
 
 str::NoteVisualizer &RobotContainer::GetNoteVisualizer() {
   return noteVisualizer;

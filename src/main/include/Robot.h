@@ -13,6 +13,8 @@
 
 #include "RobotContainer.h"
 #include "constants/Constants.h"
+#include "frc/geometry/Pose3d.h"
+#include "networktables/StructArrayTopic.h"
 #include "str/SwerveModule.h"
 
 class Robot : public frc::TimedRobot {
@@ -46,4 +48,10 @@ private:
                                       .GetTable("Looptime")
                                       ->GetDoubleTopic("RobotPeriodicLoopRate")
                                       .Publish()};
+  std::array<frc::Pose3d, 5> cameraLocations;
+  nt::StructArrayPublisher<frc::Pose3d> cameraLocationsPub{
+      nt::NetworkTableInstance::GetDefault()
+          .GetTable("Vision")
+          ->GetStructArrayTopic<frc::Pose3d>("CameraLocations")
+          .Publish()};
 };

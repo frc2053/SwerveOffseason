@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "constants/VisionConstants.h"
+#include "frc/geometry/Pose2d.h"
 #include "str/Camera.h"
 
 namespace str {
@@ -19,12 +20,13 @@ public:
   GetCameraEstimatedPoses();
   std::vector<std::optional<Eigen::Matrix<double, 3, 1>>> GetPoseStdDevs(
       const std::vector<std::optional<photon::EstimatedRobotPose>> &poses);
+  frc::Pose2d GetLargestNotePose();
 
 private:
   std::array<Camera, 4> cameras{
       Camera{consts::vision::FL_CAM_NAME, consts::vision::FL_ROBOT_TO_CAM,
              consts::vision::SINGLE_TAG_STD_DEV,
-             consts::vision::MULTI_TAG_STD_DEV, true},
+             consts::vision::MULTI_TAG_STD_DEV, false},
       Camera{consts::vision::FR_CAM_NAME, consts::vision::FR_ROBOT_TO_CAM,
              consts::vision::SINGLE_TAG_STD_DEV,
              consts::vision::MULTI_TAG_STD_DEV, false},
@@ -34,5 +36,9 @@ private:
       Camera{consts::vision::BR_CAM_NAME, consts::vision::BR_ROBOT_TO_CAM,
              consts::vision::SINGLE_TAG_STD_DEV,
              consts::vision::MULTI_TAG_STD_DEV, false}};
+  Camera noteCamera{consts::vision::NOTE_CAM_NAME,
+                    consts::vision::ROBOT_TO_NOTE_CAM,
+                    consts::vision::SINGLE_TAG_STD_DEV,
+                    consts::vision::MULTI_TAG_STD_DEV, true};
 };
 } // namespace str

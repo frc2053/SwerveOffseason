@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "frc/geometry/Translation3d.h"
+#include "units/length.h"
 #include <frc/apriltag/AprilTagFields.h>
 #include <frc/geometry/Transform3d.h>
 #include <networktables/StructTopic.h>
@@ -47,5 +49,9 @@ private:
   nt::DoublePublisher stdDevXPosePub;
   nt::DoublePublisher stdDevYPosePub;
   nt::DoublePublisher stdDevRotPosePub;
+
+  std::vector<frc::Translation3d>
+  CreateTorusVertices(units::meter_t majorRadius, units::meter_t minorRadius,
+                      int numMajorDivisions, int numMinorDivisons);
 };
 } // namespace str

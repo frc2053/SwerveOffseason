@@ -36,6 +36,6 @@ inline const Eigen::Matrix<double, 3, 1> MULTI_TAG_STD_DEV{0.5, 0.5, 1};
 inline const std::string NOTE_CAM_NAME{"note_cam"};
 inline const frc::Transform3d ROBOT_TO_NOTE_CAM{
     frc::Translation3d{-15.664852_in, 0_in, 9.437251_in},
-    frc::Rotation3d{0_rad, 20_deg, 0_rad}};
+    frc::Rotation3d{0_rad, 20_deg, 180_deg}};
 } // namespace vision
 } // namespace consts

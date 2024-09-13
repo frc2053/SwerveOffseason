@@ -5,8 +5,15 @@
 #include "str/Camera.h"
 
 #include <frc/RobotBase.h>
+#include <vector>
 
 #include "constants/Constants.h"
+#include "frc/geometry/Pose3d.h"
+#include "frc/geometry/Rotation3d.h"
+#include "frc/geometry/Translation3d.h"
+#include "photon/estimation/TargetModel.h"
+#include "photon/simulation/VisionTargetSim.h"
+#include "units/angle.h"
 
 using namespace str;
 
@@ -46,13 +53,17 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
 
       visionSim->AddCamera(cameraSim.get(), robotToCamera);
       cameraSim->EnableDrawWireframe(true);
+
+      photon::TargetModel notePlaceHolder{
+          CreateTorusVertices(14_in, 1_in, 30, 30)};
+      visionSim->AddVisionTargets({photon::VisionTargetSim{
+          frc::Pose3d{14_ft, 14_ft, 0_ft, frc::Rotation3d{}},
+          notePlaceHolder}});
     }
   }
 }
 
-photon::PhotonPipelineResult Camera::GetLatestResult() {
-  return latestResult;
-}
+photon::PhotonPipelineResult Camera::GetLatestResult() { return latestResult; }
 
 std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
   if (!simulate) {
@@ -61,13 +72,12 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
 
   std::optional<photon::EstimatedRobotPose> visionEst;
 
-  for(const auto& result : camera->GetAllUnreadResults()) {
+  for (const auto &result : camera->GetAllUnreadResults()) {
     visionEst = photonEstimator->Update(result);
 
-    if(visionEst.has_value()) {
+    if (visionEst.has_value()) {
       posePub.Set(visionEst.value().estimatedPose.ToPose2d());
-    }
-    else {
+    } else {
       posePub.Set({});
     }
 
@@ -121,4 +131,33 @@ void Camera::SimPeriodic(frc::Pose2d robotSimPose) {
   if (simulate) {
     visionSim->Update(robotSimPose);
   }
+}
+
+std::vector<frc::Translation3d>
+Camera::CreateTorusVertices(units::meter_t majorRadius,
+                            units::meter_t minorRadius, int numMajorDivisions,
+                            int numMinorDivisons) {
+  std::vector<frc::Translation3d> vertices{};
+
+  units::radian_t majorAngleIncrement =
+      units::radian_t{2 * std::numbers::pi} / numMajorDivisions;
+  units::radian_t minorAngleIncrement =
+      units::radian_t{2 * std::numbers::pi} / numMinorDivisons;
+
+  for (int i = 0; i < numMajorDivisions; i++) {
+    units::radian_t majorAngle = i * majorAngleIncrement;
+    for (int j = 0; j < numMinorDivisons; j++) {
+      units::radian_t minorAngle = j * minorAngleIncrement;
+      units::meter_t x =
+          (majorRadius + minorRadius * units::math::cos(minorAngle)) *
+          units::math::cos(majorAngle);
+      units::meter_t y =
+          (majorRadius + minorRadius * units::math::cos(minorAngle)) *
+          units::math::sin(majorAngle);
+      units::meter_t z = minorRadius * units::math::sin(minorAngle);
+      vertices.push_back(frc::Translation3d{x, y, z});
+    }
+  }
+
+  return vertices;
 }

@@ -33,7 +33,7 @@
           ]
         },
         "tabs": {
-          "selected": 4,
+          "selected": 7,
           "tabs": [
             {
               "type": 0,
@@ -321,6 +321,12 @@
                     "key": "NT:/NoteVisualizer/RobotNote",
                     "sourceTypeIndex": 1,
                     "sourceType": "Pose3d"
+                  },
+                  {
+                    "type": "Axes",
+                    "key": "NT:/Vision/CameraLocations",
+                    "sourceTypeIndex": 2,
+                    "sourceType": "Pose3d[]"
                   }
                 ],
                 [
@@ -386,14 +392,14 @@
                 "cameraIndex": -2,
                 "orbitFov": 75,
                 "cameraPosition": [
-                  0.08623348528695257,
-                  0.5998697534989375,
-                  -0.7545002972223496
+                  0.6445158815866971,
+                  0.5501543393787021,
+                  -0.20933911889688694
                 ],
                 "cameraTarget": [
-                  -0.04282162569237003,
-                  0.20970807149456866,
-                  -0.09115626728717241
+                  -5.3144279717450305,
+                  -6.9060502891866165,
+                  1.1002838294346886
                 ]
               },
               "title": "3D Field"
