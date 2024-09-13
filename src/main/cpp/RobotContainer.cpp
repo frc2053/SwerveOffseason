@@ -29,11 +29,11 @@ void RobotContainer::ConfigureBindings() {
       true, true));
 
   controller.LeftTrigger().WhileTrue(swerveSubsystem.AlignToAmp());
-  // controller.LeftBumper().WhileTrue(
-  //   swerveSubsystem.PIDToPose([this] {
-
-  //   })
-  // );
+  controller.LeftBumper().WhileTrue(
+    swerveSubsystem.PIDToPose([this] {
+      return swerveSubsystem.GetFoundNotePose();
+    })
+  );
   // controller.Back().WhileTrue(
   //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));
   // controller.Start().WhileTrue(

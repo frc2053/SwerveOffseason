@@ -62,8 +62,8 @@ public:
   frc2::CommandPtr WheelRadius(frc2::sysid::Direction dir);
   frc2::CommandPtr TuneSteerPID(std::function<bool()> isDone);
   frc2::CommandPtr TuneDrivePID(std::function<bool()> isDone);
-  frc::Pose2d CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote, std::optional<units::radian_t> angleToNote);
-
+  void CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote, std::optional<units::radian_t> angleToNote);
+  frc::Pose2d GetFoundNotePose() const;
 private:
   void SetupPathplanner();
   void LoadChoreoTrajectories();
@@ -72,6 +72,7 @@ private:
   bool IsNearAmp();
 
   units::meter_t cachedNoteDist;
+  frc::Pose2d latestNotePose;
 
   nt::StructPublisher<frc::Pose3d> foundNotePose{
     nt::NetworkTableInstance::GetDefault()

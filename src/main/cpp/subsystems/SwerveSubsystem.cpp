@@ -177,21 +177,24 @@ bool SwerveSubsystem::IsNearAmp() {
          consts::yearSpecific::closeToAmpDistance;
 }
 
-frc::Pose2d SwerveSubsystem::CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote, std::optional<units::radian_t> angleToNote) {
+void SwerveSubsystem::CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote, std::optional<units::radian_t> angleToNote) {
   frc::Pose3d robotPose = frc::Pose3d{GetRobotPose()};
-  units::meter_t dist = cachedNoteDist;
-  auto noteDistOpt = distanceToNote;
-  if(noteDistOpt.has_value()) {
-    dist = noteDistOpt.value();
-    cachedNoteDist = dist;
+  if(!angleToNote.has_value() || !distanceToNote.has_value()) {
+    latestNotePose = robotPose.ToPose2d();
   }
-  units::radian_t yaw = angleToNote.value_or(0_deg);
-  noteDistPub.Set(dist.value());
-  noteYawPub.Set(yaw.convert<units::degrees>().value());
-  frc::Transform3d camToNote{dist * units::math::cos(-yaw), dist * units::math::sin(-yaw), 0_m, frc::Rotation3d{0_rad, 0_rad, 0_rad}};
-  frc::Pose3d notePose = robotPose.TransformBy(consts::vision::ROBOT_TO_NOTE_CAM).TransformBy(camToNote);
-  foundNotePose.Set(frc::Pose3d{notePose.X(), notePose.Y(), 0_m, frc::Rotation3d{}});
-  return frc::Pose2d{notePose.X(), notePose.Y(), frc::Rotation2d{}};
+  else {
+    units::radian_t yaw = angleToNote.value_or(0_deg);
+    noteDistPub.Set(distanceToNote.value().value());
+    noteYawPub.Set(yaw.convert<units::degrees>().value());
+    frc::Transform3d camToNote{distanceToNote.value() * units::math::cos(-yaw), distanceToNote.value() * units::math::sin(-yaw), 0_m, frc::Rotation3d{0_rad, 0_rad, 0_rad}};
+    frc::Pose3d notePose = robotPose.TransformBy(consts::vision::ROBOT_TO_NOTE_CAM).TransformBy(camToNote);
+    foundNotePose.Set(frc::Pose3d{notePose.X(), notePose.Y(), 0_m, frc::Rotation3d{}});
+    latestNotePose = frc::Pose2d{notePose.X(), notePose.Y(), frc::Rotation2d{}};
+  }
+}
+
+frc::Pose2d SwerveSubsystem::GetFoundNotePose() const {
+  return latestNotePose;
 }
 
 frc2::CommandPtr
@@ -246,6 +249,11 @@ SwerveSubsystem::PIDToPose(std::function<frc::Pose2d()> goalPose) {
                  [this, goalPose] {
                    frc::Pose2d currentPose = GetRobotPose();
 
+                   xPoseController.SetGoal(goalPose().X());
+                   yPoseController.SetGoal(goalPose().Y());
+                   thetaController.SetGoal(goalPose().Rotation().Radians());
+                   pidPoseSetpointPub.Set(goalPose());
+                   
                    units::meters_per_second_t xSpeed{xPoseController.Calculate(
                        currentPose.Translation().X())};
                    units::meters_per_second_t ySpeed{yPoseController.Calculate(

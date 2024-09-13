@@ -75,38 +75,32 @@ std::optional<units::meter_t> Camera::GetDistanceToNote() {
   double max_width = 0;
   double best_yaw = 0;
   double pixelToRad = 20;
-  bool didReadData = false;
-  for (const auto &result : camera->GetAllUnreadResults()) {
-    didReadData = true;
-    if (result.HasTargets()) {
-      for (const auto &target : result.GetTargets()) {
-        if (target.GetFiducialId() == -1) {
-          double width = 0;
-          double yaw = 0;
-          std::vector<photon::TargetCorner> corners =
-              target.GetDetectedCorners();
-          double minX = corners[0].x;
-          double maxX = corners[0].x;
+  photon::PhotonPipelineResult result = camera->GetLatestResult();
+  if (result.HasTargets()) {
+    for (const auto &target : result.GetTargets()) {
+      if (target.GetFiducialId() == -1) {
+        double width = 0;
+        double yaw = 0;
+        std::vector<photon::TargetCorner> corners =
+            target.GetDetectedCorners();
+        double minX = corners[0].x;
+        double maxX = corners[0].x;
 
-          for (const auto &corner : corners) {
-            minX = std::min(minX, corner.x);
-            maxX = std::max(maxX, corner.x);
-          }
+        for (const auto &corner : corners) {
+          minX = std::min(minX, corner.x);
+          maxX = std::max(maxX, corner.x);
+        }
 
-          width = maxX - minX;
-          yaw = target.GetYaw();
+        width = maxX - minX;
+        yaw = target.GetYaw();
 
-          if(target.GetArea() > max_area) {
-            max_area = target.GetArea();
-            max_width = width;
-            best_yaw = yaw;
-          }
+        if(target.GetArea() > max_area) {
+          max_area = target.GetArea();
+          max_width = width;
+          best_yaw = yaw;
         }
       }
     }
-  }
-  if(!didReadData) {
-    fmt::print("data not found!\n");
   }
   if (max_width != 0) {
     angleToNote = std::make_optional(units::degree_t{best_yaw});
