@@ -13,6 +13,7 @@
 #include <frc2/command/FunctionalCommand.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/json.h>
+#include <wpi/expected>
 
 #include "choreo/lib/ChoreoSwerveCommand.h"
 
