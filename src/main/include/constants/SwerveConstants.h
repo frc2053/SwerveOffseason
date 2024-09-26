@@ -43,14 +43,14 @@ inline constexpr units::ampere_t SLIP_CURRENT_LIMIT = 180_A;
 namespace physical {
 
 #ifdef __FRC_ROBORIO__
-inline constexpr units::radian_t IMU_ROLL_OFFSET = -0.4168_deg;
-inline constexpr units::radian_t IMU_PITCH_OFFSET = -89.879_deg;
-inline constexpr units::radian_t IMU_YAW_OFFSET = 89.9885_deg;
+inline constexpr units::radian_t IMU_ROLL_OFFSET = 0_deg;
+inline constexpr units::radian_t IMU_PITCH_OFFSET = 0_deg;
+inline constexpr units::radian_t IMU_YAW_OFFSET = 0_deg;
 
-inline constexpr units::turn_t FL_ENC_OFFSET = 0.008789_tr;
-inline constexpr units::turn_t FR_ENC_OFFSET = -0.303223_tr;
-inline constexpr units::turn_t BL_ENC_OFFSET = -0.141357_tr;
-inline constexpr units::turn_t BR_ENC_OFFSET = 0.214111_tr;
+inline constexpr units::turn_t FL_ENC_OFFSET = -0.272949_tr;
+inline constexpr units::turn_t FR_ENC_OFFSET = 0.356201_tr;
+inline constexpr units::turn_t BL_ENC_OFFSET = .195068_tr;
+inline constexpr units::turn_t BR_ENC_OFFSET = -0.492676_tr;
 
 inline constexpr bool FL_STEER_INVERT = true;
 inline constexpr bool FR_STEER_INVERT = true;
