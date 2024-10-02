@@ -29,8 +29,8 @@ SwerveSubsystem::SwerveSubsystem()
                              consts::swerve::pathplanning::ROTATION_D})) {
   SetName("SwerveSubsystem");
   frc::SmartDashboard::PutData(this);
-  SetupPathplanner();
-  LoadChoreoTrajectories();
+  //SetupPathplanner();
+  //LoadChoreoTrajectories();
 }
 
 void SwerveSubsystem::UpdateSwerveOdom() { swerveDrive.UpdateSwerveOdom(); }

@@ -50,14 +50,14 @@ void RobotContainer::ConfigureBindings() {
   // controller.Start().WhileTrue(
   //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kForward));
 
-  controller.A().OnTrue(frc2::cmd::RunOnce([this] {
-    noteVisualizer.LaunchNote(
-        frc::Pose3d{swerveSubsystem.GetRobotPose()},
-        swerveSubsystem.GetRobotRelativeSpeed(),
-        frc::Transform3d{frc::Translation3d{-4_in, 0_in, 13_in},
-                         frc::Rotation3d{0_deg, -50_deg, 0_deg}},
-        41.71_fps);
-  }));
+  // controller.A().OnTrue(frc2::cmd::RunOnce([this] {
+  //   noteVisualizer.LaunchNote(
+  //       frc::Pose3d{swerveSubsystem.GetRobotPose()},
+  //       swerveSubsystem.GetRobotRelativeSpeed(),
+  //       frc::Transform3d{frc::Translation3d{-4_in, 0_in, 13_in},
+  //                        frc::Rotation3d{0_deg, -50_deg, 0_deg}},
+  //       41.71_fps);
+  // }));
 
   // controller.A().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticTorque(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticTorque(frc2::sysid::Direction::kReverse));
@@ -69,13 +69,13 @@ void RobotContainer::ConfigureBindings() {
   // controller.POVUp().OnTrue(swerveSubsystem.TuneDrivePID([this] { return
   // controller.Start().Get(); }));
 
-  controller.A().WhileTrue(shooterSubsystem.RunShooter(
-      [] { return consts::shooter::PRESET_SPEEDS::AMP; }));
-  controller.A().OnFalse(shooterSubsystem.RunShooter(
-      [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+  // controller.A().WhileTrue(shooterSubsystem.RunShooter(
+  //     [] { return consts::shooter::PRESET_SPEEDS::AMP; }));
+  // controller.A().OnFalse(shooterSubsystem.RunShooter(
+  //     [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
-  // controller.LeftTrigger().WhileTrue(intakeSubsystem.IntakeNote());
-  // controller.RightTrigger().WhileTrue(intakeSubsystem.PoopNote());
+  controller.LeftTrigger().WhileTrue(intakeSubsystem.IntakeNote());
+  controller.RightTrigger().WhileTrue(intakeSubsystem.PoopNote());
 
   // controller.A().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kReverse));
@@ -115,27 +115,28 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::Command *RobotContainer::GetAutonomousCommand() {
-  return autos.GetSelectedCommand();
+  //return autos.GetSelectedCommand();
+  return nullptr;
 }
 
 SwerveSubsystem &RobotContainer::GetSwerveSubsystem() {
   return swerveSubsystem;
 }
 
-ShooterSubsystem &RobotContainer::GetShooterSubsystem() {
-  return shooterSubsystem;
-}
+// ShooterSubsystem &RobotContainer::GetShooterSubsystem() {
+//   return shooterSubsystem;
+// }
 
 IntakeSubsystem &RobotContainer::GetIntakeSubsystem() {
   return intakeSubsystem;
 }
 
-FeederSubsystem &RobotContainer::GetFeederSubsystem() {
-  return feederSubsystem;
-}
+// FeederSubsystem &RobotContainer::GetFeederSubsystem() {
+//   return feederSubsystem;
+// }
 
-str::Vision &RobotContainer::GetVision() { return vision; }
+// str::Vision &RobotContainer::GetVision() { return vision; }
 
-str::NoteVisualizer &RobotContainer::GetNoteVisualizer() {
-  return noteVisualizer;
-}
+// str::NoteVisualizer &RobotContainer::GetNoteVisualizer() {
+//   return noteVisualizer;
+// }

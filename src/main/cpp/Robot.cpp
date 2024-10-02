@@ -32,41 +32,41 @@ void Robot::RobotPeriodic() {
   units::second_t loopTime = now - lastTotalLoopTime;
   loopTimePub.Set((1 / loopTime).value());
 
-  m_container.GetNoteVisualizer().DisplayRobotNote(
-      m_container.GetFeederSubsystem().HasNote(),
-      m_container.GetSwerveSubsystem().GetRobotPose());
+  // m_container.GetNoteVisualizer().DisplayRobotNote(
+  //     m_container.GetFeederSubsystem().HasNote(),
+  //     m_container.GetSwerveSubsystem().GetRobotPose());
 
   frc2::CommandScheduler::GetInstance().Run();
-  m_container.GetNoteVisualizer().Periodic();
-  UpdateVision();
-  m_container.GetSwerveSubsystem().CalculateFoundNotePose(m_container.GetVision().GetDistanceToNote(), m_container.GetVision().GetAngleToNote());
+  //m_container.GetNoteVisualizer().Periodic();
+  //UpdateVision();
+  //m_container.GetSwerveSubsystem().CalculateFoundNotePose(m_container.GetVision().GetDistanceToNote(), m_container.GetVision().GetAngleToNote());
 
   lastTotalLoopTime = now;
 }
 
 void Robot::UpdateVision() {
-  auto visionEstimates = m_container.GetVision().GetCameraEstimatedPoses();
-  auto stdDevs = m_container.GetVision().GetPoseStdDevs(visionEstimates);
+  // auto visionEstimates = m_container.GetVision().GetCameraEstimatedPoses();
+  // auto stdDevs = m_container.GetVision().GetPoseStdDevs(visionEstimates);
 
-  frc::Pose3d pose =
-      frc::Pose3d{m_container.GetSwerveSubsystem().GetRobotPose()};
+  // frc::Pose3d pose =
+  //     frc::Pose3d{m_container.GetSwerveSubsystem().GetRobotPose()};
 
-  cameraLocations[0] = pose.TransformBy(consts::vision::FL_ROBOT_TO_CAM);
-  cameraLocations[1] = pose.TransformBy(consts::vision::FR_ROBOT_TO_CAM);
-  cameraLocations[2] = pose.TransformBy(consts::vision::BL_ROBOT_TO_CAM);
-  cameraLocations[3] = pose.TransformBy(consts::vision::BR_ROBOT_TO_CAM);
-  cameraLocations[4] = pose.TransformBy(consts::vision::ROBOT_TO_NOTE_CAM);
+  // cameraLocations[0] = pose.TransformBy(consts::vision::FL_ROBOT_TO_CAM);
+  // cameraLocations[1] = pose.TransformBy(consts::vision::FR_ROBOT_TO_CAM);
+  // cameraLocations[2] = pose.TransformBy(consts::vision::BL_ROBOT_TO_CAM);
+  // cameraLocations[3] = pose.TransformBy(consts::vision::BR_ROBOT_TO_CAM);
+  // cameraLocations[4] = pose.TransformBy(consts::vision::ROBOT_TO_NOTE_CAM);
 
-  cameraLocationsPub.Set(cameraLocations);
+  // cameraLocationsPub.Set(cameraLocations);
 
-  int i = 0;
-  for (const auto &est : visionEstimates) {
-    if (est.has_value()) {
-      // m_container.GetSwerveSubsystem().AddVisionMeasurement(est.value().estimatedPose.ToPose2d(),
-      //  est.value().timestamp, stdDevs[i].value());
-    }
-    i++;
-  }
+  // int i = 0;
+  // for (const auto &est : visionEstimates) {
+  //   if (est.has_value()) {
+  //     // m_container.GetSwerveSubsystem().AddVisionMeasurement(est.value().estimatedPose.ToPose2d(),
+  //     //  est.value().timestamp, stdDevs[i].value());
+  //   }
+  //   i++;
+  // }
 }
 
 void Robot::DisabledInit() {}
@@ -111,8 +111,8 @@ void Robot::SimulationPeriodic() {
   // frc::sim::BatterySim::Calculate({m_container.GetSwerveSubsystem().GetSimulatedCurrentDraw()});
   // frc::sim::RoboRioSim::SetVInVoltage(battVoltage);
 
-  m_container.GetVision().SimulationPeriodic(
-      m_container.GetSwerveSubsystem().GetOdomPose());
+  // m_container.GetVision().SimulationPeriodic(
+  //     m_container.GetSwerveSubsystem().GetOdomPose());
 }
 
 #ifndef RUNNING_FRC_TESTS
