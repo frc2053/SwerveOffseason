@@ -45,26 +45,16 @@ SwerveModule::GoToState(frc::SwerveModuleState desiredState, bool optimize,
                         bool openLoopDrive, units::ampere_t arbff) {
   frc::SwerveModuleState currentState = GetCurrentState();
   if (optimize) {
-    desiredState =
-        frc::SwerveModuleState::Optimize(desiredState, currentState.angle);
+    desiredState.Optimize(currentState.angle);
   }
+
+  desiredState.CosineScale(currentState.angle);
 
   steerMotor.SetControl(
       steerAngleSetter.WithPosition(desiredState.angle.Radians()));
 
   units::radians_per_second_t motorSpeed =
       ConvertWheelVelToMotorVel(ConvertLinearVelToWheelVel(desiredState.speed));
-
-  // The drive motors will start turning before the module reaches the desired
-  // angle, so scale down the speed if we are far away from our setpoint Based
-  // of FRC 900 ZebROS 2023 Whitepaper
-  units::radian_t steerError =
-      desiredState.angle.Radians() - currentState.angle.Radians();
-  units::scalar_t errorMulti = units::math::cos(steerError);
-  if (errorMulti < 0.0) {
-    errorMulti = 0.0;
-  }
-  motorSpeed *= errorMulti;
 
   // Reverse the modules expected backout because of coupling
   units::radians_per_second_t driveBackout =
