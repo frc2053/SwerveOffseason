@@ -10,11 +10,11 @@
           "width": 431,
           "expanded": [
             "/SwerveDrive/OdometryPose/rotation",
-            "/Vision"
+            "/NoteVisualizer"
           ]
         },
         "tabs": {
-          "selected": 6,
+          "selected": 5,
           "tabs": [
             {
               "type": 0,
@@ -329,6 +329,24 @@
                     "options": {
                       "color": "#00ffff"
                     }
+                  },
+                  {
+                    "type": "arrow",
+                    "logKey": "NT:/Vision/FoundNotePose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "position": "center"
+                    }
+                  },
+                  {
+                    "type": "arrow",
+                    "logKey": "NT:/Vision/CameraLocations",
+                    "logType": "Pose3d[]",
+                    "visible": false,
+                    "options": {
+                      "position": "center"
+                    }
                   }
                 ],
                 "game": "2024 Field",
@@ -339,7 +357,7 @@
               },
               "controllerUUID": "6q8070aith5aem4qas9vqibokc53tw2u",
               "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 370
             },
             {
               "type": 3,
@@ -376,6 +394,16 @@
                     }
                   },
                   {
+                    "type": "vision",
+                    "logKey": "NT:/Vision/FoundNotePose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
                     "type": "ghost",
                     "logKey": "NT:/SwerveDrive/OdometryPose",
                     "logType": "Pose2d",
@@ -406,20 +434,46 @@
                     }
                   },
                   {
+                    "type": "gamePiece",
+                    "logKey": "NT:/Vision/FoundNotePose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "variant": "Note"
+                    }
+                  },
+                  {
                     "type": "axes",
                     "logKey": "NT:/Vision/CameraLocations",
-                    "logType": "Pose3d",
+                    "logType": "Pose3d[]",
                     "visible": true,
                     "options": {}
                   },
                   {
-                    "type": "cone",
-                    "logKey": "NT:/Vision/note_camPoseEstimation",
-                    "logType": "Pose2d",
+                    "type": "gamePiece",
+                    "logKey": "NT:/NoteVisualizer/StagedNotes",
+                    "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
-                      "color": "#ffff00",
-                      "position": "center"
+                      "variant": "Note"
+                    }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:/NoteVisualizer/RobotNote",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "variant": "Note"
+                    }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:/NoteVisualizer/LaunchedNotes",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "Note"
                     }
                   }
                 ],
@@ -428,20 +482,20 @@
               },
               "controllerUUID": "x7boi1av1b4umax30uw7qibln948mq54",
               "renderer": {
-                "cameraIndex": -1,
+                "cameraIndex": -4,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  1.6127243334984782,
-                  1.6521845349941926,
-                  -1.239331569312344
+                  9.672096541030845,
+                  1.5748000000000006,
+                  3.6770340417171683
                 ],
                 "cameraTarget": [
-                  1.7478139956042325,
-                  -2.281853974757421,
-                  3.854431925661106
+                  0,
+                  0.5,
+                  0
                 ]
               },
-              "controlsHeight": 318
+              "controlsHeight": 585
             },
             {
               "type": 9,
