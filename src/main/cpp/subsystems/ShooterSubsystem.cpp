@@ -8,7 +8,6 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/DataLogManager.h>
 
-
 ShooterSubsystem::ShooterSubsystem() {
   ConfigureShooterMotors(consts::shooter::physical::BOTTOM_INVERT,
                          consts::shooter::physical::TOP_INVERT,
@@ -20,12 +19,24 @@ ShooterSubsystem::ShooterSubsystem() {
   frc::SmartDashboard::PutData(this);
 }
 
-frc2::CommandPtr ShooterSubsystem::RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset) {
-    return frc2::cmd::Run([this, preset] {
+frc2::CommandPtr ShooterSubsystem::RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset, units::meter_t distance) {
+    return frc2::cmd::Run([this, preset, distance] {
         switch(preset()) {
             case consts::shooter::PRESET_SPEEDS::AMP:
                 topWheelVelocitySetpoint = consts::shooter::AMP_SPEEDS.topSpeed;
                 bottomWheelVelocitySetpoint = consts::shooter::AMP_SPEEDS.bottomSpeed;
+                break;
+            case consts::shooter::PRESET_SPEEDS::SUBWOOFER:
+                topWheelVelocitySetpoint = consts::shooter::SUBWOOFER_SPEEDS.topSpeed;
+                bottomWheelVelocitySetpoint = consts::shooter::SUBWOOFER_SPEEDS.bottomSpeed;
+                break;
+            case consts::shooter::PRESET_SPEEDS::PASS:
+                topWheelVelocitySetpoint = consts::shooter::PASS_SPEEDS.topSpeed;
+                bottomWheelVelocitySetpoint = consts::shooter::PASS_SPEEDS.bottomSpeed;
+                break;
+            case consts::shooter::PRESET_SPEEDS::SPEAKER_DIST:
+                topWheelVelocitySetpoint = consts::shooter::TOP_SHOOTER_LUT[distance];
+                bottomWheelVelocitySetpoint = consts::shooter::BOTTOM_SHOOTER_LUT[distance];
                 break;
             case consts::shooter::PRESET_SPEEDS::OFF:
                 topWheelVelocitySetpoint = 0_rpm;
@@ -191,4 +202,11 @@ frc2::CommandPtr ShooterSubsystem::BottomWheelSysIdQuasistatic(frc2::sysid::Dire
 
 frc2::CommandPtr ShooterSubsystem::BottomWheelSysIdDynamic(frc2::sysid::Direction direction) {
   return bottomWheelSysIdRoutine.Dynamic(direction).BeforeStarting([this] { runningSysid = true; }).AndThen([this] { runningSysid = false; });;
+}
+
+void ShooterSubsystem::SetupLUTs(const std::map<units::meter_t, consts::shooter::ShooterSpeeds>& speeds) {
+    for(const auto& [key, val] : speeds) {
+        consts::shooter::TOP_SHOOTER_LUT.insert(key, val.topSpeed);
+        consts::shooter::BOTTOM_SHOOTER_LUT.insert(key, val.bottomSpeed);
+    }
 }

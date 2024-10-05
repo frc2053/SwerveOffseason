@@ -27,8 +27,9 @@ public:
    */
   void Periodic() override;
   void SimulationPeriodic() override;
+  void SetupLUTs(const std::map<units::meter_t, consts::shooter::ShooterSpeeds>& speeds);
 
-  frc2::CommandPtr RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset);
+  frc2::CommandPtr RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset, units::meter_t distance=0_m);
   frc2::CommandPtr TopWheelSysIdQuasistatic(frc2::sysid::Direction direction);
   frc2::CommandPtr TopWheelSysIdDynamic(frc2::sysid::Direction direction);
   frc2::CommandPtr BottomWheelSysIdQuasistatic(frc2::sysid::Direction direction);

@@ -54,8 +54,17 @@ struct ShooterSpeeds {
 };
 
 inline constexpr ShooterSpeeds AMP_SPEEDS{3000_rpm, 2000_rpm};
+inline constexpr ShooterSpeeds SUBWOOFER_SPEEDS{5000_rpm, 5000_rpm};
+inline constexpr ShooterSpeeds PASS_SPEEDS{5000_rpm, 5000_rpm};
 
-static wpi::interpolating_map<units::meter_t, ShooterSpeeds> SHOOTER_LUT;
+struct MeterHash {
+  size_t operator()(const units::meter_t& m) const {
+    return std::hash<double>{}(m.value());
+  }
+};
+
+inline static wpi::interpolating_map<units::meter_t, units::turns_per_second_t> TOP_SHOOTER_LUT{};
+inline static wpi::interpolating_map<units::meter_t, units::turns_per_second_t> BOTTOM_SHOOTER_LUT{};
 
 enum class PRESET_SPEEDS {
     OFF,

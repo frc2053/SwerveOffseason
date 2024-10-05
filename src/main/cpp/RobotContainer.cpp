@@ -74,6 +74,16 @@ void RobotContainer::ConfigureBindings() {
   controller.A().OnFalse(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
+  controller.B().WhileTrue(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::PASS; }));
+  controller.B().OnFalse(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+
+  controller.Y().WhileTrue(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::SUBWOOFER; }));
+  controller.Y().OnFalse(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::SUBWOOFER; }));
+
   controller.LeftTrigger().WhileTrue(intakeSubsystem.IntakeNote());
   controller.RightTrigger().WhileTrue(intakeSubsystem.PoopNote());
 

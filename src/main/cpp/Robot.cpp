@@ -25,6 +25,16 @@ void Robot::RobotInit() {
   frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
   AddPeriodic([this] { m_container.GetSwerveSubsystem().UpdateSwerveOdom(); },
               consts::SWERVE_ODOM_LOOP_PERIOD, 2_ms);
+  
+  m_container.GetShooterSubsystem().SetupLUTs({
+    {1_ft, {1000_rpm, 1000_rpm}},
+    {2_ft, {1500_rpm, 1500_rpm}},
+    {3_ft, {2000_rpm, 2000_rpm}},
+    {4_ft, {2500_rpm, 2500_rpm}},
+    {5_ft, {3000_rpm, 3000_rpm}},
+    {6_ft, {3500_rpm, 3500_rpm}},
+    {7_ft, {4000_rpm, 4000_rpm}},
+  });
 }
 
 void Robot::RobotPeriodic() {
