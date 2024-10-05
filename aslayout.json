@@ -7,14 +7,16 @@
       "height": 1408,
       "state": {
         "sidebar": {
-          "width": 431,
+          "width": 435,
           "expanded": [
             "/SwerveDrive/OdometryPose/rotation",
-            "/NoteVisualizer"
+            "/NoteVisualizer",
+            "/Vision",
+            "/Vision/fl_camPoseEstimation/translation"
           ]
         },
         "tabs": {
-          "selected": 5,
+          "selected": 6,
           "tabs": [
             {
               "type": 0,
@@ -305,15 +307,6 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/SwerveDrive/LookaheadPose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "color": "#ff8c00"
-                    }
-                  },
-                  {
-                    "type": "ghost",
                     "logKey": "NT:/SwerveDrive/OdometryPose",
                     "logType": "Pose2d",
                     "visible": true,
@@ -347,6 +340,42 @@
                     "options": {
                       "position": "center"
                     }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/fl_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/fr_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/bl_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/br_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff8c00"
+                    }
                   }
                 ],
                 "game": "2024 Field",
@@ -357,7 +386,40 @@
               },
               "controllerUUID": "6q8070aith5aem4qas9vqibokc53tw2u",
               "renderer": null,
-              "controlsHeight": 370
+              "controlsHeight": 765
+            },
+            {
+              "type": 6,
+              "title": "Statistics",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "independent",
+                    "logKey": "NT:/Vision/fl_camPoseEstimation/translation/x",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2"
+                    }
+                  },
+                  {
+                    "type": "independent",
+                    "logKey": "NT:/Vision/fl_camPoseEstimation/translation/y",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b"
+                    }
+                  }
+                ],
+                "timeRange": "live-30",
+                "rangeMin": 0,
+                "rangeMax": 10,
+                "stepSize": 1
+              },
+              "controllerUUID": "6pjfdtiby71505ho7wa5qxzty118zjj5",
+              "renderer": null,
+              "controlsHeight": 200
             },
             {
               "type": 3,
@@ -415,16 +477,6 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/SwerveDrive/LookaheadPose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "model": "LynkClone",
-                      "color": "#ff8c00"
-                    }
-                  },
-                  {
-                    "type": "ghost",
                     "logKey": "NT:/SwerveDrive/PIDToPoseSetpoint",
                     "logType": "Pose2d",
                     "visible": true,
@@ -475,6 +527,46 @@
                     "options": {
                       "variant": "Note"
                     }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/fl_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "LynkClone",
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/fr_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "LynkClone",
+                      "color": "#ff0000"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/bl_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "LynkClone",
+                      "color": "#0000ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/br_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "LynkClone",
+                      "color": "#ff8c00"
+                    }
                   }
                 ],
                 "game": "2024 Field",
@@ -482,20 +574,20 @@
               },
               "controllerUUID": "x7boi1av1b4umax30uw7qibln948mq54",
               "renderer": {
-                "cameraIndex": -4,
+                "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  9.672096541030845,
-                  1.5748000000000006,
-                  3.6770340417171683
+                  4.034997599180597,
+                  4.701973813172726,
+                  -7.471308492866793
                 ],
                 "cameraTarget": [
-                  0,
-                  0.5,
-                  0
+                  4.176943140826416,
+                  0.4055404314605505,
+                  -0.34845045335340447
                 ]
               },
-              "controlsHeight": 585
+              "controlsHeight": 233
             },
             {
               "type": 9,
