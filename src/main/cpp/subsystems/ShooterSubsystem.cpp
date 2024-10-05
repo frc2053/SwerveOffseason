@@ -19,7 +19,11 @@ ShooterSubsystem::ShooterSubsystem() {
   frc::SmartDashboard::PutData(this);
 }
 
-frc2::CommandPtr ShooterSubsystem::RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset, units::meter_t distance) {
+frc2::CommandPtr ShooterSubsystem::RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset) {
+    return RunShooter(preset, []() { return 0_m; });
+}
+
+frc2::CommandPtr ShooterSubsystem::RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset, std::function<units::meter_t()> distance) {
     return frc2::cmd::Run([this, preset, distance] {
         switch(preset()) {
             case consts::shooter::PRESET_SPEEDS::AMP:
@@ -35,8 +39,8 @@ frc2::CommandPtr ShooterSubsystem::RunShooter(std::function<consts::shooter::PRE
                 bottomWheelVelocitySetpoint = consts::shooter::PASS_SPEEDS.bottomSpeed;
                 break;
             case consts::shooter::PRESET_SPEEDS::SPEAKER_DIST:
-                topWheelVelocitySetpoint = consts::shooter::TOP_SHOOTER_LUT[distance];
-                bottomWheelVelocitySetpoint = consts::shooter::BOTTOM_SHOOTER_LUT[distance];
+                topWheelVelocitySetpoint = consts::shooter::TOP_SHOOTER_LUT[distance()];
+                bottomWheelVelocitySetpoint = consts::shooter::BOTTOM_SHOOTER_LUT[distance()];
                 break;
             case consts::shooter::PRESET_SPEEDS::OFF:
                 topWheelVelocitySetpoint = 0_rpm;
