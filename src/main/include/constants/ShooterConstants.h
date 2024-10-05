@@ -25,7 +25,7 @@ inline constexpr units::ampere_t STATOR_CURRENT_LIMIT = 180_A;
 
 namespace physical {
 
-inline constexpr bool TOP_INVERT = false;
+inline constexpr bool TOP_INVERT = true;
 inline constexpr bool BOTTOM_INVERT = true;
 
 inline constexpr units::scalar_t SHOOTER_RATIO = (1.0 / 1.0);

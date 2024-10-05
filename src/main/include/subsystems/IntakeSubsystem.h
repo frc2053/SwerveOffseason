@@ -39,7 +39,7 @@ private:
   bool ConfigureMotorSignals();
 
   ctre::phoenix6::hardware::TalonFX intakeMotor{consts::intake::can_ids::INTAKE,
-                                                "*"};
+                                                "rio"};
   ctre::phoenix6::StatusSignal<units::volt_t> intakeMotorVoltageSig =
       intakeMotor.GetMotorVoltage();
   ctre::phoenix6::StatusSignal<units::ampere_t> intakeMotorTorqueCurrentSig =

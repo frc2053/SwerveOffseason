@@ -35,7 +35,7 @@ private:
   void UpdateNTEntries();
 
   ctre::phoenix6::hardware::TalonFX feederMotor{consts::feeder::can_ids::FEEDER,
-                                                "*"};
+                                                "rio"};
 
   frc::DigitalInput noteSensor{consts::feeder::ports::NOTE_SENSOR_PORT};
   frc::Debouncer noteSensorDebouncer{

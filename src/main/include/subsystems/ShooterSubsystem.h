@@ -53,8 +53,8 @@ private:
                               units::ampere_t statorCurrentLimit);
   bool ConfigureMotorSignals();
 
-  ctre::phoenix6::hardware::TalonFX topWheelMotor{consts::shooter::can_ids::TOP_SHOOTER, "*"};
-  ctre::phoenix6::hardware::TalonFX bottomWheelMotor{consts::shooter::can_ids::BOTTOM_SHOOTER, "*"};
+  ctre::phoenix6::hardware::TalonFX topWheelMotor{consts::shooter::can_ids::TOP_SHOOTER, "rio"};
+  ctre::phoenix6::hardware::TalonFX bottomWheelMotor{consts::shooter::can_ids::BOTTOM_SHOOTER, "rio"};
 
   ctre::phoenix6::StatusSignal<units::turn_t> topMotorPosSig = topWheelMotor.GetPosition();
   ctre::phoenix6::StatusSignal<units::turns_per_second_t> topMotorVelSig = topWheelMotor.GetVelocity();
