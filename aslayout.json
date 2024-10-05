@@ -7,502 +7,483 @@
       "height": 1408,
       "state": {
         "sidebar": {
-          "width": 410,
+          "width": 431,
           "expanded": [
-            "/SwerveDrive/PoseEstimatorPose/rotation",
-            "/SwerveDrive/CurrentStates/0",
-            "/SwerveDrive/DesiredStates/0",
-            "/SwerveDrive/CurrentPositions/0",
-            "/SwerveDrive/CurrentPositions/0/angle",
-            "/SwerveDrive/CurrentPositions/1",
-            "/SwerveDrive/CurrentPositions/1/angle",
-            "/SwerveDrive/CurrentPositions/2",
-            "/SwerveDrive/CurrentPositions/2/angle",
-            "/SwerveDrive/CurrentPositions/3",
-            "/SwerveDrive/CurrentPositions/3/angle",
-            "/SwerveDrive/DesiredStates/0/angle",
-            "/SwerveDrive/CurrentStates/0/angle",
-            "/photonvision/fl_cam",
-            "/Vision",
-            "/Vision/fl_camPoseEstimation",
-            "/Vision/fl_camPoseEstimation/translation",
-            "/Vision/fl_camPoseEstimation/rotation",
-            "/NoteVisualizer/LaunchedNotes",
-            "/NoteVisualizer/RobotNote",
-            "/Feeder"
+            "/SwerveDrive/OdometryPose/rotation",
+            "/Vision"
           ]
         },
         "tabs": {
-          "selected": 7,
+          "selected": 6,
           "tabs": [
             {
               "type": 0,
-              "path": "../docs/INDEX.md"
-            },
-            {
-              "type": 1,
-              "legendHeight": 0.3,
-              "legends": {
-                "left": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": [
-                    {
-                      "key": "NT:/SwerveDrive/CurrentStates/0/speed",
-                      "color": "#2b66a2",
-                      "show": true
-                    },
-                    {
-                      "key": "NT:/SwerveDrive/DesiredStates/0/speed",
-                      "color": "#e5b31b",
-                      "show": true
-                    }
-                  ]
-                },
-                "discrete": {
-                  "fields": []
-                },
-                "right": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": [
-                    {
-                      "key": "NT:/SwerveDrive/CurrentStates/0/angle/value",
-                      "color": "#af2437",
-                      "show": true
-                    },
-                    {
-                      "key": "NT:/SwerveDrive/DesiredStates/0/angle/value",
-                      "color": "#80588e",
-                      "show": true
-                    }
-                  ]
-                }
-              },
-              "title": "SwerveStates"
-            },
-            {
-              "type": 1,
-              "legendHeight": 0.3,
-              "legends": {
-                "left": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": [
-                    {
-                      "key": "NT:/Shooter/BottomWheelSetpointRPM",
-                      "color": "#2b66a2",
-                      "show": true
-                    },
-                    {
-                      "key": "NT:/Shooter/BottomWheelVelocityRPM",
-                      "color": "#e5b31b",
-                      "show": true
-                    }
-                  ]
-                },
-                "discrete": {
-                  "fields": [
-                    {
-                      "key": "NT:/Shooter/IsUpToSpeed",
-                      "color": "#af2437",
-                      "show": true
-                    }
-                  ]
-                },
-                "right": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": [
-                    {
-                      "key": "NT:/Shooter/TopWheelSetpointRPM",
-                      "color": "#80588e",
-                      "show": true
-                    },
-                    {
-                      "key": "NT:/Shooter/TopWheelVelocityRPM",
-                      "color": "#e48b32",
-                      "show": true
-                    }
-                  ]
-                }
-              },
-              "title": "Shooter"
-            },
-            {
-              "type": 1,
-              "legendHeight": 0.3,
-              "legends": {
-                "left": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": [
-                    {
-                      "key": "NT:/Intake/IntakeWheelMotorVoltage",
-                      "color": "#2b66a2",
-                      "show": true
-                    },
-                    {
-                      "key": "NT:/Intake/IntakeWheelMotorVoltageSetpoint",
-                      "color": "#e5b31b",
-                      "show": true
-                    }
-                  ]
-                },
-                "discrete": {
-                  "fields": [
-                    {
-                      "key": "NT:/Intake/TouchingNote",
-                      "color": "#af2437",
-                      "show": true
-                    }
-                  ]
-                },
-                "right": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": [
-                    {
-                      "key": "NT:/Intake/IntakeWheelMotorTorqueCurrent",
-                      "color": "#80588e",
-                      "show": true
-                    }
-                  ]
-                }
-              },
-              "title": "Intake"
-            },
-            {
-              "type": 1,
-              "legendHeight": 0.3,
-              "legends": {
-                "left": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": [
-                    {
-                      "key": "NT:/Feeder/FeederWheelMotorVoltage",
-                      "color": "#2b66a2",
-                      "show": true
-                    },
-                    {
-                      "key": "NT:/Feeder/FeederWheelMotorVoltageSetpoint",
-                      "color": "#e5b31b",
-                      "show": true
-                    }
-                  ]
-                },
-                "discrete": {
-                  "fields": [
-                    {
-                      "key": "NT:/Feeder/HasNote",
-                      "color": "#af2437",
-                      "show": true
-                    },
-                    {
-                      "key": "NT:/Feeder/NoteSensorDebouncer",
-                      "color": "#80588e",
-                      "show": true
-                    },
-                    {
-                      "key": "NT:/Feeder/NoteSensorRaw",
-                      "color": "#e48b32",
-                      "show": true
-                    }
-                  ]
-                },
-                "right": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": []
-                }
-              },
-              "title": "Feeder"
-            },
-            {
-              "type": 1,
-              "legendHeight": 0.3,
-              "legends": {
-                "left": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": [
-                    {
-                      "key": "NT:/SwerveDrive/OdomUpdateRate",
-                      "color": "#2b66a2",
-                      "show": true
-                    },
-                    {
-                      "key": "NT:/Looptime/RobotPeriodicLoopRate",
-                      "color": "#e5b31b",
-                      "show": true
-                    }
-                  ]
-                },
-                "discrete": {
-                  "fields": []
-                },
-                "right": {
-                  "lockedRange": null,
-                  "unitConversion": {
-                    "type": null,
-                    "factor": 1
-                  },
-                  "fields": []
-                }
-              },
-              "title": "LoopTimes"
-            },
-            {
-              "type": 4,
-              "fields": [
-                null,
-                null,
-                null
-              ],
-              "selectionType": "full",
-              "selectionRangeMin": 0,
-              "selectionRangeMax": 10,
-              "measurementType": "independent",
-              "measurementSampling": "fixed",
-              "measurementSamplingPeriod": 20,
-              "histogramMin": 0,
-              "histogramMax": 10,
-              "histogramStep": 1,
-              "title": "Statistics"
+              "title": "",
+              "controller": null,
+              "controllerUUID": "bmsfuvay443grhh1i8xo5wrpxf9g773u",
+              "renderer": "#/",
+              "controlsHeight": 0
             },
             {
               "type": 6,
-              "uuid": "7azj8gpne5ee1gxp8gnulcpeg1hzrw9d",
-              "fields": [],
-              "listFields": [
-                [
+              "title": "Loop Time Stats",
+              "controller": {
+                "sources": [
                   {
-                    "type": "Game Piece 0",
-                    "key": "NT:/NoteVisualizer/StagedNotes",
-                    "sourceTypeIndex": 2,
-                    "sourceType": "Pose3d[]"
+                    "type": "independent",
+                    "logKey": "NT:/Looptime/RobotPeriodicLoopRate",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2"
+                    }
                   },
                   {
-                    "type": "Game Piece 0",
-                    "key": "NT:/NoteVisualizer/LaunchedNotes",
-                    "sourceTypeIndex": 2,
-                    "sourceType": "Pose3d[]"
-                  },
-                  {
-                    "type": "Game Piece 0",
-                    "key": "NT:/NoteVisualizer/RobotNote",
-                    "sourceTypeIndex": 1,
-                    "sourceType": "Pose3d"
-                  },
-                  {
-                    "type": "Axes",
-                    "key": "NT:/Vision/CameraLocations",
-                    "sourceTypeIndex": 2,
-                    "sourceType": "Pose3d[]"
+                    "type": "independent",
+                    "logKey": "NT:/SwerveDrive/OdomUpdateRate",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b"
+                    }
                   }
                 ],
-                [
-                  {
-                    "type": "Robot",
-                    "key": "NT:/SwerveDrive/PoseEstimatorPose",
-                    "sourceTypeIndex": 1,
-                    "sourceType": "Pose2d"
-                  },
-                  {
-                    "type": "Green Ghost",
-                    "key": "NT:/Vision/bl_camPoseEstimation",
-                    "sourceTypeIndex": 1,
-                    "sourceType": "Pose2d"
-                  },
-                  {
-                    "type": "Blue Ghost",
-                    "key": "NT:/Vision/br_camPoseEstimation",
-                    "sourceTypeIndex": 1,
-                    "sourceType": "Pose2d"
-                  },
-                  {
-                    "type": "Red Ghost",
-                    "key": "NT:/Vision/fl_camPoseEstimation",
-                    "sourceTypeIndex": 1,
-                    "sourceType": "Pose2d"
-                  },
-                  {
-                    "type": "Yellow Ghost",
-                    "key": "NT:/Vision/fr_camPoseEstimation",
-                    "sourceTypeIndex": 1,
-                    "sourceType": "Pose2d"
-                  },
-                  {
-                    "type": "Yellow Ghost",
-                    "key": "NT:/PathPlanner/targetPose",
-                    "sourceTypeIndex": 0,
-                    "sourceType": 5
-                  },
-                  {
-                    "type": "Trajectory",
-                    "key": "NT:/PathPlanner/activePath",
-                    "sourceTypeIndex": 0,
-                    "sourceType": 5
-                  },
-                  {
-                    "type": "Trajectory",
-                    "key": "NT:/SwerveDrive/CurrentChoreoTrajectory",
-                    "sourceTypeIndex": 2,
-                    "sourceType": "Pose2d[]"
-                  }
-                ]
-              ],
-              "options": {
-                "field": "2024 Field",
-                "alliance": "blue",
-                "robot": "LynkClone",
-                "unitDistance": "meters",
-                "unitRotation": "radians"
+                "timeRange": "visible",
+                "rangeMin": 0,
+                "rangeMax": 10,
+                "stepSize": 1
               },
-              "configHidden": false,
-              "visualizer": {
-                "cameraIndex": -2,
-                "orbitFov": 75,
-                "cameraPosition": [
-                  0.6445158815866971,
-                  0.5501543393787021,
-                  -0.20933911889688694
-                ],
-                "cameraTarget": [
-                  -5.3144279717450305,
-                  -6.9060502891866165,
-                  1.1002838294346886
-                ]
-              },
-              "title": "3D Field"
+              "controllerUUID": "1pf3zmar42tcgtx3etsvvndz3qrtlxew",
+              "renderer": null,
+              "controlsHeight": 200
             },
             {
-              "type": 5,
-              "uuid": "surohaj5wfsq7ktr2nxzab22oc0ynqe9",
-              "fields": [],
-              "listFields": [
-                [
+              "type": 1,
+              "title": "Shooter",
+              "controller": {
+                "leftSources": [
                   {
-                    "type": "Trajectory",
-                    "key": "NT:/SwerveDrive/CurrentChoreoTrajectory",
-                    "sourceTypeIndex": 2,
-                    "sourceType": "Pose2d[]"
+                    "type": "stepped",
+                    "logKey": "NT:/Shooter/BottomWheelSetpointRPM",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
                   },
                   {
-                    "type": "Robot",
-                    "key": "NT:/SwerveDrive/PoseEstimatorPose",
-                    "sourceTypeIndex": 1,
-                    "sourceType": "Pose2d"
+                    "type": "stepped",
+                    "logKey": "NT:/Shooter/BottomWheelVelocityRPM",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
                   },
                   {
-                    "type": "Ghost",
-                    "key": "NT:/Vision/fl_camPoseEstimation",
-                    "sourceTypeIndex": 1,
-                    "sourceType": "Pose2d"
+                    "type": "stepped",
+                    "logKey": "NT:/Shooter/TopWheelSetpointRPM",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#80588e",
+                      "size": "normal"
+                    }
                   },
                   {
-                    "type": "Trajectory",
-                    "key": "NT:/PathPlanner/activePath",
-                    "sourceTypeIndex": 0,
-                    "sourceType": 5
+                    "type": "stepped",
+                    "logKey": "NT:/Shooter/TopWheelVelocityRPM",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e48b32",
+                      "size": "normal"
+                    }
                   }
-                ]
-              ],
-              "options": {
-                "game": "2024 Field",
-                "unitDistance": "meters",
-                "unitRotation": "radians",
-                "origin": "right",
-                "size": 0.868426,
-                "allianceBumpers": "auto",
-                "allianceOrigin": "blue",
-                "orientation": "blue left, red right"
+                ],
+                "rightSources": [],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Shooter/IsUpToSpeed",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437"
+                    }
+                  }
+                ],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
               },
-              "configHidden": false,
-              "visualizer": null,
-              "title": "Odometry"
+              "controllerUUID": "yx0dcottnf0urigsxii3wuarx7cretcp",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 1,
+              "title": "Intake",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Intake/IntakeWheelMotorVoltage",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Intake/IntakeWheelMotorVoltageSetpoint",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Intake/IntakeWheelMotorTorqueCurrent",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Intake/TouchingNote",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#80588e"
+                    }
+                  }
+                ],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "os6pw1l8e395joc80ibvwvjva1wawttm",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 1,
+              "title": "Feeder",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Feeder/FeederWheelMotorVoltage",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Feeder/FeederWheelMotorVoltageSetpoint",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Feeder/HasNote",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437"
+                    }
+                  },
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Feeder/NoteSensorRaw",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#80588e"
+                    }
+                  },
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Feeder/NoteSensorDebouncer",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#e48b32"
+                    }
+                  }
+                ],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "ai9log26827ymlp9xxtpox20xw43z8o0",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 2,
+              "title": "Odometry",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:/SwerveDrive/PoseEstimatorPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/SwerveDrive/CurrentStates",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/SwerveDrive/DesiredStates",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/SwerveDrive/LookaheadPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff8c00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/SwerveDrive/OdometryPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/SwerveDrive/PIDToPoseSetpoint",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ffff"
+                    }
+                  }
+                ],
+                "game": "2024 Field",
+                "bumpers": "auto",
+                "origin": "blue",
+                "orientation": 0,
+                "size": 30
+              },
+              "controllerUUID": "6q8070aith5aem4qas9vqibokc53tw2u",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 3,
+              "title": "3D Field",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:/SwerveDrive/PoseEstimatorPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "LynkClone"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/SwerveDrive/DesiredStates",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/SwerveDrive/CurrentStates",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/SwerveDrive/OdometryPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "LynkClone",
+                      "color": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/SwerveDrive/LookaheadPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "LynkClone",
+                      "color": "#ff8c00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/SwerveDrive/PIDToPoseSetpoint",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "LynkClone",
+                      "color": "#00ffff"
+                    }
+                  },
+                  {
+                    "type": "axes",
+                    "logKey": "NT:/Vision/CameraLocations",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "cone",
+                    "logKey": "NT:/Vision/note_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ffff00",
+                      "position": "center"
+                    }
+                  }
+                ],
+                "game": "2024 Field",
+                "origin": "blue"
+              },
+              "controllerUUID": "x7boi1av1b4umax30uw7qibln948mq54",
+              "renderer": {
+                "cameraIndex": -1,
+                "orbitFov": 50,
+                "cameraPosition": [
+                  1.6127243334984782,
+                  1.6521845349941926,
+                  -1.239331569312344
+                ],
+                "cameraTarget": [
+                  1.7478139956042325,
+                  -2.281853974757421,
+                  3.854431925661106
+                ]
+              },
+              "controlsHeight": 318
             },
             {
               "type": 9,
-              "uuid": "ldza8g2yvu4juu4c201rjah0f42x3bq4",
-              "fields": [
-                {
-                  "key": "NT:/SwerveDrive/CurrentStates",
-                  "sourceTypeIndex": 1,
-                  "sourceType": "SwerveModuleState[]"
-                },
-                {
-                  "key": "NT:/SwerveDrive/DesiredStates",
-                  "sourceTypeIndex": 1,
-                  "sourceType": "SwerveModuleState[]"
-                },
-                {
-                  "key": "NT:/SwerveDrive/PoseEstimatorPose/rotation/value",
-                  "sourceTypeIndex": 0,
-                  "sourceType": 2
-                }
-              ],
-              "listFields": [],
-              "options": {
-                "maxSpeed": 6.037576989785339,
-                "rotationUnits": "radians",
-                "arrangement": "0,1,2,3",
-                "sizeLeftRight": 0.55245,
-                "sizeFrontBack": 0.40005,
-                "forwardDirection": "up"
-              },
-              "configHidden": false,
-              "visualizer": null,
-              "title": "Swerve"
-            },
-            {
-              "type": 8,
-              "uuid": "w26fbqu418htpvs39zw8oddzts9aym4o",
-              "fields": [],
-              "listFields": [],
-              "options": {
-                "ids": [
-                  0,
-                  1,
-                  2
+              "title": "Swerve",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "states",
+                    "logKey": "NT:/SwerveDrive/CurrentStates",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "states",
+                    "logKey": "NT:/SwerveDrive/DesiredStates",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "rotation",
+                    "logKey": "NT:/SwerveDrive/PoseEstimatorPose/rotation",
+                    "logType": "Rotation2d",
+                    "visible": true,
+                    "options": {}
+                  }
                 ],
-                "layouts": [
-                  "Xbox Controller (White)",
-                  "Xbox Controller (Blue)",
-                  "None"
-                ]
+                "maxSpeed": 6.0375,
+                "sizeX": 0.40005,
+                "sizeY": 0.55245,
+                "orientation": 1
               },
-              "configHidden": false,
-              "visualizer": null,
-              "title": "Joysticks"
+              "controllerUUID": "czixrnenpqtl4htuwi5vldpmap014x4t",
+              "renderer": null,
+              "controlsHeight": 200
             }
           ]
         }
@@ -510,5 +491,5 @@
     }
   ],
   "satellites": [],
-  "version": "3.2.1"
+  "version": "4.0.0-beta-1"
 }
