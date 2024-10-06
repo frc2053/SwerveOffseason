@@ -19,23 +19,29 @@ public:
 
   frc2::Command *GetAutonomousCommand();
 
+  frc2::CommandPtr IntakeNote();
+
   SwerveSubsystem &GetSwerveSubsystem();
   ShooterSubsystem &GetShooterSubsystem();
   IntakeSubsystem &GetIntakeSubsystem();
   FeederSubsystem &GetFeederSubsystem();
   //str::Vision &GetVision();
-  //str::NoteVisualizer &GetNoteVisualizer();
+  str::NoteVisualizer &GetNoteVisualizer();
 
 private:
   void ConfigureBindings();
-  frc2::CommandXboxController controller{0};
+  frc2::CommandXboxController driverController{0};
+  frc2::CommandXboxController operatorController{1};
+
+  frc2::CommandPtr RumbleDriver(std::function<units::second_t()> timeToRumble);
+  frc2::CommandPtr RumbleOperator(std::function<units::second_t()> timeToRumble);
 
   SwerveSubsystem swerveSubsystem;
   ShooterSubsystem shooterSubsystem;
   IntakeSubsystem intakeSubsystem;
   FeederSubsystem feederSubsystem;
-  // str::Vision vision;
-  // str::NoteVisualizer noteVisualizer;
+  //str::Vision vision;
+  str::NoteVisualizer noteVisualizer;
 
   // Autos autos{swerveSubsystem, shooterSubsystem, intakeSubsystem,
   //             feederSubsystem};

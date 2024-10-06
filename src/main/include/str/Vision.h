@@ -29,7 +29,7 @@ private:
   std::array<Camera, 4> cameras{
       Camera{consts::vision::FL_CAM_NAME, consts::vision::FL_ROBOT_TO_CAM,
              consts::vision::SINGLE_TAG_STD_DEV,
-             consts::vision::MULTI_TAG_STD_DEV, false},
+             consts::vision::MULTI_TAG_STD_DEV, true},
       Camera{consts::vision::FR_CAM_NAME, consts::vision::FR_ROBOT_TO_CAM,
              consts::vision::SINGLE_TAG_STD_DEV,
              consts::vision::MULTI_TAG_STD_DEV, false},
@@ -42,6 +42,6 @@ private:
   Camera noteCamera{consts::vision::NOTE_CAM_NAME,
                     consts::vision::ROBOT_TO_NOTE_CAM,
                     consts::vision::SINGLE_TAG_STD_DEV,
-                    consts::vision::MULTI_TAG_STD_DEV, true};
+                    consts::vision::MULTI_TAG_STD_DEV, false};
 };
 } // namespace str

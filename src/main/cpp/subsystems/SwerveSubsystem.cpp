@@ -177,7 +177,7 @@ bool SwerveSubsystem::IsNearAmp() {
          consts::yearSpecific::closeToAmpDistance;
 }
 
-frc2::CommandPtr SwerveSubsystem::NoteAssist(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<frc::Pose2d()> notePose) {
+frc2::CommandPtr SwerveSubsystem::NoteAssist(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> rotOverride, std::function<frc::Pose2d()> notePose) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce(
                  [this, notePose] {
@@ -197,7 +197,7 @@ frc2::CommandPtr SwerveSubsystem::NoteAssist(std::function<units::meters_per_sec
                  {this})
                  .WithName("NoteAssist Init"),
              frc2::cmd::Run(
-                 [this, notePose, xVel, yVel] {
+                 [this, notePose, xVel, yVel, rotOverride] {
                    frc::Pose2d currentPose = GetRobotPose();
 
                    frc::Translation2d diff = currentPose.Translation() - notePose().Translation();
@@ -206,6 +206,10 @@ frc2::CommandPtr SwerveSubsystem::NoteAssist(std::function<units::meters_per_sec
                    units::radians_per_second_t thetaSpeed{
                        thetaController.Calculate(
                            currentPose.Rotation().Radians())};
+
+                   if(rotOverride() != 0_rad_per_s) {
+                    thetaSpeed = rotOverride();
+                   }
 
                    swerveDrive.Drive(xVel(), yVel(), thetaSpeed, true);
                  },

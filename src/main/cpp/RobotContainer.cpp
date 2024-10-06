@@ -11,53 +11,32 @@
 RobotContainer::RobotContainer() { ConfigureBindings(); }
 
 void RobotContainer::ConfigureBindings() {
+  // DEFAULT DRIVE COMMAND
   swerveSubsystem.SetDefaultCommand(swerveSubsystem.Drive(
       [this] {
         return str::NegateIfRed(
-            frc::ApplyDeadband<double>(-controller.GetLeftY(), .1) *
+            frc::ApplyDeadband<double>(-driverController.GetLeftY(), .1) *
             consts::swerve::physical::DRIVE_MAX_SPEED);
       },
       [this] {
         return str::NegateIfRed(
-            frc::ApplyDeadband<double>(-controller.GetLeftX(), .1) *
+            frc::ApplyDeadband<double>(-driverController.GetLeftX(), .1) *
             consts::swerve::physical::DRIVE_MAX_SPEED);
       },
       [this] {
-        return frc::ApplyDeadband<double>(-controller.GetRightX(), .1) *
+        return frc::ApplyDeadband<double>(-driverController.GetRightX(), .1) *
                consts::swerve::physical::DRIVE_MAX_ROT_SPEED;
       },
       true, true));
 
-  controller.LeftTrigger().WhileTrue(swerveSubsystem.AlignToAmp());
-  controller.LeftBumper().WhileTrue(
-    swerveSubsystem.NoteAssist(
-      [this] {
-        return str::NegateIfRed(
-            frc::ApplyDeadband<double>(-controller.GetLeftY(), .1) *
-            consts::swerve::physical::DRIVE_MAX_SPEED);
-      }, 
-      [this] {
-        return str::NegateIfRed(
-            frc::ApplyDeadband<double>(-controller.GetLeftX(), .1) *
-            consts::swerve::physical::DRIVE_MAX_SPEED);
-      },
-      [this] {
-        return swerveSubsystem.GetFoundNotePose();
-      })
-  );
-  // controller.Back().WhileTrue(
-  //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));
-  // controller.Start().WhileTrue(
-  //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kForward));
+  driverController.Start().WhileTrue(intakeSubsystem.FakeNote());
+  
+  driverController.LeftTrigger().OnTrue(IntakeNote());
+  (!driverController.LeftTrigger() && !intakeSubsystem.TouchedNote()).OnTrue(frc2::cmd::Sequence(intakeSubsystem.Stop(), frc2::cmd::Print("Cancelled")));
+  intakeSubsystem.TouchedNote().OnTrue(RumbleDriver([]{ return .1_s; }));
+  feederSubsystem.GotNote().OnTrue(frc2::cmd::Parallel(intakeSubsystem.Stop(), feederSubsystem.Stop(), RumbleDriver([] { return .5_s; }), RumbleOperator([] { return .5_s; })));
 
-  // controller.A().OnTrue(frc2::cmd::RunOnce([this] {
-  //   noteVisualizer.LaunchNote(
-  //       frc::Pose3d{swerveSubsystem.GetRobotPose()},
-  //       swerveSubsystem.GetRobotRelativeSpeed(),
-  //       frc::Transform3d{frc::Translation3d{-4_in, 0_in, 13_in},
-  //                        frc::Rotation3d{0_deg, -50_deg, 0_deg}},
-  //       41.71_fps);
-  // }));
+  driverController.A().WhileTrue(swerveSubsystem.AlignToAmp());
 
   // controller.A().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticTorque(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticTorque(frc2::sysid::Direction::kReverse));
@@ -69,23 +48,27 @@ void RobotContainer::ConfigureBindings() {
   // controller.POVUp().OnTrue(swerveSubsystem.TuneDrivePID([this] { return
   // controller.Start().Get(); }));
 
-  controller.A().WhileTrue(shooterSubsystem.RunShooter(
+  // controller.Back().WhileTrue(
+  //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));
+  // controller.Start().WhileTrue(
+  //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kForward));
+
+  operatorController.A().WhileTrue(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::AMP; }));
-  controller.A().OnFalse(shooterSubsystem.RunShooter(
+  operatorController.A().OnFalse(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
-  controller.B().WhileTrue(shooterSubsystem.RunShooter(
+  operatorController.Y().WhileTrue(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::PASS; }));
-  controller.B().OnFalse(shooterSubsystem.RunShooter(
+  operatorController.Y().OnFalse(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
-  controller.Y().WhileTrue(shooterSubsystem.RunShooter(
+  operatorController.B().WhileTrue(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::SUBWOOFER; }));
-  controller.Y().OnFalse(shooterSubsystem.RunShooter(
+  operatorController.B().OnFalse(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::SUBWOOFER; }));
 
-  controller.LeftTrigger().WhileTrue(intakeSubsystem.IntakeNote());
-  controller.RightTrigger().WhileTrue(intakeSubsystem.PoopNote());
+  operatorController.Back().WhileTrue(frc2::cmd::Parallel(intakeSubsystem.PoopNote(), feederSubsystem.Eject()));
 
   // controller.A().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kReverse));
@@ -124,6 +107,16 @@ void RobotContainer::ConfigureBindings() {
   // { return 180_deg; }));
 }
 
+frc2::CommandPtr RobotContainer::IntakeNote() {
+  return frc2::cmd::Parallel(
+    frc2::cmd::Print("IntakeNote"),
+    intakeSubsystem.IntakeNote(),
+    feederSubsystem.Feed()
+  ).Until([this] {
+    return feederSubsystem.HasNote();
+  });
+}
+
 frc2::Command *RobotContainer::GetAutonomousCommand() {
   //return autos.GetSelectedCommand();
   return nullptr;
@@ -147,6 +140,38 @@ FeederSubsystem &RobotContainer::GetFeederSubsystem() {
 
 // str::Vision &RobotContainer::GetVision() { return vision; }
 
-// str::NoteVisualizer &RobotContainer::GetNoteVisualizer() {
-//   return noteVisualizer;
-// }
+str::NoteVisualizer &RobotContainer::GetNoteVisualizer() {
+  return noteVisualizer;
+}
+
+frc2::CommandPtr RobotContainer::RumbleDriver(std::function<units::second_t()> timeToRumble) {
+  return frc2::cmd::Sequence(
+             frc2::cmd::RunOnce([this] {
+               driverController.SetRumble(
+                   frc::GenericHID::RumbleType::kBothRumble, 1.0);
+             }),
+             frc2::cmd::Wait(timeToRumble()), frc2::cmd::RunOnce([this] {
+               driverController.SetRumble(
+                   frc::GenericHID::RumbleType::kBothRumble, 0.0);
+             }))
+      .FinallyDo([this] {
+        driverController.SetRumble(frc::GenericHID::RumbleType::kBothRumble,
+                                   0.0);
+      });
+}
+
+frc2::CommandPtr RobotContainer::RumbleOperator(std::function<units::second_t()> timeToRumble) {
+  return frc2::cmd::Sequence(
+             frc2::cmd::RunOnce([this] {
+               operatorController.SetRumble(
+                   frc::GenericHID::RumbleType::kBothRumble, 1.0);
+             }),
+             frc2::cmd::Wait(timeToRumble()), frc2::cmd::RunOnce([this] {
+               operatorController.SetRumble(
+                   frc::GenericHID::RumbleType::kBothRumble, 0.0);
+             }))
+      .FinallyDo([this] {
+        operatorController.SetRumble(frc::GenericHID::RumbleType::kBothRumble,
+                                     0.0);
+      });
+}

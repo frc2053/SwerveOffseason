@@ -16,6 +16,7 @@
 #include <networktables/NetworkTableInstance.h>
 #include <units/base.h>
 #include <units/current.h>
+#include <frc2/command/button/Trigger.h>
 
 class IntakeSubsystem : public frc2::SubsystemBase {
 public:
@@ -27,9 +28,12 @@ public:
   void Periodic() override;
   void SimulationPeriodic() override;
   bool TouchingNote();
+  frc2::Trigger TouchedNote() { return touchedNote; }
 
   frc2::CommandPtr IntakeNote();
+  frc2::CommandPtr Stop();
   frc2::CommandPtr PoopNote();
+  frc2::CommandPtr FakeNote();
 
 private:
   void UpdateNTEntries();
@@ -68,8 +72,12 @@ private:
   nt::BooleanPublisher touchingNotePub{
       nt->GetBooleanTopic("TouchingNote").Publish()};
 
+  frc::Timer stateTimer{};
   frc::Debouncer intakeSpikeDebouncer{.25_s, frc::Debouncer::kFalling};
   bool isTouchingNote{false};
+  bool simOverrideTorque{false};
+
+  frc2::Trigger touchedNote{[this] { return isTouchingNote; }};
 
   units::volt_t intakeWheelVoltageSetpoint{0_V};
   units::volt_t currentIntakeWheelVoltage{0_V};

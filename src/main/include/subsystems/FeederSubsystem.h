@@ -15,10 +15,18 @@
 #include <networktables/BooleanTopic.h>
 #include <networktables/DoubleTopic.h>
 #include <networktables/NetworkTableInstance.h>
+#include <frc2/command/button/Trigger.h>
 
 class FeederSubsystem : public frc2::SubsystemBase {
 public:
   FeederSubsystem();
+
+
+  frc2::CommandPtr Feed();
+  frc2::CommandPtr Stop();
+  frc2::CommandPtr Eject();
+
+  frc2::Trigger GotNote() { return gotNote; }
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -72,6 +80,8 @@ private:
   bool noteSensorRawVal{false};
   bool noteSensorDebouced{false};
   bool hasNote{false};
+
+  frc2::Trigger gotNote{[this] { return hasNote; }};
 
   units::volt_t feederWheelVoltageSetpoint{0_V};
   units::volt_t currentFeederWheelVoltage{0_V};

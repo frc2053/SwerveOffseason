@@ -24,14 +24,32 @@ frc2::CommandPtr IntakeSubsystem::IntakeNote() {
     intakeWheelVoltageSetpoint = consts::intake::gains::NOTE_INTAKE_VOLTAGE;
   }, [this] {
     intakeWheelVoltageSetpoint = 0_V;
-  }, {this});
+    stateTimer.Restart();
+  }, {this}).WithName("IntakeNote").BeforeStarting([this] { stateTimer.Restart(); });
+}
+
+frc2::CommandPtr IntakeSubsystem::Stop() {
+  return frc2::cmd::RunOnce([this] {
+    intakeWheelVoltageSetpoint = 0_V;
+    stateTimer.Restart();
+  }, {this}).WithName("Stop");
+}
+
+frc2::CommandPtr IntakeSubsystem::FakeNote() {
+  return frc2::cmd::Run([this] {
+    simOverrideTorque = true;
+  }).FinallyDo([this] {
+    simOverrideTorque = false;
+  });
 }
 
 frc2::CommandPtr IntakeSubsystem::PoopNote() {
   return frc2::cmd::RunEnd([this] {
     intakeWheelVoltageSetpoint = consts::intake::gains::NOTE_EJECT_VOLTAGE;
+    stateTimer.Restart();
   }, [this] {
     intakeWheelVoltageSetpoint = 0_V;
+    stateTimer.Restart();
   }, {this});
 }
 
@@ -43,9 +61,14 @@ void IntakeSubsystem::Periodic() {
   });
 
   currentIntakeWheelVoltage = intakeMotorVoltageSig.GetValue();
-  intakeWheelTorqueCurrent = intakeMotorTorqueCurrentSig.GetValue();
+  if(simOverrideTorque) {
+    intakeWheelTorqueCurrent = 300_A;
+  }
+  else {
+    intakeWheelTorqueCurrent = intakeMotorTorqueCurrentSig.GetValue();
+  }
 
-  isTouchingNote = intakeSpikeDebouncer.Calculate(intakeWheelTorqueCurrent > consts::intake::gains::NOTE_SPIKE_THRESHOLD);
+  isTouchingNote = stateTimer.HasElapsed(.25_s) && intakeSpikeDebouncer.Calculate(intakeWheelTorqueCurrent > consts::intake::gains::NOTE_SPIKE_THRESHOLD);
 
   intakeMotor.SetControl(intakeMotorVoltageSetter.WithOutput(intakeWheelVoltageSetpoint));
 

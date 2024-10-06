@@ -45,7 +45,7 @@ inline constexpr units::kilogram_square_meter_t FEEDER_MOI =
 
 namespace gains {
 inline constexpr units::volt_t NOTE_FEED_VOLTAGE = 10_V;
-inline constexpr units::volt_t NOTE_EJECT_VOLTAGE = -5_V;
+inline constexpr units::volt_t NOTE_EJECT_VOLTAGE = -10_V;
 inline constexpr units::second_t NOTE_SENSOR_DEBOUNCE_TIME = 0.1_s;
 } // namespace gains
 } // namespace feeder
