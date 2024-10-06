@@ -15,10 +15,12 @@
 #include <subsystems/SwerveSubsystem.h>
 
 class Autos {
-public:
-  explicit Autos(SwerveSubsystem &swerveSub, ShooterSubsystem &shooterSub,
-                 IntakeSubsystem &intakeSub, FeederSubsystem &feederSub)
-      : swerveSub(swerveSub), shooterSub(shooterSub), intakeSub(intakeSub),
+ public:
+  explicit Autos(SwerveSubsystem& swerveSub, ShooterSubsystem& shooterSub,
+                 IntakeSubsystem& intakeSub, FeederSubsystem& feederSub)
+      : swerveSub(swerveSub),
+        shooterSub(shooterSub),
+        intakeSub(intakeSub),
         feederSub(feederSub) {
     pathplanner::NamedCommands::registerCommand(
         "Shoot", frc2::cmd::Print("Shooting Note"));
@@ -36,17 +38,17 @@ public:
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
   }
 
-  frc2::Command *GetSelectedCommand() { return selectCommand.get(); }
+  frc2::Command* GetSelectedCommand() { return selectCommand.get(); }
 
-private:
+ private:
   enum AutoSelector { CHOREO_TEST, CHOREO_LIME };
 
   frc::SendableChooser<AutoSelector> autoChooser;
 
-  SwerveSubsystem &swerveSub;
-  ShooterSubsystem &shooterSub;
-  IntakeSubsystem &intakeSub;
-  FeederSubsystem &feederSub;
+  SwerveSubsystem& swerveSub;
+  ShooterSubsystem& shooterSub;
+  IntakeSubsystem& intakeSub;
+  FeederSubsystem& feederSub;
 
   frc2::CommandPtr selectCommand{frc2::cmd::None()};
 };

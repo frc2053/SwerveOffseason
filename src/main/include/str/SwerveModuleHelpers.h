@@ -49,7 +49,7 @@ struct SwerveModuleSteerGains {
   str::gains::radial::turn_amp_ki_unit_t kI;
   str::gains::radial::turn_amp_kd_unit_t kD;
 
-  bool operator==(const SwerveModuleSteerGains &rhs) const {
+  bool operator==(const SwerveModuleSteerGains& rhs) const {
     return units::essentiallyEqual(kA, rhs.kA, 1e-6) &&
            units::essentiallyEqual(kV, rhs.kV, 1e-6) &&
            units::essentiallyEqual(kS, rhs.kS, 1e-6) &&
@@ -57,7 +57,7 @@ struct SwerveModuleSteerGains {
            units::essentiallyEqual(kI, rhs.kI, 1e-6) &&
            units::essentiallyEqual(kD, rhs.kD, 1e-6);
   }
-  bool operator!=(const SwerveModuleSteerGains &rhs) const {
+  bool operator!=(const SwerveModuleSteerGains& rhs) const {
     return !operator==(rhs);
   }
 };
@@ -70,7 +70,7 @@ struct SwerveModuleDriveGains {
   str::gains::radial::turn_amp_ki_unit_t kI;
   str::gains::radial::turn_amp_kd_unit_t kD;
 
-  bool operator==(const SwerveModuleDriveGains &rhs) const {
+  bool operator==(const SwerveModuleDriveGains& rhs) const {
     return units::essentiallyEqual(kA, rhs.kA, 1e-6) &&
            units::essentiallyEqual(kV, rhs.kV, 1e-6) &&
            units::essentiallyEqual(kS, rhs.kS, 1e-6) &&
@@ -78,7 +78,7 @@ struct SwerveModuleDriveGains {
            units::essentiallyEqual(kI, rhs.kI, 1e-6) &&
            units::essentiallyEqual(kD, rhs.kD, 1e-6);
   }
-  bool operator!=(const SwerveModuleDriveGains &rhs) const {
+  bool operator!=(const SwerveModuleDriveGains& rhs) const {
     return !operator==(rhs);
   }
 };
@@ -91,4 +91,4 @@ struct WheelRadiusCharData {
   frc::SlewRateLimiter<units::radians_per_second> omegaLimiter{1_rad_per_s /
                                                                1_s};
 };
-} // namespace str
+}  // namespace str

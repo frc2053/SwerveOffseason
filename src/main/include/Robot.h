@@ -18,7 +18,7 @@
 #include "str/SwerveModule.h"
 
 class Robot : public frc::TimedRobot {
-public:
+ public:
   Robot() : frc::TimedRobot(consts::LOOP_PERIOD) {}
   void RobotInit() override;
   void RobotPeriodic() override;
@@ -38,8 +38,8 @@ public:
   void SimulationPeriodic() override;
   void UpdateVision();
 
-private:
-  frc2::Command *m_autonomousCommand = nullptr;
+ private:
+  frc2::Command* m_autonomousCommand = nullptr;
 
   RobotContainer m_container;
 

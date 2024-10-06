@@ -8,7 +8,9 @@
 #include <frc2/command/Commands.h>
 #include <str/DriverstationUtils.h>
 
-RobotContainer::RobotContainer() { ConfigureBindings(); }
+RobotContainer::RobotContainer() {
+  ConfigureBindings();
+}
 
 void RobotContainer::ConfigureBindings() {
   // DEFAULT DRIVE COMMAND
@@ -119,35 +121,35 @@ frc2::CommandPtr RobotContainer::IntakeNote() {
       .Until([this] { return feederSubsystem.HasNote(); });
 }
 
-frc2::Command *RobotContainer::GetAutonomousCommand() {
+frc2::Command* RobotContainer::GetAutonomousCommand() {
   // return autos.GetSelectedCommand();
   return nullptr;
 }
 
-SwerveSubsystem &RobotContainer::GetSwerveSubsystem() {
+SwerveSubsystem& RobotContainer::GetSwerveSubsystem() {
   return swerveSubsystem;
 }
 
-ShooterSubsystem &RobotContainer::GetShooterSubsystem() {
+ShooterSubsystem& RobotContainer::GetShooterSubsystem() {
   return shooterSubsystem;
 }
 
-IntakeSubsystem &RobotContainer::GetIntakeSubsystem() {
+IntakeSubsystem& RobotContainer::GetIntakeSubsystem() {
   return intakeSubsystem;
 }
 
-FeederSubsystem &RobotContainer::GetFeederSubsystem() {
+FeederSubsystem& RobotContainer::GetFeederSubsystem() {
   return feederSubsystem;
 }
 
 // str::Vision &RobotContainer::GetVision() { return vision; }
 
-str::NoteVisualizer &RobotContainer::GetNoteVisualizer() {
+str::NoteVisualizer& RobotContainer::GetNoteVisualizer() {
   return noteVisualizer;
 }
 
-frc2::CommandPtr
-RobotContainer::RumbleDriver(std::function<units::second_t()> timeToRumble) {
+frc2::CommandPtr RobotContainer::RumbleDriver(
+    std::function<units::second_t()> timeToRumble) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([this] {
                driverController.SetRumble(
@@ -163,8 +165,8 @@ RobotContainer::RumbleDriver(std::function<units::second_t()> timeToRumble) {
       });
 }
 
-frc2::CommandPtr
-RobotContainer::RumbleOperator(std::function<units::second_t()> timeToRumble) {
+frc2::CommandPtr RobotContainer::RumbleOperator(
+    std::function<units::second_t()> timeToRumble) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([this] {
                operatorController.SetRumble(

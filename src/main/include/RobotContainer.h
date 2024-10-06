@@ -16,28 +16,28 @@
 #include "subsystems/SwerveSubsystem.h"
 
 class RobotContainer {
-public:
+ public:
   RobotContainer();
 
-  frc2::Command *GetAutonomousCommand();
+  frc2::Command* GetAutonomousCommand();
 
   frc2::CommandPtr IntakeNote();
 
-  SwerveSubsystem &GetSwerveSubsystem();
-  ShooterSubsystem &GetShooterSubsystem();
-  IntakeSubsystem &GetIntakeSubsystem();
-  FeederSubsystem &GetFeederSubsystem();
+  SwerveSubsystem& GetSwerveSubsystem();
+  ShooterSubsystem& GetShooterSubsystem();
+  IntakeSubsystem& GetIntakeSubsystem();
+  FeederSubsystem& GetFeederSubsystem();
   // str::Vision &GetVision();
-  str::NoteVisualizer &GetNoteVisualizer();
+  str::NoteVisualizer& GetNoteVisualizer();
 
-private:
+ private:
   void ConfigureBindings();
   frc2::CommandXboxController driverController{0};
   frc2::CommandXboxController operatorController{1};
 
   frc2::CommandPtr RumbleDriver(std::function<units::second_t()> timeToRumble);
-  frc2::CommandPtr
-  RumbleOperator(std::function<units::second_t()> timeToRumble);
+  frc2::CommandPtr RumbleOperator(
+      std::function<units::second_t()> timeToRumble);
 
   SwerveSubsystem swerveSubsystem;
   ShooterSubsystem shooterSubsystem;

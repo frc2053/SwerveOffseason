@@ -19,7 +19,7 @@ namespace str {
  */
 class ChoreoSwerveCommandWithForce
     : public frc2::CommandHelper<frc2::Command, ChoreoSwerveCommandWithForce> {
-public:
+ public:
   /**
    * Creates a new ChoreoSwerveCommand that controls a swerve drivetrain
    *
@@ -60,7 +60,7 @@ public:
   /// Command will end once this returns true
   bool IsFinished() override;
 
-private:
+ private:
   frc::Timer m_timer;
   choreolib::ChoreoTrajectory m_traj;
   std::function<frc::Pose2d()> m_pose;
@@ -70,4 +70,4 @@ private:
   std::function<void(std::array<units::newton_t, 4>)> m_outputYForce;
   std::function<bool(void)> m_mirrorTrajectory;
 };
-} // namespace str
+}  // namespace str

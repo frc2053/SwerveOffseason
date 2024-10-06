@@ -8,6 +8,8 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/Commands.h>
 
+#include <map>
+
 #include "constants/Constants.h"
 
 ShooterSubsystem::ShooterSubsystem() {
@@ -32,38 +34,38 @@ frc2::CommandPtr ShooterSubsystem::RunShooter(
   return frc2::cmd::Run(
              [this, preset, distance] {
                switch (preset()) {
-               case consts::shooter::PRESET_SPEEDS::AMP:
-                 topWheelVelocitySetpoint =
-                     consts::shooter::AMP_SPEEDS.topSpeed;
-                 bottomWheelVelocitySetpoint =
-                     consts::shooter::AMP_SPEEDS.bottomSpeed;
-                 break;
-               case consts::shooter::PRESET_SPEEDS::SUBWOOFER:
-                 topWheelVelocitySetpoint =
-                     consts::shooter::SUBWOOFER_SPEEDS.topSpeed;
-                 bottomWheelVelocitySetpoint =
-                     consts::shooter::SUBWOOFER_SPEEDS.bottomSpeed;
-                 break;
-               case consts::shooter::PRESET_SPEEDS::PASS:
-                 topWheelVelocitySetpoint =
-                     consts::shooter::PASS_SPEEDS.topSpeed;
-                 bottomWheelVelocitySetpoint =
-                     consts::shooter::PASS_SPEEDS.bottomSpeed;
-                 break;
-               case consts::shooter::PRESET_SPEEDS::SPEAKER_DIST:
-                 topWheelVelocitySetpoint =
-                     consts::shooter::TOP_SHOOTER_LUT[distance()];
-                 bottomWheelVelocitySetpoint =
-                     consts::shooter::BOTTOM_SHOOTER_LUT[distance()];
-                 break;
-               case consts::shooter::PRESET_SPEEDS::OFF:
-                 topWheelVelocitySetpoint = 0_rpm;
-                 bottomWheelVelocitySetpoint = 0_rpm;
-                 break;
-               default:
-                 topWheelVelocitySetpoint = 0_rpm;
-                 bottomWheelVelocitySetpoint = 0_rpm;
-                 break;
+                 case consts::shooter::PRESET_SPEEDS::AMP:
+                   topWheelVelocitySetpoint =
+                       consts::shooter::AMP_SPEEDS.topSpeed;
+                   bottomWheelVelocitySetpoint =
+                       consts::shooter::AMP_SPEEDS.bottomSpeed;
+                   break;
+                 case consts::shooter::PRESET_SPEEDS::SUBWOOFER:
+                   topWheelVelocitySetpoint =
+                       consts::shooter::SUBWOOFER_SPEEDS.topSpeed;
+                   bottomWheelVelocitySetpoint =
+                       consts::shooter::SUBWOOFER_SPEEDS.bottomSpeed;
+                   break;
+                 case consts::shooter::PRESET_SPEEDS::PASS:
+                   topWheelVelocitySetpoint =
+                       consts::shooter::PASS_SPEEDS.topSpeed;
+                   bottomWheelVelocitySetpoint =
+                       consts::shooter::PASS_SPEEDS.bottomSpeed;
+                   break;
+                 case consts::shooter::PRESET_SPEEDS::SPEAKER_DIST:
+                   topWheelVelocitySetpoint =
+                       consts::shooter::TOP_SHOOTER_LUT[distance()];
+                   bottomWheelVelocitySetpoint =
+                       consts::shooter::BOTTOM_SHOOTER_LUT[distance()];
+                   break;
+                 case consts::shooter::PRESET_SPEEDS::OFF:
+                   topWheelVelocitySetpoint = 0_rpm;
+                   bottomWheelVelocitySetpoint = 0_rpm;
+                   break;
+                 default:
+                   topWheelVelocitySetpoint = 0_rpm;
+                   bottomWheelVelocitySetpoint = 0_rpm;
+                   break;
                }
              },
              {this})
@@ -156,7 +158,6 @@ void ShooterSubsystem::UpdateNTEntries() {
 bool ShooterSubsystem::ConfigureShooterMotors(
     bool invertBottom, bool invertTop, units::scalar_t shooterGearing,
     units::ampere_t supplyCurrentLimit, units::ampere_t statorCurrentLimit) {
-
   ctre::phoenix6::configs::TalonFXConfiguration shooterConfig{};
 
   shooterConfig.MotorOutput.NeutralMode =
@@ -225,15 +226,15 @@ bool ShooterSubsystem::ConfigureMotorSignals() {
   return optimizeTopMotor.IsOK() && optimizeBottomMotor.IsOK();
 }
 
-frc2::CommandPtr
-ShooterSubsystem::TopWheelSysIdQuasistatic(frc2::sysid::Direction direction) {
+frc2::CommandPtr ShooterSubsystem::TopWheelSysIdQuasistatic(
+    frc2::sysid::Direction direction) {
   return topWheelSysIdRoutine.Quasistatic(direction)
       .BeforeStarting([this] { runningSysid = true; })
       .AndThen([this] { runningSysid = false; });
 }
 
-frc2::CommandPtr
-ShooterSubsystem::TopWheelSysIdDynamic(frc2::sysid::Direction direction) {
+frc2::CommandPtr ShooterSubsystem::TopWheelSysIdDynamic(
+    frc2::sysid::Direction direction) {
   return topWheelSysIdRoutine.Dynamic(direction)
       .BeforeStarting([this] { runningSysid = true; })
       .AndThen([this] { runningSysid = false; });
@@ -246,16 +247,16 @@ frc2::CommandPtr ShooterSubsystem::BottomWheelSysIdQuasistatic(
       .AndThen([this] { runningSysid = false; });
 }
 
-frc2::CommandPtr
-ShooterSubsystem::BottomWheelSysIdDynamic(frc2::sysid::Direction direction) {
+frc2::CommandPtr ShooterSubsystem::BottomWheelSysIdDynamic(
+    frc2::sysid::Direction direction) {
   return bottomWheelSysIdRoutine.Dynamic(direction)
       .BeforeStarting([this] { runningSysid = true; })
       .AndThen([this] { runningSysid = false; });
 }
 
 void ShooterSubsystem::SetupLUTs(
-    const std::map<units::meter_t, consts::shooter::ShooterSpeeds> &speeds) {
-  for (const auto &[key, val] : speeds) {
+    const std::map<units::meter_t, consts::shooter::ShooterSpeeds>& speeds) {
+  for (const auto& [key, val] : speeds) {
     consts::shooter::TOP_SHOOTER_LUT.insert(key, val.topSpeed);
     consts::shooter::BOTTOM_SHOOTER_LUT.insert(key, val.bottomSpeed);
   }

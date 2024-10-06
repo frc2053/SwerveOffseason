@@ -17,12 +17,12 @@ namespace consts {
 namespace intake {
 namespace can_ids {
 inline constexpr int INTAKE = 17;
-} // namespace can_ids
+}  // namespace can_ids
 
 namespace current_limits {
 inline constexpr units::ampere_t SUPPLY_CURRENT_LIMIT = 60_A;
 inline constexpr units::ampere_t STATOR_CURRENT_LIMIT = 180_A;
-} // namespace current_limits
+}  // namespace current_limits
 
 namespace physical {
 
@@ -37,12 +37,12 @@ inline constexpr units::meter_t WHEEL_RADIUS = 1_in;
 // From onshape doc
 inline constexpr units::kilogram_square_meter_t INTAKE_MOI =
     5.350445 * 1_in * 1_in * 1_lb;
-} // namespace physical
+}  // namespace physical
 
 namespace gains {
 inline constexpr units::ampere_t NOTE_SPIKE_THRESHOLD = 100_A;
 inline constexpr units::volt_t NOTE_INTAKE_VOLTAGE = 10_V;
 inline constexpr units::volt_t NOTE_EJECT_VOLTAGE = -10_V;
-} // namespace gains
-} // namespace intake
-} // namespace consts
+}  // namespace gains
+}  // namespace intake
+}  // namespace consts

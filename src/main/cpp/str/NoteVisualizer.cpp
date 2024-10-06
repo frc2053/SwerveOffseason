@@ -65,7 +65,7 @@ void NoteVisualizer::Periodic() {
 }
 
 void NoteVisualizer::DisplayRobotNote(bool hasNote,
-                                      const frc::Pose2d &robotPosition) {
+                                      const frc::Pose2d& robotPosition) {
   if (hasNote) {
     frc::Pose3d robotPose = frc::Pose3d(robotPosition);
     robotNote = robotPose.TransformBy(
@@ -78,7 +78,7 @@ void NoteVisualizer::DisplayRobotNote(bool hasNote,
 
 void NoteVisualizer::UpdateLaunchedNotes(units::second_t loopTime) {
   int i = 0;
-  for (auto &note : launchedNotes) {
+  for (auto& note : launchedNotes) {
     ProjectileMotion(note, loopTime);
     launchedNotePoses[i] = note.currentPose;
     i++;
@@ -98,7 +98,7 @@ void NoteVisualizer::CleanUp() {
   }
 }
 
-void NoteVisualizer::ProjectileMotion(FlyingNote &note,
+void NoteVisualizer::ProjectileMotion(FlyingNote& note,
                                       units::second_t loopTime) {
   note.currentVelocity.zVel =
       note.currentVelocity.zVel - (9.81_mps_sq * loopTime);

@@ -20,7 +20,9 @@ IntakeSubsystem::IntakeSubsystem() {
   frc::SmartDashboard::PutData(this);
 }
 
-bool IntakeSubsystem::TouchingNote() { return isTouchingNote; }
+bool IntakeSubsystem::TouchingNote() {
+  return isTouchingNote;
+}
 
 frc2::CommandPtr IntakeSubsystem::IntakeNote() {
   return frc2::cmd::RunEnd(

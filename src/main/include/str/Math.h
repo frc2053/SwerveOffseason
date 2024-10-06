@@ -8,13 +8,13 @@
 
 namespace str {
 namespace math {
-static bool IsPointInsideField(const frc::Translation2d &point) {
+static bool IsPointInsideField(const frc::Translation2d& point) {
   return point.X() >= 0_m && point.Y() >= 0_m &&
          point.X() <= consts::yearSpecific::aprilTagLayout.GetFieldLength() &&
          point.Y() <= consts::yearSpecific::aprilTagLayout.GetFieldWidth();
 }
 
-static bool IsPoseInsideField(const frc::Pose2d &poseToCheck) {
+static bool IsPoseInsideField(const frc::Pose2d& poseToCheck) {
   units::radian_t currentRotation = poseToCheck.Rotation().Radians();
   units::meter_t ox = (consts::swerve::physical::TOTAL_WIDTH / 2);
   units::meter_t oy = (consts::swerve::physical::TOTAL_LENGTH / 2);
@@ -48,5 +48,5 @@ static bool IsPoseInsideField(const frc::Pose2d &poseToCheck) {
          math::IsPointInsideField(blCorner) &&
          math::IsPointInsideField(brCorner);
 }
-} // namespace math
-} // namespace str
+}  // namespace math
+}  // namespace str

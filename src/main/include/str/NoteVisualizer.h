@@ -32,18 +32,18 @@ struct FlyingNote {
 };
 
 class NoteVisualizer {
-public:
+ public:
   NoteVisualizer();
   void Periodic();
   void LaunchNote(frc::Pose3d currentRobotPose,
                   frc::ChassisSpeeds robotCurrentVelocity,
                   frc::Transform3d noteExitPose,
                   units::meters_per_second_t initialVelocity);
-  void DisplayRobotNote(bool hasNote, const frc::Pose2d &robotPosition);
+  void DisplayRobotNote(bool hasNote, const frc::Pose2d& robotPosition);
 
-private:
+ private:
   void UpdateLaunchedNotes(units::second_t loopTime);
-  void ProjectileMotion(FlyingNote &note, units::second_t loopTime);
+  void ProjectileMotion(FlyingNote& note, units::second_t loopTime);
   void CleanUp();
 
   units::second_t lastLoopTime;
@@ -63,44 +63,44 @@ private:
 
   std::array<frc::Pose3d, 11> initialNoteLocations{
       // BLUE SIDE
-      frc::Pose3d{frc::Translation3d{NOTE_HORIZONTAL_SPACING,
-                                     ALLY_NOTE_VERTICAL_OFFSET,
-                                     NOTE_GROUND_HEIGHT},
+      frc::Pose3d{
+          frc::Translation3d{NOTE_HORIZONTAL_SPACING, ALLY_NOTE_VERTICAL_OFFSET,
+                             NOTE_GROUND_HEIGHT},
+          frc::Rotation3d{}},
+      frc::Pose3d{frc::Translation3d{
+                      NOTE_HORIZONTAL_SPACING,
+                      ALLY_NOTE_VERTICAL_OFFSET + (NOTE_VERTICAL_SPACING * 1),
+                      NOTE_GROUND_HEIGHT},
                   frc::Rotation3d{}},
-      frc::Pose3d{frc::Translation3d{NOTE_HORIZONTAL_SPACING,
-                                     ALLY_NOTE_VERTICAL_OFFSET +
-                                         (NOTE_VERTICAL_SPACING * 1),
-                                     NOTE_GROUND_HEIGHT},
-                  frc::Rotation3d{}},
-      frc::Pose3d{frc::Translation3d{NOTE_HORIZONTAL_SPACING,
-                                     ALLY_NOTE_VERTICAL_OFFSET +
-                                         (NOTE_VERTICAL_SPACING * 2),
-                                     NOTE_GROUND_HEIGHT},
+      frc::Pose3d{frc::Translation3d{
+                      NOTE_HORIZONTAL_SPACING,
+                      ALLY_NOTE_VERTICAL_OFFSET + (NOTE_VERTICAL_SPACING * 2),
+                      NOTE_GROUND_HEIGHT},
                   frc::Rotation3d{}},
       // MIDDLE
-      frc::Pose3d{frc::Translation3d{NOTE_MIDDLE_OFFSET,
-                                     MIDDLE_NOTE_VERTICAL_OFFSET,
-                                     NOTE_GROUND_HEIGHT},
+      frc::Pose3d{
+          frc::Translation3d{NOTE_MIDDLE_OFFSET, MIDDLE_NOTE_VERTICAL_OFFSET,
+                             NOTE_GROUND_HEIGHT},
+          frc::Rotation3d{}},
+      frc::Pose3d{frc::Translation3d{
+                      NOTE_MIDDLE_OFFSET,
+                      MIDDLE_NOTE_VERTICAL_OFFSET - (NOTE_MIDDLE_SPACING * 1),
+                      NOTE_GROUND_HEIGHT},
                   frc::Rotation3d{}},
-      frc::Pose3d{frc::Translation3d{NOTE_MIDDLE_OFFSET,
-                                     MIDDLE_NOTE_VERTICAL_OFFSET -
-                                         (NOTE_MIDDLE_SPACING * 1),
-                                     NOTE_GROUND_HEIGHT},
+      frc::Pose3d{frc::Translation3d{
+                      NOTE_MIDDLE_OFFSET,
+                      MIDDLE_NOTE_VERTICAL_OFFSET - (NOTE_MIDDLE_SPACING * 2),
+                      NOTE_GROUND_HEIGHT},
                   frc::Rotation3d{}},
-      frc::Pose3d{frc::Translation3d{NOTE_MIDDLE_OFFSET,
-                                     MIDDLE_NOTE_VERTICAL_OFFSET -
-                                         (NOTE_MIDDLE_SPACING * 2),
-                                     NOTE_GROUND_HEIGHT},
+      frc::Pose3d{frc::Translation3d{
+                      NOTE_MIDDLE_OFFSET,
+                      MIDDLE_NOTE_VERTICAL_OFFSET - (NOTE_MIDDLE_SPACING * 3),
+                      NOTE_GROUND_HEIGHT},
                   frc::Rotation3d{}},
-      frc::Pose3d{frc::Translation3d{NOTE_MIDDLE_OFFSET,
-                                     MIDDLE_NOTE_VERTICAL_OFFSET -
-                                         (NOTE_MIDDLE_SPACING * 3),
-                                     NOTE_GROUND_HEIGHT},
-                  frc::Rotation3d{}},
-      frc::Pose3d{frc::Translation3d{NOTE_MIDDLE_OFFSET,
-                                     MIDDLE_NOTE_VERTICAL_OFFSET -
-                                         (NOTE_MIDDLE_SPACING * 4),
-                                     NOTE_GROUND_HEIGHT},
+      frc::Pose3d{frc::Translation3d{
+                      NOTE_MIDDLE_OFFSET,
+                      MIDDLE_NOTE_VERTICAL_OFFSET - (NOTE_MIDDLE_SPACING * 4),
+                      NOTE_GROUND_HEIGHT},
                   frc::Rotation3d{}},
       // RED SIDE
       frc::Pose3d{frc::Translation3d{
@@ -131,4 +131,4 @@ private:
   nt::StructPublisher<frc::Pose3d> robotNotePub{
       nt->GetStructTopic<frc::Pose3d>("RobotNote").Publish()};
 };
-} // namespace str
+}  // namespace str

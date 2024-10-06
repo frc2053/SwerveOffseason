@@ -22,23 +22,23 @@
 
 namespace str {
 class SwerveDrive {
-public:
+ public:
   SwerveDrive();
-  void ResetPose(const frc::Pose2d &resetPose);
-  void DriveRobotRelative(const frc::ChassisSpeeds &robotRelativeSpeeds);
+  void ResetPose(const frc::Pose2d& resetPose);
+  void DriveRobotRelative(const frc::ChassisSpeeds& robotRelativeSpeeds);
   void Drive(units::meters_per_second_t xVel, units::meters_per_second_t yVel,
              units::radians_per_second_t omega, bool fieldRelative,
              bool openLoop = false);
   void SetModuleStates(
-      const std::array<frc::SwerveModuleState, 4> &desiredStates,
+      const std::array<frc::SwerveModuleState, 4>& desiredStates,
       bool optimize = true, bool openLoop = false,
-      const std::array<units::ampere_t, 4> &moduleTorqueCurrentsFF = {});
-  void AddVisionMeasurement(const frc::Pose2d &visionMeasurement,
+      const std::array<units::ampere_t, 4>& moduleTorqueCurrentsFF = {});
+  void AddVisionMeasurement(const frc::Pose2d& visionMeasurement,
                             units::second_t timestamp,
-                            const Eigen::Vector3d &stdDevs);
+                            const Eigen::Vector3d& stdDevs);
   units::ampere_t GetSimulatedCurrentDraw() const;
-  void SetXModuleForces(const std::array<units::newton_t, 4> &xForce);
-  void SetYModuleForces(const std::array<units::newton_t, 4> &yForce);
+  void SetXModuleForces(const std::array<units::newton_t, 4>& xForce);
+  void SetYModuleForces(const std::array<units::newton_t, 4>& yForce);
   void UpdateSwerveOdom();
   void UpdateNTEntries();
   frc::ChassisSpeeds GetRobotRelativeSpeeds() const;
@@ -55,22 +55,22 @@ public:
   void SetMk4iCharacterizationVoltageSteer(units::volt_t volts);
   void SetMk4nCharacterizationVoltageSteer(units::volt_t volts);
   void SetCharacterizationVoltageDrive(units::volt_t volts);
-  void LogMk4iSteerTorque(frc::sysid::SysIdRoutineLog *log);
-  void LogMk4nSteerTorque(frc::sysid::SysIdRoutineLog *log);
-  void LogDriveTorque(frc::sysid::SysIdRoutineLog *log);
-  void LogMk4iSteerVoltage(frc::sysid::SysIdRoutineLog *log);
-  void LogMk4nSteerVoltage(frc::sysid::SysIdRoutineLog *log);
-  void LogDriveVoltage(frc::sysid::SysIdRoutineLog *log);
+  void LogMk4iSteerTorque(frc::sysid::SysIdRoutineLog* log);
+  void LogMk4nSteerTorque(frc::sysid::SysIdRoutineLog* log);
+  void LogDriveTorque(frc::sysid::SysIdRoutineLog* log);
+  void LogMk4iSteerVoltage(frc::sysid::SysIdRoutineLog* log);
+  void LogMk4nSteerVoltage(frc::sysid::SysIdRoutineLog* log);
+  void LogDriveVoltage(frc::sysid::SysIdRoutineLog* log);
 
   str::SwerveModuleSteerGains GetSteerGains() const;
   void SetSteerGains(str::SwerveModuleSteerGains newGains);
   str::SwerveModuleDriveGains GetDriveGains() const;
   void SetDriveGains(str::SwerveModuleDriveGains newGains);
 
-private:
+ private:
   std::array<units::ampere_t, 4> ConvertModuleForcesToTorqueCurrent(
-      const std::array<units::newton_t, 4> &xForce,
-      const std::array<units::newton_t, 4> &yForce);
+      const std::array<units::newton_t, 4>& xForce,
+      const std::array<units::newton_t, 4>& yForce);
 
   bool IsSlipping();
 
@@ -141,9 +141,9 @@ private:
           swervePhysicalFront, steerGainsMk4i, driveGains}};
 
   ctre::phoenix6::hardware::Pigeon2 imu{consts::swerve::can_ids::IMU, "*"};
-  ctre::phoenix6::sim::Pigeon2SimState &imuSimState = imu.GetSimState();
+  ctre::phoenix6::sim::Pigeon2SimState& imuSimState = imu.GetSimState();
 
-  std::array<ctre::phoenix6::BaseStatusSignal *, 34> allSignals;
+  std::array<ctre::phoenix6::BaseStatusSignal*, 34> allSignals;
 
   std::array<frc::SwerveModulePosition, 4> modulePositions;
   std::array<frc::SwerveModuleState, 4> moduleStates;
@@ -186,4 +186,4 @@ private:
   nt::DoublePublisher odomUpdateRatePub{
       nt->GetDoubleTopic("OdomUpdateRate").Publish()};
 };
-} // namespace str
+}  // namespace str

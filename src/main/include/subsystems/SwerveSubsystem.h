@@ -19,7 +19,7 @@
 #include "constants/Constants.h"
 
 class SwerveSubsystem : public frc2::SubsystemBase {
-public:
+ public:
   SwerveSubsystem();
 
   /**
@@ -33,13 +33,13 @@ public:
   frc::ChassisSpeeds GetFieldRelativeSpeed();
   frc::ChassisSpeeds GetRobotRelativeSpeed() const;
   void UpdateSwerveOdom();
-  void AddVisionMeasurement(const frc::Pose2d &visionMeasurement,
+  void AddVisionMeasurement(const frc::Pose2d& visionMeasurement,
                             units::second_t timestamp,
-                            const Eigen::Vector3d &stdDevs);
-  frc2::CommandPtr
-  FollowChoreoTrajectory(std::function<std::string()> pathName);
-  frc2::CommandPtr
-  PointWheelsToAngle(std::function<units::radian_t()> wheelAngle);
+                            const Eigen::Vector3d& stdDevs);
+  frc2::CommandPtr FollowChoreoTrajectory(
+      std::function<std::string()> pathName);
+  frc2::CommandPtr PointWheelsToAngle(
+      std::function<units::radian_t()> wheelAngle);
   frc2::CommandPtr XPattern();
   frc2::CommandPtr Drive(std::function<units::meters_per_second_t()> xVel,
                          std::function<units::meters_per_second_t()> yVel,
@@ -65,13 +65,13 @@ public:
   void CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote,
                               std::optional<units::radian_t> angleToNote);
   frc::Pose2d GetFoundNotePose() const;
-  frc2::CommandPtr
-  NoteAssist(std::function<units::meters_per_second_t()> xVel,
-             std::function<units::meters_per_second_t()> yVel,
-             std::function<units::radians_per_second_t()> rotOverride,
-             std::function<frc::Pose2d()> notePose);
+  frc2::CommandPtr NoteAssist(
+      std::function<units::meters_per_second_t()> xVel,
+      std::function<units::meters_per_second_t()> yVel,
+      std::function<units::radians_per_second_t()> rotOverride,
+      std::function<frc::Pose2d()> notePose);
 
-private:
+ private:
   void SetupPathplanner();
   void LoadChoreoTrajectories();
   frc::Translation2d GetAmpLocation();
@@ -150,7 +150,7 @@ private:
                                swerveDrive.SetMk4iCharacterizationTorqueSteer(
                                    voltsToSend);
                              },
-                             [this](frc::sysid::SysIdRoutineLog *log) {
+                             [this](frc::sysid::SysIdRoutineLog* log) {
                                swerveDrive.LogMk4iSteerTorque(log);
                              },
                              this, "swerve-steer-mk4i"}};
@@ -168,7 +168,7 @@ private:
                                swerveDrive.SetMk4nCharacterizationTorqueSteer(
                                    voltsToSend);
                              },
-                             [this](frc::sysid::SysIdRoutineLog *log) {
+                             [this](frc::sysid::SysIdRoutineLog* log) {
                                swerveDrive.LogMk4nSteerTorque(log);
                              },
                              this, "swerve-steer-mk4n"}};
@@ -184,7 +184,7 @@ private:
                                swerveDrive.SetMk4iCharacterizationVoltageSteer(
                                    voltsToSend);
                              },
-                             [this](frc::sysid::SysIdRoutineLog *log) {
+                             [this](frc::sysid::SysIdRoutineLog* log) {
                                swerveDrive.LogMk4iSteerVoltage(log);
                              },
                              this, "swerve-steer-mk4i"}};
@@ -200,7 +200,7 @@ private:
                                swerveDrive.SetMk4nCharacterizationVoltageSteer(
                                    voltsToSend);
                              },
-                             [this](frc::sysid::SysIdRoutineLog *log) {
+                             [this](frc::sysid::SysIdRoutineLog* log) {
                                swerveDrive.LogMk4nSteerVoltage(log);
                              },
                              this, "swerve-steer-mk4n"}};
@@ -218,7 +218,7 @@ private:
                                swerveDrive.SetCharacterizationTorqueDrive(
                                    voltsToSend);
                              },
-                             [this](frc::sysid::SysIdRoutineLog *log) {
+                             [this](frc::sysid::SysIdRoutineLog* log) {
                                swerveDrive.LogDriveTorque(log);
                              },
                              this, "swerve-drive"}};
@@ -234,7 +234,7 @@ private:
                                swerveDrive.SetCharacterizationVoltageDrive(
                                    voltsToSend);
                              },
-                             [this](frc::sysid::SysIdRoutineLog *log) {
+                             [this](frc::sysid::SysIdRoutineLog* log) {
                                swerveDrive.LogDriveVoltage(log);
                              },
                              this, "swerve-drive"}};

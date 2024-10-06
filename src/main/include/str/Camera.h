@@ -23,7 +23,7 @@
 
 namespace str {
 class Camera {
-public:
+ public:
   Camera(std::string cameraName, frc::Transform3d robotToCamera,
          Eigen::Matrix<double, 3, 1> singleTagStdDev,
          Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate);
@@ -34,7 +34,7 @@ public:
   std::optional<units::meter_t> GetDistanceToNote();
   std::optional<units::radian_t> GetAngleToNote();
 
-private:
+ private:
   bool simulate;
   std::unique_ptr<photon::PhotonPoseEstimator> photonEstimator;
   std::unique_ptr<photon::PhotonCamera> camera;
@@ -59,8 +59,8 @@ private:
   units::radian_t cacheYaw = 0_rad;
   units::meter_t cacheDist = 0_m;
 
-  std::vector<frc::Translation3d>
-  CreateTorusVertices(units::meter_t majorRadius, units::meter_t minorRadius,
-                      int numMajorDivisions, int numMinorDivisons);
+  std::vector<frc::Translation3d> CreateTorusVertices(
+      units::meter_t majorRadius, units::meter_t minorRadius,
+      int numMajorDivisions, int numMinorDivisons);
 };
-} // namespace str
+}  // namespace str

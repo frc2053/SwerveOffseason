@@ -139,4 +139,6 @@ bool FeederSubsystem::ConfigureMotorSignals() {
   return optimizeFeederMotor.IsOK();
 }
 
-bool FeederSubsystem::HasNote() const { return hasNote; }
+bool FeederSubsystem::HasNote() const {
+  return hasNote;
+}

@@ -32,13 +32,13 @@ inline constexpr int BR_STEER = 12;
 inline constexpr int BR_ENC = 13;
 
 inline constexpr int IMU = 14;
-} // namespace can_ids
+}  // namespace can_ids
 
 namespace current_limits {
 inline constexpr units::ampere_t STEER_TORQUE_CURRENT_LIMIT = 40_A;
 inline constexpr units::ampere_t SUPPLY_CURRENT_LIMIT = 60_A;
 inline constexpr units::ampere_t SLIP_CURRENT_LIMIT = 180_A;
-} // namespace current_limits
+}  // namespace current_limits
 
 namespace physical {
 
@@ -134,7 +134,7 @@ inline constexpr units::meters_per_second_squared_t DRIVE_MAX_ACCEL =
     2000_fps_sq;
 inline constexpr units::radians_per_second_squared_t DRIVE_MAX_ROT_ACCEL =
     720_deg_per_s_sq;
-} // namespace physical
+}  // namespace physical
 
 namespace gains {
 inline constexpr units::radians_per_second_t MK4I_STEER_CRUISE_VEL =
@@ -172,7 +172,7 @@ inline constexpr units::volt_t DRIVE_KS_V{1};
 inline constexpr str::gains::radial::turn_amp_kp_unit_t DRIVE_KP{9};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t DRIVE_KI{0};
 inline constexpr str::gains::radial::turn_amp_kd_unit_t DRIVE_KD{0};
-} // namespace gains
+}  // namespace gains
 
 namespace pathplanning {
 
@@ -212,6 +212,6 @@ inline constexpr units::meters_per_second_t translationalVelPIDDeadband =
     0.5_fps;
 inline constexpr units::radians_per_second_t rotationalVelPIDDeadband =
     5_deg_per_s;
-} // namespace pathplanning
-} // namespace swerve
-} // namespace consts
+}  // namespace pathplanning
+}  // namespace swerve
+}  // namespace consts

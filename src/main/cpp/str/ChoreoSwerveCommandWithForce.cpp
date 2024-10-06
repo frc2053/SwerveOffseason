@@ -19,7 +19,8 @@ ChoreoSwerveCommandWithForce::ChoreoSwerveCommandWithForce(
     std::function<void(std::array<units::newton_t, 4>)> outputXForce,
     std::function<void(std::array<units::newton_t, 4>)> outputYForce,
     std::function<bool(void)> mirrorTrajectory, frc2::Requirements requirements)
-    : m_traj(std::move(trajectory)), m_pose(std::move(poseSupplier)),
+    : m_traj(std::move(trajectory)),
+      m_pose(std::move(poseSupplier)),
       m_controller(std::move(controller)),
       m_outputChassisSpeeds(std::move(outputChassisSpeeds)),
       m_outputXForce(std::move(outputXForce)),
@@ -29,7 +30,9 @@ ChoreoSwerveCommandWithForce::ChoreoSwerveCommandWithForce(
 }
 
 // Called when the command is initially scheduled.
-void ChoreoSwerveCommandWithForce::Initialize() { m_timer.Restart(); }
+void ChoreoSwerveCommandWithForce::Initialize() {
+  m_timer.Restart();
+}
 
 // Called repeatedly when this Command is scheduled to run
 void ChoreoSwerveCommandWithForce::Execute() {

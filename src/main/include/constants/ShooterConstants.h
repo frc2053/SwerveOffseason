@@ -16,12 +16,12 @@ namespace shooter {
 namespace can_ids {
 inline constexpr int TOP_SHOOTER = 15;
 inline constexpr int BOTTOM_SHOOTER = 16;
-} // namespace can_ids
+}  // namespace can_ids
 
 namespace current_limits {
 inline constexpr units::ampere_t SUPPLY_CURRENT_LIMIT = 60_A;
 inline constexpr units::ampere_t STATOR_CURRENT_LIMIT = 180_A;
-} // namespace current_limits
+}  // namespace current_limits
 
 namespace physical {
 
@@ -37,7 +37,7 @@ inline constexpr units::meter_t WHEEL_RADIUS = 2_in;
 // From onshape doc
 inline constexpr units::kilogram_square_meter_t FLYWHEEL_MOI =
     5.01 * 1_in * 1_in * 1_lb;
-} // namespace physical
+}  // namespace physical
 
 namespace gains {
 inline constexpr units::turns_per_second_t VEL_TOLERANCE = 10_rpm;
@@ -47,7 +47,7 @@ inline constexpr units::volt_t SHOOTER_KS{0.02364};
 inline constexpr str::gains::radial::turn_volt_kp_unit_t SHOOTER_KP{0.047275};
 inline constexpr str::gains::radial::turn_volt_ki_unit_t SHOOTER_KI{0};
 inline constexpr str::gains::radial::turn_volt_kd_unit_t SHOOTER_KD{0};
-} // namespace gains
+}  // namespace gains
 
 struct ShooterSpeeds {
   units::turns_per_second_t topSpeed;
@@ -59,7 +59,7 @@ inline constexpr ShooterSpeeds SUBWOOFER_SPEEDS{5000_rpm, 5000_rpm};
 inline constexpr ShooterSpeeds PASS_SPEEDS{5000_rpm, 5000_rpm};
 
 struct MeterHash {
-  size_t operator()(const units::meter_t &m) const {
+  size_t operator()(const units::meter_t& m) const {
     return std::hash<double>{}(m.value());
   }
 };
@@ -70,5 +70,5 @@ inline static wpi::interpolating_map<units::meter_t, units::turns_per_second_t>
     BOTTOM_SHOOTER_LUT{};
 
 enum class PRESET_SPEEDS { OFF, AMP, SPEAKER_DIST, SUBWOOFER, PASS };
-} // namespace shooter
-} // namespace consts
+}  // namespace shooter
+}  // namespace consts

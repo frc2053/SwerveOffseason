@@ -13,6 +13,8 @@
 #include <str/ChoreoSwerveCommandWithForce.h>
 #include <str/DriverstationUtils.h>
 
+#include <string>
+
 #include "constants/Constants.h"
 #include "constants/VisionConstants.h"
 
@@ -33,22 +35,32 @@ SwerveSubsystem::SwerveSubsystem()
   // LoadChoreoTrajectories();
 }
 
-void SwerveSubsystem::UpdateSwerveOdom() { swerveDrive.UpdateSwerveOdom(); }
+void SwerveSubsystem::UpdateSwerveOdom() {
+  swerveDrive.UpdateSwerveOdom();
+}
 
-void SwerveSubsystem::AddVisionMeasurement(const frc::Pose2d &visionMeasurement,
+void SwerveSubsystem::AddVisionMeasurement(const frc::Pose2d& visionMeasurement,
                                            units::second_t timestamp,
-                                           const Eigen::Vector3d &stdDevs) {
+                                           const Eigen::Vector3d& stdDevs) {
   swerveDrive.AddVisionMeasurement(visionMeasurement, timestamp, stdDevs);
 }
 
 // This method will be called once per scheduler run
-void SwerveSubsystem::Periodic() { swerveDrive.UpdateNTEntries(); }
+void SwerveSubsystem::Periodic() {
+  swerveDrive.UpdateNTEntries();
+}
 
-void SwerveSubsystem::SimulationPeriodic() { swerveDrive.SimulationPeriodic(); }
+void SwerveSubsystem::SimulationPeriodic() {
+  swerveDrive.SimulationPeriodic();
+}
 
-frc::Pose2d SwerveSubsystem::GetOdomPose() { return swerveDrive.GetOdomPose(); }
+frc::Pose2d SwerveSubsystem::GetOdomPose() {
+  return swerveDrive.GetOdomPose();
+}
 
-frc::Pose2d SwerveSubsystem::GetRobotPose() { return swerveDrive.GetPose(); }
+frc::Pose2d SwerveSubsystem::GetRobotPose() {
+  return swerveDrive.GetPose();
+}
 
 frc::ChassisSpeeds SwerveSubsystem::GetFieldRelativeSpeed() {
   return frc::ChassisSpeeds::FromRobotRelativeSpeeds(
@@ -63,8 +75,8 @@ units::ampere_t SwerveSubsystem::GetSimulatedCurrentDraw() const {
   return swerveDrive.GetSimulatedCurrentDraw();
 }
 
-frc2::CommandPtr
-SwerveSubsystem::FollowChoreoTrajectory(std::function<std::string()> pathName) {
+frc2::CommandPtr SwerveSubsystem::FollowChoreoTrajectory(
+    std::function<std::string()> pathName) {
   return frc2::cmd::Either(
       frc2::cmd::Sequence(
           frc2::cmd::RunOnce([this, pathName] {
@@ -104,7 +116,7 @@ frc2::CommandPtr SwerveSubsystem::PointWheelsToAngle(
   return frc2::cmd::RunOnce(
              [this, wheelAngle] {
                std::array<frc::SwerveModuleState, 4> states;
-               for (auto &state : states) {
+               for (auto& state : states) {
                  state.angle = wheelAngle();
                  state.speed = 0_mps;
                }
@@ -146,7 +158,7 @@ void SwerveSubsystem::SetupPathplanner() {
 }
 
 void SwerveSubsystem::LoadChoreoTrajectories() {
-  for (const auto &entry : std::filesystem::directory_iterator(
+  for (const auto& entry : std::filesystem::directory_iterator(
            frc::filesystem::GetDeployDirectory() + "/choreo/")) {
     std::string fileName = entry.path().stem().string();
     if (fileName != "choreo") {
@@ -247,13 +259,15 @@ void SwerveSubsystem::CalculateFoundNotePose(
   }
 }
 
-frc::Pose2d SwerveSubsystem::GetFoundNotePose() const { return latestNotePose; }
+frc::Pose2d SwerveSubsystem::GetFoundNotePose() const {
+  return latestNotePose;
+}
 
-frc2::CommandPtr
-SwerveSubsystem::Drive(std::function<units::meters_per_second_t()> xVel,
-                       std::function<units::meters_per_second_t()> yVel,
-                       std::function<units::radians_per_second_t()> omega,
-                       bool fieldRelative, bool openLoop) {
+frc2::CommandPtr SwerveSubsystem::Drive(
+    std::function<units::meters_per_second_t()> xVel,
+    std::function<units::meters_per_second_t()> yVel,
+    std::function<units::radians_per_second_t()> omega, bool fieldRelative,
+    bool openLoop) {
   return frc2::cmd::Run(
              [this, xVel, yVel, omega, fieldRelative, openLoop] {
                swerveDrive.Drive(xVel(), yVel(), omega(), fieldRelative,
@@ -263,8 +277,8 @@ SwerveSubsystem::Drive(std::function<units::meters_per_second_t()> xVel,
       .WithName("Drive Command");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::PIDToPose(std::function<frc::Pose2d()> goalPose) {
+frc2::CommandPtr SwerveSubsystem::PIDToPose(
+    std::function<frc::Pose2d()> goalPose) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce(
                  [this, goalPose] {
@@ -336,40 +350,40 @@ frc2::CommandPtr SwerveSubsystem::AlignToAmp() {
       .WithName("AlignToAmp");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4iQuasistaticTorque(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); }),
              steerMk4iTorqueSysid.Quasistatic(dir))
       .WithName("Steer Mk4i Quasistatic Torque");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdSteerMk4iDynamicTorque(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4iDynamicTorque(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); }),
              steerMk4iTorqueSysid.Dynamic(dir))
       .WithName("Steer Mk4i Dynamic Torque");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdSteerMk4nQuasistaticTorque(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4nQuasistaticTorque(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); }),
              steerMk4nTorqueSysid.Quasistatic(dir))
       .WithName("Steer Mk4n Quasistatic Torque");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdSteerMk4nDynamicTorque(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4nDynamicTorque(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); }),
              steerMk4nTorqueSysid.Dynamic(dir))
       .WithName("Steer Mk4n Dynamic Torque");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdDriveQuasistaticTorque(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdDriveQuasistaticTorque(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); },
                                 {this}),
@@ -380,8 +394,8 @@ SwerveSubsystem::SysIdDriveQuasistaticTorque(frc2::sysid::Direction dir) {
       .WithName("Drive Quasistatic Torque");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdDriveDynamicTorque(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdDriveDynamicTorque(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); },
                                 {this}),
@@ -392,8 +406,8 @@ SwerveSubsystem::SysIdDriveDynamicTorque(frc2::sysid::Direction dir) {
       .WithName("Drive Dynamic Torque");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdSteerMk4iQuasistaticVoltage(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4iQuasistaticVoltage(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); },
                                 {this}),
@@ -401,8 +415,8 @@ SwerveSubsystem::SysIdSteerMk4iQuasistaticVoltage(frc2::sysid::Direction dir) {
       .WithName("Steer Mk4i Quasistatic Voltage");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdSteerMk4iDynamicVoltage(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4iDynamicVoltage(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); },
                                 {this}),
@@ -410,8 +424,8 @@ SwerveSubsystem::SysIdSteerMk4iDynamicVoltage(frc2::sysid::Direction dir) {
       .WithName("Steer Mk4i Dynamic Voltage");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdSteerMk4nQuasistaticVoltage(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4nQuasistaticVoltage(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); },
                                 {this}),
@@ -419,8 +433,8 @@ SwerveSubsystem::SysIdSteerMk4nQuasistaticVoltage(frc2::sysid::Direction dir) {
       .WithName("Steer Mk4n Quasistatic Voltage");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdSteerMk4nDynamicVoltage(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4nDynamicVoltage(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); },
                                 {this}),
@@ -428,8 +442,8 @@ SwerveSubsystem::SysIdSteerMk4nDynamicVoltage(frc2::sysid::Direction dir) {
       .WithName("Steer Mk4n Dynamic Voltage");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdDriveQuasistaticVoltage(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdDriveQuasistaticVoltage(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); },
                                 {this}),
@@ -440,8 +454,8 @@ SwerveSubsystem::SysIdDriveQuasistaticVoltage(frc2::sysid::Direction dir) {
       .WithName("Drive Quasistatic Voltage");
 }
 
-frc2::CommandPtr
-SwerveSubsystem::SysIdDriveDynamicVoltage(frc2::sysid::Direction dir) {
+frc2::CommandPtr SwerveSubsystem::SysIdDriveDynamicVoltage(
+    frc2::sysid::Direction dir) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([] { ctre::phoenix6::SignalLogger::Start(); },
                                 {this}),

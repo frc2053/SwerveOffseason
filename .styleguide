@@ -35,4 +35,5 @@ modifiableFileExclude {
    src/main/include/pathplanner/
    src/main/include/photon/
    src/main/include/PhotonVersion.h
+   src/main/cpp/PhotonVersion.cpp
 }

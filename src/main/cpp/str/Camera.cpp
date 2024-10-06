@@ -6,7 +6,11 @@
 
 #include <frc/RobotBase.h>
 
+#include <algorithm>
+#include <limits>
+#include <memory>
 #include <optional>
+#include <string>
 #include <vector>
 
 #include "constants/Constants.h"
@@ -26,7 +30,8 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
     : simulate(simulate),
       posePub(nt->GetStructTopic<frc::Pose2d>(cameraName + "PoseEstimation")
                   .Publish()),
-      singleTagDevs(singleTagDevs), multiTagDevs(multiTagDevs),
+      singleTagDevs(singleTagDevs),
+      multiTagDevs(multiTagDevs),
       stdDevXPosePub(nt->GetDoubleTopic(cameraName + "StdDevsX").Publish()),
       stdDevYPosePub(nt->GetDoubleTopic(cameraName + "StdDevsY").Publish()),
       stdDevRotPosePub(
@@ -81,7 +86,7 @@ std::optional<units::meter_t> Camera::GetDistanceToNote() {
   double pixelToRad = 20;
   photon::PhotonPipelineResult result = camera->GetLatestResult();
   if (result.HasTargets()) {
-    for (const auto &target : result.GetTargets()) {
+    for (const auto& target : result.GetTargets()) {
       if (target.GetFiducialId() == -1) {
         double width = 0;
         double yaw = 0;
@@ -89,7 +94,7 @@ std::optional<units::meter_t> Camera::GetDistanceToNote() {
         double minX = corners[0].x;
         double maxX = corners[0].x;
 
-        for (const auto &corner : corners) {
+        for (const auto& corner : corners) {
           minX = std::min(minX, corner.x);
           maxX = std::max(maxX, corner.x);
         }
@@ -119,9 +124,13 @@ std::optional<units::meter_t> Camera::GetDistanceToNote() {
   }
 }
 
-std::optional<units::radian_t> Camera::GetAngleToNote() { return angleToNote; }
+std::optional<units::radian_t> Camera::GetAngleToNote() {
+  return angleToNote;
+}
 
-photon::PhotonPipelineResult Camera::GetLatestResult() { return latestResult; }
+photon::PhotonPipelineResult Camera::GetLatestResult() {
+  return latestResult;
+}
 
 std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
   if (!simulate) {
@@ -130,7 +139,7 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
 
   std::optional<photon::EstimatedRobotPose> visionEst;
 
-  for (const auto &result : camera->GetAllUnreadResults()) {
+  for (const auto& result : camera->GetAllUnreadResults()) {
     visionEst = photonEstimator->Update(result);
 
     if (visionEst.has_value()) {
@@ -145,13 +154,13 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
   return visionEst;
 }
 
-Eigen::Matrix<double, 3, 1>
-Camera::GetEstimationStdDevs(frc::Pose2d estimatedPose) {
+Eigen::Matrix<double, 3, 1> Camera::GetEstimationStdDevs(
+    frc::Pose2d estimatedPose) {
   Eigen::Matrix<double, 3, 1> estStdDevs = singleTagDevs;
   auto targets = GetLatestResult().GetTargets();
   int numTags = 0;
   units::meter_t avgDist = 0_m;
-  for (const auto &tgt : targets) {
+  for (const auto& tgt : targets) {
     auto tagPose =
         photonEstimator->GetFieldLayout().GetTagPose(tgt.GetFiducialId());
     if (tagPose.has_value()) {
@@ -191,10 +200,9 @@ void Camera::SimPeriodic(frc::Pose2d robotSimPose) {
   }
 }
 
-std::vector<frc::Translation3d>
-Camera::CreateTorusVertices(units::meter_t majorRadius,
-                            units::meter_t minorRadius, int numMajorDivisions,
-                            int numMinorDivisons) {
+std::vector<frc::Translation3d> Camera::CreateTorusVertices(
+    units::meter_t majorRadius, units::meter_t minorRadius,
+    int numMajorDivisions, int numMinorDivisons) {
   std::vector<frc::Translation3d> vertices{};
 
   units::radian_t majorAngleIncrement =

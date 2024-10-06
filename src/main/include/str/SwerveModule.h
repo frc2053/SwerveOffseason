@@ -22,7 +22,7 @@
 namespace str {
 
 class SwerveModule {
-public:
+ public:
   explicit SwerveModule(SwerveModuleConstants constants,
                         SwerveModulePhysical physicalAttrib,
                         SwerveModuleSteerGains steerGains,
@@ -37,7 +37,7 @@ public:
   frc::SwerveModuleState GetCurrentState();
   frc::SwerveModuleState UpdateSimulation(units::second_t deltaTime,
                                           units::volt_t supplyVoltage);
-  std::array<ctre::phoenix6::BaseStatusSignal *, 8> GetSignals();
+  std::array<ctre::phoenix6::BaseStatusSignal*, 8> GetSignals();
   bool OptimizeBusSignals();
   std::string GetName() const;
   units::ampere_t GetSimulatedCurrentDraw() const;
@@ -50,7 +50,7 @@ public:
   str::SwerveModuleSteerGains GetSteerGains() const;
   str::SwerveModuleDriveGains GetDriveGains() const;
 
-private:
+ private:
   bool ConfigureSteerMotor(bool invertSteer, units::scalar_t steerGearing,
                            units::ampere_t supplyCurrentLimit,
                            units::ampere_t torqueCurrentLimit);
@@ -60,16 +60,16 @@ private:
   void ConfigureControlSignals();
   units::radian_t ConvertDriveMotorRotationsToWheelRotations(
       units::radian_t motorRotations) const;
-  units::radians_per_second_t
-  ConvertDriveMotorVelToWheelVel(units::radians_per_second_t motorVel) const;
-  units::meter_t
-  ConvertWheelRotationsToWheelDistance(units::radian_t wheelRotations) const;
-  units::meters_per_second_t
-  ConvertWheelVelToLinearVel(units::radians_per_second_t wheelVel) const;
-  units::radians_per_second_t
-  ConvertLinearVelToWheelVel(units::meters_per_second_t linVel) const;
-  units::radians_per_second_t
-  ConvertWheelVelToMotorVel(units::radians_per_second_t wheelVel) const;
+  units::radians_per_second_t ConvertDriveMotorVelToWheelVel(
+      units::radians_per_second_t motorVel) const;
+  units::meter_t ConvertWheelRotationsToWheelDistance(
+      units::radian_t wheelRotations) const;
+  units::meters_per_second_t ConvertWheelVelToLinearVel(
+      units::radians_per_second_t wheelVel) const;
+  units::radians_per_second_t ConvertLinearVelToWheelVel(
+      units::meters_per_second_t linVel) const;
+  units::radians_per_second_t ConvertWheelVelToMotorVel(
+      units::radians_per_second_t wheelVel) const;
 
   ctre::phoenix6::hardware::TalonFX steerMotor;
   ctre::phoenix6::hardware::TalonFX driveMotor;
@@ -117,4 +117,4 @@ private:
 
   SwerveModuleSim moduleSim;
 };
-} // namespace str
+}  // namespace str

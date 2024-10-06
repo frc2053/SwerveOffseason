@@ -11,7 +11,7 @@
 
 namespace str {
 namespace gains {
-namespace linear {} // namespace linear
+namespace linear {}  // namespace linear
 
 namespace radial {
 using radial_velocity =
@@ -61,6 +61,6 @@ using turn_amp_kd_unit =
     units::compound_unit<units::amperes,
                          units::inverse<units::turns_per_second>>;
 using turn_amp_kd_unit_t = units::unit_t<turn_amp_kd_unit>;
-} // namespace radial
-} // namespace gains
-} // namespace str
+}  // namespace radial
+}  // namespace gains
+}  // namespace str

@@ -7,15 +7,20 @@
 #include <frc/DataLogManager.h>
 #include <frc/MathUtil.h>
 
+#include <string>
+
 using namespace str;
 
 SwerveModule::SwerveModule(SwerveModuleConstants constants,
                            SwerveModulePhysical physicalAttrib,
                            SwerveModuleSteerGains steerGains,
                            SwerveModuleDriveGains driveGains)
-    : steerMotor(constants.steerId, "*"), driveMotor(constants.driveId, "*"),
-      steerEncoder(constants.encoderId, "*"), moduleName(constants.moduleName),
-      steerGains(steerGains), driveGains(driveGains),
+    : steerMotor(constants.steerId, "*"),
+      driveMotor(constants.driveId, "*"),
+      steerEncoder(constants.encoderId, "*"),
+      moduleName(constants.moduleName),
+      steerGains(steerGains),
+      driveGains(driveGains),
       couplingRatio(physicalAttrib.couplingRatio),
       driveGearing(physicalAttrib.driveGearing),
       wheelRadius(physicalAttrib.wheelRadius),
@@ -40,9 +45,9 @@ SwerveModule::SwerveModule(SwerveModuleConstants constants,
   ConfigureControlSignals();
 }
 
-frc::SwerveModuleState
-SwerveModule::GoToState(frc::SwerveModuleState desiredState, bool optimize,
-                        bool openLoopDrive, units::ampere_t arbff) {
+frc::SwerveModuleState SwerveModule::GoToState(
+    frc::SwerveModuleState desiredState, bool optimize, bool openLoopDrive,
+    units::ampere_t arbff) {
   frc::SwerveModuleState currentState = GetCurrentState();
   if (optimize) {
     desiredState.Optimize(currentState.angle);
@@ -141,13 +146,12 @@ units::radian_t SwerveModule::GetOutputShaftTurns() {
   return ConvertDriveMotorRotationsToWheelRotations(latencyCompDrivePos);
 }
 
-frc::SwerveModuleState
-SwerveModule::UpdateSimulation(units::second_t deltaTime,
-                               units::volt_t supplyVoltage) {
+frc::SwerveModuleState SwerveModule::UpdateSimulation(
+    units::second_t deltaTime, units::volt_t supplyVoltage) {
   return moduleSim.Update(deltaTime, supplyVoltage);
 }
 
-std::array<ctre::phoenix6::BaseStatusSignal *, 8> SwerveModule::GetSignals() {
+std::array<ctre::phoenix6::BaseStatusSignal*, 8> SwerveModule::GetSignals() {
   return {&drivePositionSig, &driveVelocitySig,      &steerPositionSig,
           &steerVelocitySig, &driveTorqueCurrentSig, &steerTorqueCurrentSig,
           &driveVoltageSig,  &steerVoltageSig};
@@ -300,7 +304,9 @@ bool SwerveModule::OptimizeBusSignals() {
   return optimizeDriveResult.IsOK() && optimizeSteerResult.IsOK();
 }
 
-std::string SwerveModule::GetName() const { return moduleName; }
+std::string SwerveModule::GetName() const {
+  return moduleName;
+}
 
 units::ampere_t SwerveModule::GetSimulatedCurrentDraw() const {
   return moduleSim.GetDriveCurrentDraw() + moduleSim.GetSteerCurrentDraw();

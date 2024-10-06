@@ -18,7 +18,8 @@ static bool IsOnRed() {
   return false;
 }
 
-template <typename T> static T NegateIfRed(T input) {
+template <typename T>
+static T NegateIfRed(T input) {
   return IsOnRed() ? input * -1 : input;
 }
-} // namespace str
+}  // namespace str

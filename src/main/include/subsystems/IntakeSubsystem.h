@@ -22,7 +22,7 @@
 #include <ctre/phoenix6/TalonFX.hpp>
 
 class IntakeSubsystem : public frc2::SubsystemBase {
-public:
+ public:
   IntakeSubsystem();
 
   /**
@@ -38,7 +38,7 @@ public:
   frc2::CommandPtr PoopNote();
   frc2::CommandPtr FakeNote();
 
-private:
+ private:
   void UpdateNTEntries();
   bool ConfigureIntakeMotor(bool invert, units::scalar_t intakeGearing,
                             units::ampere_t supplyCurrentLimit,
@@ -53,7 +53,7 @@ private:
       intakeMotor.GetTorqueCurrent();
   ctre::phoenix6::controls::VoltageOut intakeMotorVoltageSetter{0_V};
 
-  ctre::phoenix6::sim::TalonFXSimState &intakeMotorSim =
+  ctre::phoenix6::sim::TalonFXSimState& intakeMotorSim =
       intakeMotor.GetSimState();
 
   frc::LinearSystem<1, 1, 1> intakePlant{frc::LinearSystemId::FlywheelSystem(

@@ -10,14 +10,15 @@ using namespace str;
 
 SwerveModuleSim::SwerveModuleSim(
     SwerveModuleConstants constants, SwerveModulePhysical physicalAttrib,
-    ctre::phoenix6::sim::TalonFXSimState &driveSimState,
-    ctre::phoenix6::sim::TalonFXSimState &steerSimState,
-    ctre::phoenix6::sim::CANcoderSimState &steerEncoderSimState)
+    ctre::phoenix6::sim::TalonFXSimState& driveSimState,
+    ctre::phoenix6::sim::TalonFXSimState& steerSimState,
+    ctre::phoenix6::sim::CANcoderSimState& steerEncoderSimState)
     : driveSim(physicalAttrib.driveMotor, physicalAttrib.driveGearing,
                0.025_kg_sq_m),
       steerSim(physicalAttrib.steerMotor, physicalAttrib.steerGearing,
                0.004_kg_sq_m),
-      driveSimState(driveSimState), steerSimState(steerSimState),
+      driveSimState(driveSimState),
+      steerSimState(steerSimState),
       steerEncoderSimState(steerEncoderSimState),
       driveInverted(constants.invertDrive),
       steerInverted(constants.invertSteer),
@@ -70,14 +71,13 @@ frc::SwerveModuleState SwerveModuleSim::Update(units::second_t deltaTime,
   steerEncoderSimState.SetRawPosition(steerSim.GetAngularPosition());
   steerEncoderSimState.SetVelocity(steerSim.GetAngularVelocity());
 
-  return frc::SwerveModuleState{(driveSim.GetAngularVelocity() / 1_rad) *
-                                    wheelRadius,
-                                frc::Rotation2d{steerSim.GetAngularPosition()}};
+  return frc::SwerveModuleState{
+      (driveSim.GetAngularVelocity() / 1_rad) * wheelRadius,
+      frc::Rotation2d{steerSim.GetAngularPosition()}};
 }
 
-units::volt_t
-SwerveModuleSim::AddFrictionVoltage(units::volt_t outputVoltage,
-                                    units::volt_t frictionVoltage) {
+units::volt_t SwerveModuleSim::AddFrictionVoltage(
+    units::volt_t outputVoltage, units::volt_t frictionVoltage) {
   if (units::math::abs(outputVoltage) < frictionVoltage) {
     outputVoltage = 0_V;
   } else if (outputVoltage > 0_V) {

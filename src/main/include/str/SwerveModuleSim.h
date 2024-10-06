@@ -15,28 +15,28 @@
 namespace str {
 
 class SwerveModuleSim {
-public:
+ public:
   explicit SwerveModuleSim(
       SwerveModuleConstants constants, SwerveModulePhysical physicalAttrib,
-      ctre::phoenix6::sim::TalonFXSimState &driveSimState,
-      ctre::phoenix6::sim::TalonFXSimState &steerSimState,
-      ctre::phoenix6::sim::CANcoderSimState &steerEncoderSimState);
+      ctre::phoenix6::sim::TalonFXSimState& driveSimState,
+      ctre::phoenix6::sim::TalonFXSimState& steerSimState,
+      ctre::phoenix6::sim::CANcoderSimState& steerEncoderSimState);
 
   frc::SwerveModuleState Update(units::second_t deltaTime,
                                 units::volt_t supplyVoltage);
   units::ampere_t GetSteerCurrentDraw() const;
   units::ampere_t GetDriveCurrentDraw() const;
 
-private:
+ private:
   units::volt_t AddFrictionVoltage(units::volt_t outputVoltage,
                                    units::volt_t frictionVoltage);
 
   frc::sim::DCMotorSim driveSim;
   frc::sim::DCMotorSim steerSim;
 
-  ctre::phoenix6::sim::TalonFXSimState &driveSimState;
-  ctre::phoenix6::sim::TalonFXSimState &steerSimState;
-  ctre::phoenix6::sim::CANcoderSimState &steerEncoderSimState;
+  ctre::phoenix6::sim::TalonFXSimState& driveSimState;
+  ctre::phoenix6::sim::TalonFXSimState& steerSimState;
+  ctre::phoenix6::sim::CANcoderSimState& steerEncoderSimState;
 
   bool driveInverted;
   bool steerInverted;
@@ -50,4 +50,4 @@ private:
   units::meter_t wheelRadius;
 };
 
-} // namespace str
+}  // namespace str

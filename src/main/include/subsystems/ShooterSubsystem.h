@@ -24,7 +24,7 @@
 #include "constants/ShooterConstants.h"
 
 class ShooterSubsystem : public frc2::SubsystemBase {
-public:
+ public:
   ShooterSubsystem();
 
   /**
@@ -33,22 +33,22 @@ public:
   void Periodic() override;
   void SimulationPeriodic() override;
   void SetupLUTs(
-      const std::map<units::meter_t, consts::shooter::ShooterSpeeds> &speeds);
+      const std::map<units::meter_t, consts::shooter::ShooterSpeeds>& speeds);
 
-  frc2::CommandPtr
-  RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset);
-  frc2::CommandPtr
-  RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset,
-             std::function<units::meter_t()> distance);
+  frc2::CommandPtr RunShooter(
+      std::function<consts::shooter::PRESET_SPEEDS()> preset);
+  frc2::CommandPtr RunShooter(
+      std::function<consts::shooter::PRESET_SPEEDS()> preset,
+      std::function<units::meter_t()> distance);
   frc2::CommandPtr TopWheelSysIdQuasistatic(frc2::sysid::Direction direction);
   frc2::CommandPtr TopWheelSysIdDynamic(frc2::sysid::Direction direction);
-  frc2::CommandPtr
-  BottomWheelSysIdQuasistatic(frc2::sysid::Direction direction);
+  frc2::CommandPtr BottomWheelSysIdQuasistatic(
+      frc2::sysid::Direction direction);
   frc2::CommandPtr BottomWheelSysIdDynamic(frc2::sysid::Direction direction);
 
-  const frc2::Trigger &UpToSpeed() const { return upToSpeedTrigger; }
+  const frc2::Trigger& UpToSpeed() const { return upToSpeedTrigger; }
 
-private:
+ private:
   void UpdateNTEntries();
 
   bool IsUpToSpeed() {
@@ -90,9 +90,9 @@ private:
 
   ctre::phoenix6::controls::CoastOut coastSetter{};
 
-  ctre::phoenix6::sim::TalonFXSimState &topMotorSim =
+  ctre::phoenix6::sim::TalonFXSimState& topMotorSim =
       topWheelMotor.GetSimState();
-  ctre::phoenix6::sim::TalonFXSimState &bottomMotorSim =
+  ctre::phoenix6::sim::TalonFXSimState& bottomMotorSim =
       bottomWheelMotor.GetSimState();
 
   frc::LinearSystem<1, 1, 1> shooterPlant{frc::LinearSystemId::FlywheelSystem(
@@ -123,33 +123,33 @@ private:
 
   frc2::sysid::SysIdRoutine topWheelSysIdRoutine{
       frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
-      frc2::sysid::Mechanism{[this](units::volt_t driveVoltage) {
-                               topWheelMotor.SetControl(
-                                   topMotorVoltageSetter.WithOutput(
-                                       driveVoltage));
-                             },
-                             [this](frc::sysid::SysIdRoutineLog *log) {
-                               log->Motor("top-shooter-wheel")
-                                   .voltage(topMotorVoltageSig.GetValue())
-                                   .position(currentTopWheelPosition)
-                                   .velocity(currentTopWheelVelocity);
-                             },
-                             this}};
+      frc2::sysid::Mechanism{
+          [this](units::volt_t driveVoltage) {
+            topWheelMotor.SetControl(
+                topMotorVoltageSetter.WithOutput(driveVoltage));
+          },
+          [this](frc::sysid::SysIdRoutineLog* log) {
+            log->Motor("top-shooter-wheel")
+                .voltage(topMotorVoltageSig.GetValue())
+                .position(currentTopWheelPosition)
+                .velocity(currentTopWheelVelocity);
+          },
+          this}};
 
   frc2::sysid::SysIdRoutine bottomWheelSysIdRoutine{
       frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
-      frc2::sysid::Mechanism{[this](units::volt_t driveVoltage) {
-                               bottomWheelMotor.SetControl(
-                                   bottomMotorVoltageSetter.WithOutput(
-                                       driveVoltage));
-                             },
-                             [this](frc::sysid::SysIdRoutineLog *log) {
-                               log->Motor("bottom-shooter-wheel")
-                                   .voltage(bottomMotorVoltageSig.GetValue())
-                                   .position(currentBottomWheelPosition)
-                                   .velocity(currentBottomWheelVelocity);
-                             },
-                             this}};
+      frc2::sysid::Mechanism{
+          [this](units::volt_t driveVoltage) {
+            bottomWheelMotor.SetControl(
+                bottomMotorVoltageSetter.WithOutput(driveVoltage));
+          },
+          [this](frc::sysid::SysIdRoutineLog* log) {
+            log->Motor("bottom-shooter-wheel")
+                .voltage(bottomMotorVoltageSig.GetValue())
+                .position(currentBottomWheelPosition)
+                .velocity(currentBottomWheelVelocity);
+          },
+          this}};
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Shooter")};

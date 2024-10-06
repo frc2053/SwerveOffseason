@@ -19,10 +19,9 @@
 #include <ctre/phoenix6/TalonFX.hpp>
 
 #include "frc/DigitalInput.h"
-#include "networktables/BooleanTopic.h"
 
 class FeederSubsystem : public frc2::SubsystemBase {
-public:
+ public:
   FeederSubsystem();
 
   frc2::CommandPtr Feed();
@@ -38,7 +37,7 @@ public:
   void SimulationPeriodic() override;
   bool HasNote() const;
 
-private:
+ private:
   bool ConfigureFeederMotor(bool invert, units::scalar_t intakeGearing,
                             units::ampere_t supplyCurrentLimit,
                             units::ampere_t statorCurrentLimit);
@@ -57,7 +56,7 @@ private:
       feederMotor.GetMotorVoltage();
   ctre::phoenix6::controls::VoltageOut feederMotorVoltageSetter{0_V};
 
-  ctre::phoenix6::sim::TalonFXSimState &feederMotorSim =
+  ctre::phoenix6::sim::TalonFXSimState& feederMotorSim =
       feederMotor.GetSimState();
 
   frc::LinearSystem<1, 1, 1> feederPlant{frc::LinearSystemId::FlywheelSystem(

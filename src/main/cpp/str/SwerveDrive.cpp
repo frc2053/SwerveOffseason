@@ -13,7 +13,7 @@ using namespace str;
 
 SwerveDrive::SwerveDrive() {
   for (size_t i = 0; i < modules.size(); i++) {
-    const auto &modSigs = modules[i].GetSignals();
+    const auto& modSigs = modules[i].GetSignals();
     allSignals[(i * 8) + 0] = modSigs[0];
     allSignals[(i * 8) + 1] = modSigs[1];
     allSignals[(i * 8) + 2] = modSigs[2];
@@ -42,11 +42,11 @@ SwerveDrive::SwerveDrive() {
   allSignals[allSignals.size() - 2] = &imu.GetYaw();
   allSignals[allSignals.size() - 1] = &imu.GetAngularVelocityZWorld();
 
-  for (const auto &sig : allSignals) {
+  for (const auto& sig : allSignals) {
     sig->SetUpdateFrequency(1 / consts::SWERVE_ODOM_LOOP_PERIOD);
   }
 
-  for (auto &mod : modules) {
+  for (auto& mod : modules) {
     if (!mod.OptimizeBusSignals()) {
       frc::DataLogManager::Log(fmt::format(
           "Failed to optimize bus signals for {}\n", mod.GetName()));
@@ -60,7 +60,7 @@ SwerveDrive::SwerveDrive() {
   lastOdomUpdateTime = frc::Timer::GetFPGATimestamp();
 }
 
-void SwerveDrive::ResetPose(const frc::Pose2d &resetPose) {
+void SwerveDrive::ResetPose(const frc::Pose2d& resetPose) {
   odom.ResetPosition(frc::Rotation2d{GetYawFromImu()}, modulePositions,
                      resetPose);
   poseEstimator.ResetPosition(frc::Rotation2d{GetYawFromImu()}, modulePositions,
@@ -68,7 +68,7 @@ void SwerveDrive::ResetPose(const frc::Pose2d &resetPose) {
 }
 
 void SwerveDrive::DriveRobotRelative(
-    const frc::ChassisSpeeds &robotRelativeSpeeds) {
+    const frc::ChassisSpeeds& robotRelativeSpeeds) {
   Drive(robotRelativeSpeeds.vx, robotRelativeSpeeds.vy,
         robotRelativeSpeeds.omega, false);
 }
@@ -100,7 +100,9 @@ frc::ChassisSpeeds SwerveDrive::GetRobotRelativeSpeeds() const {
   return consts::swerve::physical::KINEMATICS.ToChassisSpeeds(moduleStates);
 }
 
-frc::Pose2d SwerveDrive::GetOdomPose() const { return odom.GetPose(); }
+frc::Pose2d SwerveDrive::GetOdomPose() const {
+  return odom.GetPose();
+}
 
 frc::Pose2d SwerveDrive::GetPose() const {
   return poseEstimator.GetEstimatedPosition();
@@ -115,7 +117,9 @@ frc::Pose2d SwerveDrive::GetPredictedPose(units::second_t translationLookahead,
                        frc::Rotation2d{currentVel.omega * rotationLookahead}});
 }
 
-units::radian_t SwerveDrive::GetYawFromImu() { return yawLatencyComped; }
+units::radian_t SwerveDrive::GetYawFromImu() {
+  return yawLatencyComped;
+}
 
 std::array<units::radian_t, 4>
 SwerveDrive::GetModuleDriveOutputShaftPositions() {
@@ -124,14 +128,14 @@ SwerveDrive::GetModuleDriveOutputShaftPositions() {
 }
 
 void SwerveDrive::SetModuleStates(
-    const std::array<frc::SwerveModuleState, 4> &desiredStates, bool optimize,
+    const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize,
     bool openLoop,
-    const std::array<units::ampere_t, 4> &moduleTorqueCurrentsFF) {
+    const std::array<units::ampere_t, 4>& moduleTorqueCurrentsFF) {
   wpi::array<frc::SwerveModuleState, 4> finalState = desiredStates;
   frc::SwerveDriveKinematics<4>::DesaturateWheelSpeeds(
       &finalState, consts::swerve::physical::DRIVE_MAX_SPEED);
   int i = 0;
-  for (auto &mod : modules) {
+  for (auto& mod : modules) {
     finalState[i] = mod.GoToState(finalState[i], optimize, openLoop,
                                   moduleTorqueCurrentsFF[i]);
     i++;
@@ -139,9 +143,9 @@ void SwerveDrive::SetModuleStates(
   desiredStatesPub.Set(finalState);
 }
 
-void SwerveDrive::AddVisionMeasurement(const frc::Pose2d &visionMeasurement,
+void SwerveDrive::AddVisionMeasurement(const frc::Pose2d& visionMeasurement,
                                        units::second_t timestamp,
-                                       const Eigen::Vector3d &stdDevs) {
+                                       const Eigen::Vector3d& stdDevs) {
   // outside field, so we dont want to add this measurement to estimator,
   // because we know its wrong
   // TODO: Maybe add a small a buffer around the robots frame to add poses that
@@ -167,7 +171,7 @@ void SwerveDrive::UpdateSwerveOdom() {
   // }
 
   int i = 0;
-  for (auto &mod : modules) {
+  for (auto& mod : modules) {
     modulePositions[i] = mod.GetCurrentPosition(false);
     moduleStates[i] = mod.GetCurrentState();
     i++;
@@ -197,7 +201,7 @@ void SwerveDrive::UpdateNTEntries() {
 void SwerveDrive::SimulationPeriodic() {
   std::array<frc::SwerveModuleState, 4> simState;
   int i = 0;
-  for (auto &swerveModule : modules) {
+  for (auto& swerveModule : modules) {
     simState[i] = swerveModule.UpdateSimulation(
         consts::LOOP_PERIOD, frc::RobotController::GetBatteryVoltage());
     i++;
@@ -215,19 +219,19 @@ void SwerveDrive::SimulationPeriodic() {
 
 units::ampere_t SwerveDrive::GetSimulatedCurrentDraw() const {
   units::ampere_t totalCurrent = 0_A;
-  for (const auto &swerveModule : modules) {
+  for (const auto& swerveModule : modules) {
     totalCurrent += swerveModule.GetSimulatedCurrentDraw();
   }
   return totalCurrent;
 }
 
 void SwerveDrive::SetXModuleForces(
-    const std::array<units::newton_t, 4> &xForce) {
+    const std::array<units::newton_t, 4>& xForce) {
   xModuleForce = xForce;
 }
 
 void SwerveDrive::SetYModuleForces(
-    const std::array<units::newton_t, 4> &yForce) {
+    const std::array<units::newton_t, 4>& yForce) {
   yModuleForce = yForce;
 }
 
@@ -261,7 +265,7 @@ void SwerveDrive::SetCharacterizationVoltageDrive(units::volt_t volts) {
   modules[3].SetDriveToVoltage(volts);
 }
 
-void SwerveDrive::LogMk4iSteerTorque(frc::sysid::SysIdRoutineLog *log) {
+void SwerveDrive::LogMk4iSteerTorque(frc::sysid::SysIdRoutineLog* log) {
   log->Motor("swerve-steer-mk4i")
       .voltage(units::volt_t{allSignals[5]->GetValueAsDouble()})
       .position(units::turn_t{allSignals[2]->GetValueAsDouble()})
@@ -269,21 +273,21 @@ void SwerveDrive::LogMk4iSteerTorque(frc::sysid::SysIdRoutineLog *log) {
 }
 
 // This assumes the mk4n's are in the back of the robot
-void SwerveDrive::LogMk4nSteerTorque(frc::sysid::SysIdRoutineLog *log) {
+void SwerveDrive::LogMk4nSteerTorque(frc::sysid::SysIdRoutineLog* log) {
   log->Motor("swerve-steer-mk4n")
       .voltage(units::volt_t{allSignals[21]->GetValueAsDouble()})
       .position(units::turn_t{allSignals[18]->GetValueAsDouble()})
       .velocity(units::turns_per_second_t{allSignals[19]->GetValueAsDouble()});
 }
 
-void SwerveDrive::LogDriveTorque(frc::sysid::SysIdRoutineLog *log) {
+void SwerveDrive::LogDriveTorque(frc::sysid::SysIdRoutineLog* log) {
   log->Motor("swerve-drive")
       .voltage(units::volt_t{allSignals[4]->GetValueAsDouble()})
       .position(units::turn_t{allSignals[0]->GetValueAsDouble()})
       .velocity(units::turns_per_second_t{allSignals[1]->GetValueAsDouble()});
 }
 
-void SwerveDrive::LogMk4iSteerVoltage(frc::sysid::SysIdRoutineLog *log) {
+void SwerveDrive::LogMk4iSteerVoltage(frc::sysid::SysIdRoutineLog* log) {
   log->Motor("swerve-steer-mk4i")
       .voltage(units::volt_t{allSignals[7]->GetValueAsDouble()})
       .position(units::turn_t{allSignals[2]->GetValueAsDouble()})
@@ -291,14 +295,14 @@ void SwerveDrive::LogMk4iSteerVoltage(frc::sysid::SysIdRoutineLog *log) {
 }
 
 // This assumes the mk4n's are in the back of the robot
-void SwerveDrive::LogMk4nSteerVoltage(frc::sysid::SysIdRoutineLog *log) {
+void SwerveDrive::LogMk4nSteerVoltage(frc::sysid::SysIdRoutineLog* log) {
   log->Motor("swerve-steer-mk4n")
       .voltage(units::volt_t{allSignals[23]->GetValueAsDouble()})
       .position(units::turn_t{allSignals[18]->GetValueAsDouble()})
       .velocity(units::turns_per_second_t{allSignals[19]->GetValueAsDouble()});
 }
 
-void SwerveDrive::LogDriveVoltage(frc::sysid::SysIdRoutineLog *log) {
+void SwerveDrive::LogDriveVoltage(frc::sysid::SysIdRoutineLog* log) {
   log->Motor("swerve-drive")
       .voltage(units::volt_t{allSignals[6]->GetValueAsDouble()})
       .position(units::turn_t{allSignals[0]->GetValueAsDouble()})
@@ -306,8 +310,8 @@ void SwerveDrive::LogDriveVoltage(frc::sysid::SysIdRoutineLog *log) {
 }
 
 std::array<units::ampere_t, 4> SwerveDrive::ConvertModuleForcesToTorqueCurrent(
-    const std::array<units::newton_t, 4> &xForce,
-    const std::array<units::newton_t, 4> &yForce) {
+    const std::array<units::newton_t, 4>& xForce,
+    const std::array<units::newton_t, 4>& yForce) {
   std::array<units::ampere_t, 4> retVal;
   for (int i = 0; i < 4; i++) {
     frc::Translation2d moduleForceFieldRef{units::meter_t{xForce[i].value()},
@@ -336,12 +340,12 @@ bool SwerveDrive::IsSlipping() {
           translationComponent);
   auto maxIt = std::max_element(
       transStates.begin(), transStates.end(),
-      [](const frc::SwerveModuleState &a, const frc::SwerveModuleState &b) {
+      [](const frc::SwerveModuleState& a, const frc::SwerveModuleState& b) {
         return a.speed < b.speed;
       });
   auto minIt = std::min_element(
       transStates.begin(), transStates.end(),
-      [](const frc::SwerveModuleState &a, const frc::SwerveModuleState &b) {
+      [](const frc::SwerveModuleState& a, const frc::SwerveModuleState& b) {
         return a.speed < b.speed;
       });
   return (maxIt->speed / minIt->speed) > slipCoeff;

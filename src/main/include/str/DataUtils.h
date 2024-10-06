@@ -6,8 +6,8 @@
 
 namespace str {
 class DataUtils {
-public:
+ public:
   DataUtils() = delete;
   static void LogGitInfo();
 };
-} // namespace str
+}  // namespace str
