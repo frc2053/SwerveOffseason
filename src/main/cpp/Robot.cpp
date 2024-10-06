@@ -42,12 +42,12 @@ void Robot::RobotPeriodic() {
   units::second_t loopTime = now - lastTotalLoopTime;
   loopTimePub.Set((1 / loopTime).value());
 
-  // m_container.GetNoteVisualizer().DisplayRobotNote(
-  //     m_container.GetFeederSubsystem().HasNote(),
-  //     m_container.GetSwerveSubsystem().GetRobotPose());
+  m_container.GetNoteVisualizer().DisplayRobotNote(
+      m_container.GetFeederSubsystem().HasNote(),
+      m_container.GetSwerveSubsystem().GetRobotPose());
 
   frc2::CommandScheduler::GetInstance().Run();
-  //m_container.GetNoteVisualizer().Periodic();
+  m_container.GetNoteVisualizer().Periodic();
   //UpdateVision();
   //m_container.GetSwerveSubsystem().CalculateFoundNotePose(m_container.GetVision().GetDistanceToNote(), m_container.GetVision().GetAngleToNote());
 
