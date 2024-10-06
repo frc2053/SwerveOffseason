@@ -4,8 +4,8 @@
 
 #include "str/SwerveModule.h"
 
-#include <frc/MathUtil.h>
 #include <frc/DataLogManager.h>
+#include <frc/MathUtil.h>
 
 using namespace str;
 
@@ -87,9 +87,10 @@ frc::SwerveModulePosition SwerveModule::GetCurrentPosition(bool refresh) {
             steerPositionSig, steerVelocitySig, steerVoltageSig);
 
     if (!moduleSignalStatus.IsOK()) {
-      frc::DataLogManager::Log(fmt::format("Error refreshing {} module signal in GetCurrentPosition()! "
-                 "Error was: {}\n",
-                 moduleName, moduleSignalStatus.GetName()));
+      frc::DataLogManager::Log(fmt::format(
+          "Error refreshing {} module signal in GetCurrentPosition()! "
+          "Error was: {}\n",
+          moduleName, moduleSignalStatus.GetName()));
     }
   }
 
@@ -127,9 +128,10 @@ units::radian_t SwerveModule::GetOutputShaftTurns() {
                                                    driveVelocitySig);
 
   if (!moduleSignalStatus.IsOK()) {
-    frc::DataLogManager::Log(fmt::format("Error refreshing {} module signal in GetDriveMotorTurns()! "
-               "Error was: {}\n",
-               moduleName, moduleSignalStatus.GetName()));
+    frc::DataLogManager::Log(fmt::format(
+        "Error refreshing {} module signal in GetDriveMotorTurns()! "
+        "Error was: {}\n",
+        moduleName, moduleSignalStatus.GetName()));
   }
 
   units::radian_t latencyCompDrivePos =
@@ -202,8 +204,9 @@ bool SwerveModule::ConfigureSteerMotor(bool invertSteer,
   ctre::phoenix::StatusCode configResult =
       steerMotor.GetConfigurator().Apply(steerConfig);
 
-  frc::DataLogManager::Log(fmt::format("Configured steer motor on module {}. Result was: {}\n",
-             moduleName, configResult.GetName()));
+  frc::DataLogManager::Log(
+      fmt::format("Configured steer motor on module {}. Result was: {}\n",
+                  moduleName, configResult.GetName()));
 
   return configResult.IsOK();
 }
@@ -243,8 +246,9 @@ bool SwerveModule::ConfigureDriveMotor(bool invertDrive,
   ctre::phoenix::StatusCode configResult =
       driveMotor.GetConfigurator().Apply(driveConfig);
 
-  frc::DataLogManager::Log(fmt::format("Configured drive motor on module {}. Result was: {}\n",
-             moduleName, configResult.GetName()));
+  frc::DataLogManager::Log(
+      fmt::format("Configured drive motor on module {}. Result was: {}\n",
+                  moduleName, configResult.GetName()));
 
   return configResult.IsOK();
 }
@@ -259,8 +263,9 @@ bool SwerveModule::ConfigureSteerEncoder(units::turn_t encoderOffset) {
   ctre::phoenix::StatusCode configResult =
       steerEncoder.GetConfigurator().Apply(encoderConfig);
 
-  frc::DataLogManager::Log(fmt::format("Configured steer encoder on module {}. Result was: {}\n",
-             moduleName, configResult.GetName()));
+  frc::DataLogManager::Log(
+      fmt::format("Configured steer encoder on module {}. Result was: {}\n",
+                  moduleName, configResult.GetName()));
 
   return configResult.IsOK();
 }
@@ -283,12 +288,14 @@ bool SwerveModule::OptimizeBusSignals() {
   ctre::phoenix::StatusCode optimizeDriveResult =
       driveMotor.OptimizeBusUtilization();
   if (optimizeDriveResult.IsOK()) {
-    frc::DataLogManager::Log(fmt::format("Optimized bus signals for {} drive motor\n", moduleName));
+    frc::DataLogManager::Log(
+        fmt::format("Optimized bus signals for {} drive motor\n", moduleName));
   }
   ctre::phoenix::StatusCode optimizeSteerResult =
       steerMotor.OptimizeBusUtilization();
   if (optimizeSteerResult.IsOK()) {
-    frc::DataLogManager::Log(fmt::format("Optimized bus signals for {} steer motor\n", moduleName));
+    frc::DataLogManager::Log(
+        fmt::format("Optimized bus signals for {} steer motor\n", moduleName));
   }
   return optimizeDriveResult.IsOK() && optimizeSteerResult.IsOK();
 }
@@ -313,10 +320,8 @@ void SwerveModule::SetSteerGains(str::SwerveModuleSteerGains newGains) {
 
   steerMMConfig.MotionMagicCruiseVelocity =
       steerGains.motionMagicCruiseVel.value();
-  steerMMConfig.MotionMagicExpo_kV =
-      steerGains.motionMagicExpoKv.value();
-  steerMMConfig.MotionMagicExpo_kA =
-      steerGains.motionMagicExpoKa.value();
+  steerMMConfig.MotionMagicExpo_kV = steerGains.motionMagicExpoKv.value();
+  steerMMConfig.MotionMagicExpo_kA = steerGains.motionMagicExpoKa.value();
 
   ctre::phoenix::StatusCode statusGains =
       steerMotor.GetConfigurator().Apply(steerSlotConfig);
@@ -330,10 +335,10 @@ void SwerveModule::SetSteerGains(str::SwerveModuleSteerGains newGains) {
   ctre::phoenix::StatusCode statusMM =
       steerMotor.GetConfigurator().Apply(steerMMConfig);
   if (!statusMM.IsOK()) {
-    frc::DataLogManager::Log(
-        fmt::format("Swerve Steer Motor was unable to set new motion magic config! "
-                    "Error: {}, More Info: {}",
-                    statusMM.GetName(), statusMM.GetDescription()));
+    frc::DataLogManager::Log(fmt::format(
+        "Swerve Steer Motor was unable to set new motion magic config! "
+        "Error: {}, More Info: {}",
+        statusMM.GetName(), statusMM.GetDescription()));
   }
 }
 

@@ -3,13 +3,14 @@
 // the MIT License file in the root of this project
 
 #include "str/NoteVisualizer.h"
+
+#include <frc/Timer.h>
+#include <units/acceleration.h>
+
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation3d.h"
-
-#include <frc/Timer.h>
-#include <units/acceleration.h>
 
 using namespace str;
 

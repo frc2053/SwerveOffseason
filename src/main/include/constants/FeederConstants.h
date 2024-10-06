@@ -21,7 +21,7 @@ inline constexpr int FEEDER = 18;
 
 namespace ports {
 inline constexpr int NOTE_SENSOR_PORT = 2;
-}
+} // namespace ports
 
 namespace current_limits {
 inline constexpr units::ampere_t SUPPLY_CURRENT_LIMIT = 60_A;

@@ -1,13 +1,16 @@
-// Copyright (c) FIRST and other WPILib contributors.
+// Copyright (c) FRC 2053.
 // Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// the MIT License file in the root of this project
 
 #include "subsystems/FeederSubsystem.h"
-#include "constants/Constants.h"
+
 #include <frc/DataLogManager.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/Commands.h>
+
 #include <iostream>
+
+#include "constants/Constants.h"
 
 FeederSubsystem::FeederSubsystem() {
   SetName("FeederSubsystem");
@@ -20,36 +23,42 @@ FeederSubsystem::FeederSubsystem() {
 }
 
 frc2::CommandPtr FeederSubsystem::Feed() {
-  return frc2::cmd::RunEnd([this] {
-    feederWheelVoltageSetpoint = consts::feeder::gains::NOTE_FEED_VOLTAGE;
-  }, [this] {
-    feederWheelVoltageSetpoint = 0_V;
-  }, {this}).WithName("FeedUntilNote");
+  return frc2::cmd::RunEnd(
+             [this] {
+               feederWheelVoltageSetpoint =
+                   consts::feeder::gains::NOTE_FEED_VOLTAGE;
+             },
+             [this] { feederWheelVoltageSetpoint = 0_V; }, {this})
+      .WithName("FeedUntilNote");
 }
 
 frc2::CommandPtr FeederSubsystem::Stop() {
-  return frc2::cmd::RunOnce([this] {
-    feederWheelVoltageSetpoint = 0_V;
-  }, {this}).WithName("Stop");
+  return frc2::cmd::RunOnce([this] { feederWheelVoltageSetpoint = 0_V; },
+                            {this})
+      .WithName("Stop");
 }
 
 frc2::CommandPtr FeederSubsystem::Eject() {
-  return frc2::cmd::RunEnd([this] {
-    feederWheelVoltageSetpoint = consts::feeder::gains::NOTE_EJECT_VOLTAGE;
-  }, [this] {
-    feederWheelVoltageSetpoint = 0_V;
-  }, {this}).WithName("Eject");
+  return frc2::cmd::RunEnd(
+             [this] {
+               feederWheelVoltageSetpoint =
+                   consts::feeder::gains::NOTE_EJECT_VOLTAGE;
+             },
+             [this] { feederWheelVoltageSetpoint = 0_V; }, {this})
+      .WithName("Eject");
 }
 
 // This method will be called once per scheduler run
 void FeederSubsystem::Periodic() {
+  ctre::phoenix::StatusCode feederWaitResult =
+      ctre::phoenix6::BaseStatusSignal::RefreshAll({
+          &feederMotorVoltageSig,
+      });
 
-  ctre::phoenix::StatusCode feederWaitResult = ctre::phoenix6::BaseStatusSignal::RefreshAll({
-    &feederMotorVoltageSig,
-  });
-
-  if(!feederWaitResult.IsOK()) {
-    frc::DataLogManager::Log(fmt::format("Error grabbing feeder signals! Details: {}\n", feederWaitResult.GetName()));
+  if (!feederWaitResult.IsOK()) {
+    frc::DataLogManager::Log(
+        fmt::format("Error grabbing feeder signals! Details: {}\n",
+                    feederWaitResult.GetName()));
   }
 
   currentFeederWheelVoltage = feederMotorVoltageSig.GetValue();
@@ -61,8 +70,9 @@ void FeederSubsystem::Periodic() {
   } else {
     hasNote = false;
   }
-  
-  feederMotor.SetControl(feederMotorVoltageSetter.WithOutput(feederWheelVoltageSetpoint));
+
+  feederMotor.SetControl(
+      feederMotorVoltageSetter.WithOutput(feederWheelVoltageSetpoint));
 
   UpdateNTEntries();
 }
@@ -87,7 +97,6 @@ bool FeederSubsystem::ConfigureFeederMotor(bool invert,
                                            units::scalar_t intakeGearing,
                                            units::ampere_t supplyCurrentLimit,
                                            units::ampere_t statorCurrentLimit) {
-
   ctre::phoenix6::configs::TalonFXConfiguration feederConfig{};
 
   feederConfig.MotorOutput.NeutralMode =

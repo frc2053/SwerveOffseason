@@ -39,7 +39,7 @@ public:
                   frc::ChassisSpeeds robotCurrentVelocity,
                   frc::Transform3d noteExitPose,
                   units::meters_per_second_t initialVelocity);
-  void DisplayRobotNote(bool hasNote, const frc::Pose2d& robotPosition);
+  void DisplayRobotNote(bool hasNote, const frc::Pose2d &robotPosition);
 
 private:
   void UpdateLaunchedNotes(units::second_t loopTime);

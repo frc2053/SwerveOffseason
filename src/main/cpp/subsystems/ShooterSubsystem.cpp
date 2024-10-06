@@ -3,10 +3,12 @@
 // the MIT License file in the root of this project
 
 #include "subsystems/ShooterSubsystem.h"
-#include "constants/Constants.h"
-#include <frc2/command/Commands.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+
 #include <frc/DataLogManager.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+#include <frc2/command/Commands.h>
+
+#include "constants/Constants.h"
 
 ShooterSubsystem::ShooterSubsystem() {
   ConfigureShooterMotors(consts::shooter::physical::BOTTOM_INVERT,
@@ -19,108 +21,136 @@ ShooterSubsystem::ShooterSubsystem() {
   frc::SmartDashboard::PutData(this);
 }
 
-frc2::CommandPtr ShooterSubsystem::RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset) {
-    return RunShooter(preset, []() { return 0_m; });
+frc2::CommandPtr ShooterSubsystem::RunShooter(
+    std::function<consts::shooter::PRESET_SPEEDS()> preset) {
+  return RunShooter(preset, []() { return 0_m; });
 }
 
-frc2::CommandPtr ShooterSubsystem::RunShooter(std::function<consts::shooter::PRESET_SPEEDS()> preset, std::function<units::meter_t()> distance) {
-    return frc2::cmd::Run([this, preset, distance] {
-        switch(preset()) {
-            case consts::shooter::PRESET_SPEEDS::AMP:
-                topWheelVelocitySetpoint = consts::shooter::AMP_SPEEDS.topSpeed;
-                bottomWheelVelocitySetpoint = consts::shooter::AMP_SPEEDS.bottomSpeed;
-                break;
-            case consts::shooter::PRESET_SPEEDS::SUBWOOFER:
-                topWheelVelocitySetpoint = consts::shooter::SUBWOOFER_SPEEDS.topSpeed;
-                bottomWheelVelocitySetpoint = consts::shooter::SUBWOOFER_SPEEDS.bottomSpeed;
-                break;
-            case consts::shooter::PRESET_SPEEDS::PASS:
-                topWheelVelocitySetpoint = consts::shooter::PASS_SPEEDS.topSpeed;
-                bottomWheelVelocitySetpoint = consts::shooter::PASS_SPEEDS.bottomSpeed;
-                break;
-            case consts::shooter::PRESET_SPEEDS::SPEAKER_DIST:
-                topWheelVelocitySetpoint = consts::shooter::TOP_SHOOTER_LUT[distance()];
-                bottomWheelVelocitySetpoint = consts::shooter::BOTTOM_SHOOTER_LUT[distance()];
-                break;
-            case consts::shooter::PRESET_SPEEDS::OFF:
-                topWheelVelocitySetpoint = 0_rpm;
-                bottomWheelVelocitySetpoint = 0_rpm;
-                break;
-            default:
-                topWheelVelocitySetpoint = 0_rpm;
-                bottomWheelVelocitySetpoint = 0_rpm;
-                break;
-        }
-    }, {this}).Until([this] { return IsUpToSpeed(); });
+frc2::CommandPtr ShooterSubsystem::RunShooter(
+    std::function<consts::shooter::PRESET_SPEEDS()> preset,
+    std::function<units::meter_t()> distance) {
+  return frc2::cmd::Run(
+             [this, preset, distance] {
+               switch (preset()) {
+               case consts::shooter::PRESET_SPEEDS::AMP:
+                 topWheelVelocitySetpoint =
+                     consts::shooter::AMP_SPEEDS.topSpeed;
+                 bottomWheelVelocitySetpoint =
+                     consts::shooter::AMP_SPEEDS.bottomSpeed;
+                 break;
+               case consts::shooter::PRESET_SPEEDS::SUBWOOFER:
+                 topWheelVelocitySetpoint =
+                     consts::shooter::SUBWOOFER_SPEEDS.topSpeed;
+                 bottomWheelVelocitySetpoint =
+                     consts::shooter::SUBWOOFER_SPEEDS.bottomSpeed;
+                 break;
+               case consts::shooter::PRESET_SPEEDS::PASS:
+                 topWheelVelocitySetpoint =
+                     consts::shooter::PASS_SPEEDS.topSpeed;
+                 bottomWheelVelocitySetpoint =
+                     consts::shooter::PASS_SPEEDS.bottomSpeed;
+                 break;
+               case consts::shooter::PRESET_SPEEDS::SPEAKER_DIST:
+                 topWheelVelocitySetpoint =
+                     consts::shooter::TOP_SHOOTER_LUT[distance()];
+                 bottomWheelVelocitySetpoint =
+                     consts::shooter::BOTTOM_SHOOTER_LUT[distance()];
+                 break;
+               case consts::shooter::PRESET_SPEEDS::OFF:
+                 topWheelVelocitySetpoint = 0_rpm;
+                 bottomWheelVelocitySetpoint = 0_rpm;
+                 break;
+               default:
+                 topWheelVelocitySetpoint = 0_rpm;
+                 bottomWheelVelocitySetpoint = 0_rpm;
+                 break;
+               }
+             },
+             {this})
+      .Until([this] { return IsUpToSpeed(); });
 }
 
 // This method will be called once per scheduler run
 void ShooterSubsystem::Periodic() {
-    ctre::phoenix::StatusCode shooterWaitResult = ctre::phoenix6::BaseStatusSignal::RefreshAll({
-        &topMotorPosSig, 
-        &topMotorVelSig, 
-        &topMotorVoltageSig,
-        &bottomMotorPosSig,
-        &bottomMotorVelSig, 
-        &bottomMotorVoltageSig
-    });
+  ctre::phoenix::StatusCode shooterWaitResult =
+      ctre::phoenix6::BaseStatusSignal::RefreshAll(
+          {&topMotorPosSig, &topMotorVelSig, &topMotorVoltageSig,
+           &bottomMotorPosSig, &bottomMotorVelSig, &bottomMotorVoltageSig});
 
-    if(!shooterWaitResult.IsOK()) {
-        frc::DataLogManager::Log(fmt::format("Error grabbing shooter signals! Details: {}\n", shooterWaitResult.GetName()));
+  if (!shooterWaitResult.IsOK()) {
+    frc::DataLogManager::Log(
+        fmt::format("Error grabbing shooter signals! Details: {}\n",
+                    shooterWaitResult.GetName()));
+  }
+
+  currentTopWheelPosition =
+      ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(
+          topMotorPosSig, topMotorVelSig);
+  currentBottomWheelPosition =
+      ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(
+          bottomMotorPosSig, bottomMotorVelSig);
+
+  currentBottomWheelVelocity = bottomMotorVelSig.GetValue();
+  currentTopWheelVelocity = topMotorVelSig.GetValue();
+
+  units::volt_t topFFVolts = topWheelFF.Calculate(topWheelVelocitySetpoint);
+  units::volt_t bottomFFVolts =
+      bottomWheelFF.Calculate(bottomWheelVelocitySetpoint);
+
+  units::volt_t topPIDOutput = units::volt_t{topWheelPID.Calculate(
+      currentTopWheelVelocity.value(), topWheelVelocitySetpoint.value())};
+  units::volt_t bottomPIDOutput = units::volt_t{bottomWheelPID.Calculate(
+      currentTopWheelVelocity.value(), topWheelVelocitySetpoint.value())};
+
+  if (!runningSysid) {
+    if (topWheelVelocitySetpoint == 0_rpm) {
+      topWheelMotor.SetControl(coastSetter);
+    } else {
+      topWheelMotor.SetControl(
+          topMotorVoltageSetter.WithOutput(topFFVolts + topPIDOutput));
     }
-
-    currentTopWheelPosition = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(topMotorPosSig, topMotorVelSig);
-    currentBottomWheelPosition = ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(bottomMotorPosSig, bottomMotorVelSig);
-
-    currentBottomWheelVelocity = bottomMotorVelSig.GetValue();
-    currentTopWheelVelocity = topMotorVelSig.GetValue();
-
-    units::volt_t topFFVolts = topWheelFF.Calculate(topWheelVelocitySetpoint);
-    units::volt_t bottomFFVolts = bottomWheelFF.Calculate(bottomWheelVelocitySetpoint);
-
-    units::volt_t topPIDOutput = units::volt_t{topWheelPID.Calculate(currentTopWheelVelocity.value(), topWheelVelocitySetpoint.value())};
-    units::volt_t bottomPIDOutput = units::volt_t{bottomWheelPID.Calculate(currentTopWheelVelocity.value(), topWheelVelocitySetpoint.value())};
-
-    if(!runningSysid) {
-        if(topWheelVelocitySetpoint == 0_rpm) {
-            topWheelMotor.SetControl(coastSetter);
-        }
-        else {
-            topWheelMotor.SetControl(topMotorVoltageSetter.WithOutput(topFFVolts + topPIDOutput));
-        }
-        if(bottomWheelVelocitySetpoint == 0_rpm) {
-            bottomWheelMotor.SetControl(coastSetter);
-        }
-        else {
-            bottomWheelMotor.SetControl(bottomMotorVoltageSetter.WithOutput(bottomFFVolts + bottomPIDOutput));
-        }
+    if (bottomWheelVelocitySetpoint == 0_rpm) {
+      bottomWheelMotor.SetControl(coastSetter);
+    } else {
+      bottomWheelMotor.SetControl(
+          bottomMotorVoltageSetter.WithOutput(bottomFFVolts + bottomPIDOutput));
     }
+  }
 
-    UpdateNTEntries();
+  UpdateNTEntries();
 }
 
 void ShooterSubsystem::SimulationPeriodic() {
-    topMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
-    bottomMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
+  topMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
+  bottomMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
 
-    topFlywheelSim.SetInputVoltage(topMotorSim.GetMotorVoltage());
-    bottomFlywheelSim.SetInputVoltage(bottomMotorSim.GetMotorVoltage());
+  topFlywheelSim.SetInputVoltage(topMotorSim.GetMotorVoltage());
+  bottomFlywheelSim.SetInputVoltage(bottomMotorSim.GetMotorVoltage());
 
-    topFlywheelSim.Update(consts::LOOP_PERIOD);
-    bottomFlywheelSim.Update(consts::LOOP_PERIOD);
+  topFlywheelSim.Update(consts::LOOP_PERIOD);
+  bottomFlywheelSim.Update(consts::LOOP_PERIOD);
 
-    topMotorSim.SetRotorVelocity(topFlywheelSim.GetAngularVelocity() * consts::shooter::physical::SHOOTER_RATIO);
-    bottomMotorSim.SetRotorVelocity(bottomFlywheelSim.GetAngularVelocity() * consts::shooter::physical::SHOOTER_RATIO);
+  topMotorSim.SetRotorVelocity(topFlywheelSim.GetAngularVelocity() *
+                               consts::shooter::physical::SHOOTER_RATIO);
+  bottomMotorSim.SetRotorVelocity(bottomFlywheelSim.GetAngularVelocity() *
+                                  consts::shooter::physical::SHOOTER_RATIO);
 }
 
 void ShooterSubsystem::UpdateNTEntries() {
-    topWheelSetpointPub.Set(topWheelVelocitySetpoint.convert<units::revolutions_per_minute>().value());
-    bottomWheelSetpointPub.Set(bottomWheelVelocitySetpoint.convert<units::revolutions_per_minute>().value());
+  topWheelSetpointPub.Set(
+      topWheelVelocitySetpoint.convert<units::revolutions_per_minute>()
+          .value());
+  bottomWheelSetpointPub.Set(
+      bottomWheelVelocitySetpoint.convert<units::revolutions_per_minute>()
+          .value());
 
-    bottomWheelVelocityPub.Set(currentBottomWheelVelocity.convert<units::revolutions_per_minute>().value());
-    topWheelVelocityPub.Set(currentTopWheelVelocity.convert<units::revolutions_per_minute>().value());
+  bottomWheelVelocityPub.Set(
+      currentBottomWheelVelocity.convert<units::revolutions_per_minute>()
+          .value());
+  topWheelVelocityPub.Set(
+      currentTopWheelVelocity.convert<units::revolutions_per_minute>().value());
 
-    isUpToSpeedPub.Set(UpToSpeed().Get());
+  isUpToSpeedPub.Set(UpToSpeed().Get());
 }
 
 bool ShooterSubsystem::ConfigureShooterMotors(
@@ -145,8 +175,9 @@ bool ShooterSubsystem::ConfigureShooterMotors(
   ctre::phoenix::StatusCode topConfigResult =
       topWheelMotor.GetConfigurator().Apply(shooterConfig);
 
-  frc::DataLogManager::Log(fmt::format("Configured top shooter motor. Result was: {}\n",
-             topConfigResult.GetName()));
+  frc::DataLogManager::Log(
+      fmt::format("Configured top shooter motor. Result was: {}\n",
+                  topConfigResult.GetName()));
 
   shooterConfig.MotorOutput.Inverted =
       invertBottom
@@ -156,8 +187,9 @@ bool ShooterSubsystem::ConfigureShooterMotors(
   ctre::phoenix::StatusCode bottomConfigResult =
       bottomWheelMotor.GetConfigurator().Apply(shooterConfig);
 
-  frc::DataLogManager::Log(fmt::format("Configured bottom shooter motor. Result was: {}\n",
-             bottomConfigResult.GetName()));
+  frc::DataLogManager::Log(
+      fmt::format("Configured bottom shooter motor. Result was: {}\n",
+                  bottomConfigResult.GetName()));
 
   return bottomConfigResult.IsOK() && topConfigResult.IsOK();
 }
@@ -167,7 +199,7 @@ bool ShooterSubsystem::ConfigureMotorSignals() {
   bottomMotorVoltageSetter.UpdateFreqHz = 0_Hz;
   coastSetter.UpdateFreqHz = 0_Hz;
 
-  //Double the rio update rate? Not sure what is optimal here
+  // Double the rio update rate? Not sure what is optimal here
   units::hertz_t updateRate = 1.0 / (consts::LOOP_PERIOD * 2.0);
 
   topMotorPosSig.SetUpdateFrequency(updateRate);
@@ -186,31 +218,45 @@ bool ShooterSubsystem::ConfigureMotorSignals() {
   ctre::phoenix::StatusCode optimizeBottomMotor =
       bottomWheelMotor.OptimizeBusUtilization();
   if (optimizeBottomMotor.IsOK()) {
-    frc::DataLogManager::Log("Optimized bus signals for bottom shooter motor\n");
+    frc::DataLogManager::Log(
+        "Optimized bus signals for bottom shooter motor\n");
   }
 
   return optimizeTopMotor.IsOK() && optimizeBottomMotor.IsOK();
 }
 
-frc2::CommandPtr ShooterSubsystem::TopWheelSysIdQuasistatic(frc2::sysid::Direction direction) {
-  return topWheelSysIdRoutine.Quasistatic(direction).BeforeStarting([this] { runningSysid = true; }).AndThen([this] { runningSysid = false; });
+frc2::CommandPtr
+ShooterSubsystem::TopWheelSysIdQuasistatic(frc2::sysid::Direction direction) {
+  return topWheelSysIdRoutine.Quasistatic(direction)
+      .BeforeStarting([this] { runningSysid = true; })
+      .AndThen([this] { runningSysid = false; });
 }
 
-frc2::CommandPtr ShooterSubsystem::TopWheelSysIdDynamic(frc2::sysid::Direction direction) {
-  return topWheelSysIdRoutine.Dynamic(direction).BeforeStarting([this] { runningSysid = true; }).AndThen([this] { runningSysid = false; });;
+frc2::CommandPtr
+ShooterSubsystem::TopWheelSysIdDynamic(frc2::sysid::Direction direction) {
+  return topWheelSysIdRoutine.Dynamic(direction)
+      .BeforeStarting([this] { runningSysid = true; })
+      .AndThen([this] { runningSysid = false; });
 }
 
-frc2::CommandPtr ShooterSubsystem::BottomWheelSysIdQuasistatic(frc2::sysid::Direction direction) {
-  return bottomWheelSysIdRoutine.Quasistatic(direction).BeforeStarting([this] { runningSysid = true; }).AndThen([this] { runningSysid = false; });
+frc2::CommandPtr ShooterSubsystem::BottomWheelSysIdQuasistatic(
+    frc2::sysid::Direction direction) {
+  return bottomWheelSysIdRoutine.Quasistatic(direction)
+      .BeforeStarting([this] { runningSysid = true; })
+      .AndThen([this] { runningSysid = false; });
 }
 
-frc2::CommandPtr ShooterSubsystem::BottomWheelSysIdDynamic(frc2::sysid::Direction direction) {
-  return bottomWheelSysIdRoutine.Dynamic(direction).BeforeStarting([this] { runningSysid = true; }).AndThen([this] { runningSysid = false; });;
+frc2::CommandPtr
+ShooterSubsystem::BottomWheelSysIdDynamic(frc2::sysid::Direction direction) {
+  return bottomWheelSysIdRoutine.Dynamic(direction)
+      .BeforeStarting([this] { runningSysid = true; })
+      .AndThen([this] { runningSysid = false; });
 }
 
-void ShooterSubsystem::SetupLUTs(const std::map<units::meter_t, consts::shooter::ShooterSpeeds>& speeds) {
-    for(const auto& [key, val] : speeds) {
-        consts::shooter::TOP_SHOOTER_LUT.insert(key, val.topSpeed);
-        consts::shooter::BOTTOM_SHOOTER_LUT.insert(key, val.bottomSpeed);
-    }
+void ShooterSubsystem::SetupLUTs(
+    const std::map<units::meter_t, consts::shooter::ShooterSpeeds> &speeds) {
+  for (const auto &[key, val] : speeds) {
+    consts::shooter::TOP_SHOOTER_LUT.insert(key, val.topSpeed);
+    consts::shooter::BOTTOM_SHOOTER_LUT.insert(key, val.bottomSpeed);
+  }
 }

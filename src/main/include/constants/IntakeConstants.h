@@ -6,10 +6,10 @@
 
 #include <frc/system/plant/DCMotor.h>
 #include <units/base.h>
-#include <units/velocity.h>
-#include <wpi/interpolating_map.h>
 #include <units/dimensionless.h>
 #include <units/moment_of_inertia.h>
+#include <units/velocity.h>
+#include <wpi/interpolating_map.h>
 
 #include "str/Gains.h"
 
@@ -34,14 +34,15 @@ inline constexpr frc::DCMotor INTAKE_MOTOR = frc::DCMotor::Falcon500(1);
 
 inline constexpr units::meter_t WHEEL_RADIUS = 1_in;
 
-//From onshape doc
-inline constexpr units::kilogram_square_meter_t INTAKE_MOI = 5.350445 * 1_in * 1_in * 1_lb;
+// From onshape doc
+inline constexpr units::kilogram_square_meter_t INTAKE_MOI =
+    5.350445 * 1_in * 1_in * 1_lb;
 } // namespace physical
 
 namespace gains {
 inline constexpr units::ampere_t NOTE_SPIKE_THRESHOLD = 100_A;
 inline constexpr units::volt_t NOTE_INTAKE_VOLTAGE = 10_V;
 inline constexpr units::volt_t NOTE_EJECT_VOLTAGE = -10_V;
-}
+} // namespace gains
 } // namespace intake
 } // namespace consts

@@ -62,9 +62,15 @@ public:
   frc2::CommandPtr WheelRadius(frc2::sysid::Direction dir);
   frc2::CommandPtr TuneSteerPID(std::function<bool()> isDone);
   frc2::CommandPtr TuneDrivePID(std::function<bool()> isDone);
-  void CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote, std::optional<units::radian_t> angleToNote);
+  void CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote,
+                              std::optional<units::radian_t> angleToNote);
   frc::Pose2d GetFoundNotePose() const;
-  frc2::CommandPtr NoteAssist(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> rotOverride, std::function<frc::Pose2d()> notePose);
+  frc2::CommandPtr
+  NoteAssist(std::function<units::meters_per_second_t()> xVel,
+             std::function<units::meters_per_second_t()> yVel,
+             std::function<units::radians_per_second_t()> rotOverride,
+             std::function<frc::Pose2d()> notePose);
+
 private:
   void SetupPathplanner();
   void LoadChoreoTrajectories();
@@ -76,20 +82,18 @@ private:
   frc::Pose2d latestNotePose;
 
   nt::StructPublisher<frc::Pose3d> foundNotePose{
-    nt::NetworkTableInstance::GetDefault()
-    .GetTable("Vision")
-    ->GetStructTopic<frc::Pose3d>("FoundNotePose")
-    .Publish()};
-  nt::DoublePublisher noteDistPub{
-    nt::NetworkTableInstance::GetDefault()
-    .GetTable("Vision")
-    ->GetDoubleTopic("NoteDist")
-    .Publish()};
-  nt::DoublePublisher noteYawPub{
-    nt::NetworkTableInstance::GetDefault()
-    .GetTable("Vision")
-    ->GetDoubleTopic("NoteYaw")
-    .Publish()};
+      nt::NetworkTableInstance::GetDefault()
+          .GetTable("Vision")
+          ->GetStructTopic<frc::Pose3d>("FoundNotePose")
+          .Publish()};
+  nt::DoublePublisher noteDistPub{nt::NetworkTableInstance::GetDefault()
+                                      .GetTable("Vision")
+                                      ->GetDoubleTopic("NoteDist")
+                                      .Publish()};
+  nt::DoublePublisher noteYawPub{nt::NetworkTableInstance::GetDefault()
+                                     .GetTable("Vision")
+                                     ->GetDoubleTopic("NoteYaw")
+                                     .Publish()};
 
   frc::TrapezoidProfile<units::meters>::Constraints translationConstraints{
       consts::swerve::physical::DRIVE_MAX_SPEED,

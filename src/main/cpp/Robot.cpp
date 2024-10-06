@@ -4,13 +4,13 @@
 
 #include "Robot.h"
 
-#include "constants/VisionConstants.h"
-#include "frc/Alert.h"
 #include <frc/DataLogManager.h>
 #include <frc/DriverStation.h>
 #include <frc/simulation/RoboRioSim.h>
 #include <frc2/command/CommandScheduler.h>
 
+#include "constants/VisionConstants.h"
+#include "frc/Alert.h"
 #include "frc/Threads.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Pose3d.h"
@@ -25,15 +25,15 @@ void Robot::RobotInit() {
   frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
   AddPeriodic([this] { m_container.GetSwerveSubsystem().UpdateSwerveOdom(); },
               consts::SWERVE_ODOM_LOOP_PERIOD, 2_ms);
-  
+
   m_container.GetShooterSubsystem().SetupLUTs({
-    {1_ft, {1000_rpm, 1000_rpm}},
-    {2_ft, {1500_rpm, 1500_rpm}},
-    {3_ft, {2000_rpm, 2000_rpm}},
-    {4_ft, {2500_rpm, 2500_rpm}},
-    {5_ft, {3000_rpm, 3000_rpm}},
-    {6_ft, {3500_rpm, 3500_rpm}},
-    {7_ft, {4000_rpm, 4000_rpm}},
+      {1_ft, {1000_rpm, 1000_rpm}},
+      {2_ft, {1500_rpm, 1500_rpm}},
+      {3_ft, {2000_rpm, 2000_rpm}},
+      {4_ft, {2500_rpm, 2500_rpm}},
+      {5_ft, {3000_rpm, 3000_rpm}},
+      {6_ft, {3500_rpm, 3500_rpm}},
+      {7_ft, {4000_rpm, 4000_rpm}},
   });
 }
 
@@ -48,8 +48,9 @@ void Robot::RobotPeriodic() {
 
   frc2::CommandScheduler::GetInstance().Run();
   m_container.GetNoteVisualizer().Periodic();
-  //UpdateVision();
-  //m_container.GetSwerveSubsystem().CalculateFoundNotePose(m_container.GetVision().GetDistanceToNote(), m_container.GetVision().GetAngleToNote());
+  // UpdateVision();
+  // m_container.GetSwerveSubsystem().CalculateFoundNotePose(m_container.GetVision().GetDistanceToNote(),
+  // m_container.GetVision().GetAngleToNote());
 
   lastTotalLoopTime = now;
 }
@@ -72,7 +73,8 @@ void Robot::UpdateVision() {
   // int i = 0;
   // for (const auto &est : visionEstimates) {
   //   if (est.has_value()) {
-  //     // m_container.GetSwerveSubsystem().AddVisionMeasurement(est.value().estimatedPose.ToPose2d(),
+  //     //
+  //     m_container.GetSwerveSubsystem().AddVisionMeasurement(est.value().estimatedPose.ToPose2d(),
   //     //  est.value().timestamp, stdDevs[i].value());
   //   }
   //   i++;

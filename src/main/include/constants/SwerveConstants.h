@@ -82,7 +82,6 @@ inline constexpr bool BL_DRIVE_INVERT = false;
 inline constexpr bool BR_DRIVE_INVERT = false;
 #endif
 
-
 inline constexpr units::scalar_t STEER_GEARING_MK4I =
     (50.0 / 14.0) * (60.0 / 10.0);
 inline constexpr units::scalar_t STEER_GEARING_MK4N =

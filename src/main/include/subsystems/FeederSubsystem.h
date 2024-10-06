@@ -1,26 +1,29 @@
-// Copyright (c) FIRST and other WPILib contributors.
+// Copyright (c) FRC 2053.
 // Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// the MIT License file in the root of this project
 
 #pragma once
 
-#include "frc/DigitalInput.h"
-#include "networktables/BooleanTopic.h"
 #include <constants/FeederConstants.h>
-#include <ctre/phoenix6/TalonFX.hpp>
 #include <frc/filter/Debouncer.h>
 #include <frc/simulation/FlywheelSim.h>
 #include <frc/system/plant/LinearSystemId.h>
 #include <frc2/command/SubsystemBase.h>
+#include <frc2/command/button/Trigger.h>
 #include <networktables/BooleanTopic.h>
 #include <networktables/DoubleTopic.h>
 #include <networktables/NetworkTableInstance.h>
-#include <frc2/command/button/Trigger.h>
+
+#include <memory>
+
+#include <ctre/phoenix6/TalonFX.hpp>
+
+#include "frc/DigitalInput.h"
+#include "networktables/BooleanTopic.h"
 
 class FeederSubsystem : public frc2::SubsystemBase {
 public:
   FeederSubsystem();
-
 
   frc2::CommandPtr Feed();
   frc2::CommandPtr Stop();

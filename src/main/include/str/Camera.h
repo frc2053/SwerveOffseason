@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "frc/geometry/Translation3d.h"
-#include "units/length.h"
 #include <frc/apriltag/AprilTagFields.h>
 #include <frc/geometry/Transform3d.h>
 #include <networktables/StructTopic.h>
@@ -18,6 +16,10 @@
 
 #include <memory>
 #include <string>
+#include <vector>
+
+#include "frc/geometry/Translation3d.h"
+#include "units/length.h"
 
 namespace str {
 class Camera {

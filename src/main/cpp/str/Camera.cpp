@@ -5,11 +5,12 @@
 #include "str/Camera.h"
 
 #include <frc/RobotBase.h>
+
 #include <optional>
 #include <vector>
-#include "constants/VisionConstants.h"
 
 #include "constants/Constants.h"
+#include "constants/VisionConstants.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Translation3d.h"
@@ -44,10 +45,9 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
       visionSim->AddAprilTags(consts::yearSpecific::aprilTagLayout);
       cameraProps = std::make_unique<photon::SimCameraProperties>();
 
-      if(cameraName == consts::vision::NOTE_CAM_NAME) {
+      if (cameraName == consts::vision::NOTE_CAM_NAME) {
         cameraProps->SetCalibration(640, 480, frc::Rotation2d{75_deg});
-      }
-      else {
+      } else {
         cameraProps->SetCalibration(1600, 1200, frc::Rotation2d{75_deg});
       }
       cameraProps->SetCalibError(.35, .10);
@@ -63,11 +63,13 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
 
       photon::TargetModel notePlaceHolder{
           CreateTorusVertices(14_in, 1_in, 5, 5)};
-      visionSim->AddVisionTargets({photon::VisionTargetSim{
-          frc::Pose3d{14_ft, 14_ft, 0_ft, frc::Rotation3d{}},
-          notePlaceHolder}, photon::VisionTargetSim{
-          frc::Pose3d{5_ft, 2_ft, 0_ft, frc::Rotation3d{}},
-          notePlaceHolder}});
+      visionSim->AddVisionTargets(
+          {photon::VisionTargetSim{
+               frc::Pose3d{14_ft, 14_ft, 0_ft, frc::Rotation3d{}},
+               notePlaceHolder},
+           photon::VisionTargetSim{
+               frc::Pose3d{5_ft, 2_ft, 0_ft, frc::Rotation3d{}},
+               notePlaceHolder}});
     }
   }
 }
@@ -83,8 +85,7 @@ std::optional<units::meter_t> Camera::GetDistanceToNote() {
       if (target.GetFiducialId() == -1) {
         double width = 0;
         double yaw = 0;
-        std::vector<photon::TargetCorner> corners =
-            target.GetDetectedCorners();
+        std::vector<photon::TargetCorner> corners = target.GetDetectedCorners();
         double minX = corners[0].x;
         double maxX = corners[0].x;
 
@@ -96,7 +97,7 @@ std::optional<units::meter_t> Camera::GetDistanceToNote() {
         width = maxX - minX;
         yaw = target.GetYaw();
 
-        if(target.GetArea() > max_area) {
+        if (target.GetArea() > max_area) {
           max_area = target.GetArea();
           max_width = width;
           best_yaw = yaw;
@@ -107,7 +108,10 @@ std::optional<units::meter_t> Camera::GetDistanceToNote() {
   if (max_width != 0) {
     angleToNote = std::make_optional(units::degree_t{best_yaw});
     fmt::print("max width: {}\n", max_width);
-    units::meter_t dist = 14_in / units::math::tan(units::radian_t{max_width / (cameraProps->GetResWidth() / cameraProps->GetHorizFOV().Radians())});
+    units::meter_t dist =
+        14_in / units::math::tan(units::radian_t{
+                    max_width / (cameraProps->GetResWidth() /
+                                 cameraProps->GetHorizFOV().Radians())});
     return dist;
   } else {
     fmt::print("not found!\n");
@@ -115,9 +119,7 @@ std::optional<units::meter_t> Camera::GetDistanceToNote() {
   }
 }
 
-std::optional<units::radian_t> Camera::GetAngleToNote() {
-  return angleToNote;
-}
+std::optional<units::radian_t> Camera::GetAngleToNote() { return angleToNote; }
 
 photon::PhotonPipelineResult Camera::GetLatestResult() { return latestResult; }
 

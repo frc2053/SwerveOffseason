@@ -7,6 +7,8 @@
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/button/CommandXboxController.h>
 
+#include <functional>
+
 #include "Autos.h"
 #include "str/NoteVisualizer.h"
 #include "str/Vision.h"
@@ -25,7 +27,7 @@ public:
   ShooterSubsystem &GetShooterSubsystem();
   IntakeSubsystem &GetIntakeSubsystem();
   FeederSubsystem &GetFeederSubsystem();
-  //str::Vision &GetVision();
+  // str::Vision &GetVision();
   str::NoteVisualizer &GetNoteVisualizer();
 
 private:
@@ -34,13 +36,14 @@ private:
   frc2::CommandXboxController operatorController{1};
 
   frc2::CommandPtr RumbleDriver(std::function<units::second_t()> timeToRumble);
-  frc2::CommandPtr RumbleOperator(std::function<units::second_t()> timeToRumble);
+  frc2::CommandPtr
+  RumbleOperator(std::function<units::second_t()> timeToRumble);
 
   SwerveSubsystem swerveSubsystem;
   ShooterSubsystem shooterSubsystem;
   IntakeSubsystem intakeSubsystem;
   FeederSubsystem feederSubsystem;
-  //str::Vision vision;
+  // str::Vision vision;
   str::NoteVisualizer noteVisualizer;
 
   // Autos autos{swerveSubsystem, shooterSubsystem, intakeSubsystem,

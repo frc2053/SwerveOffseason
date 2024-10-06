@@ -3,18 +3,18 @@
 // the MIT License file in the root of this project
 
 #include "subsystems/SwerveSubsystem.h"
-#include "constants/VisionConstants.h"
 
 #include <choreo/lib/Choreo.h>
+#include <frc/DataLogManager.h>
 #include <frc/Filesystem.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/Commands.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <str/ChoreoSwerveCommandWithForce.h>
 #include <str/DriverstationUtils.h>
-#include <frc/DataLogManager.h>
 
 #include "constants/Constants.h"
+#include "constants/VisionConstants.h"
 
 SwerveSubsystem::SwerveSubsystem()
     : choreoController(choreolib::Choreo::ChoreoSwerveController(
@@ -29,8 +29,8 @@ SwerveSubsystem::SwerveSubsystem()
                              consts::swerve::pathplanning::ROTATION_D})) {
   SetName("SwerveSubsystem");
   frc::SmartDashboard::PutData(this);
-  //SetupPathplanner();
-  //LoadChoreoTrajectories();
+  // SetupPathplanner();
+  // LoadChoreoTrajectories();
 }
 
 void SwerveSubsystem::UpdateSwerveOdom() { swerveDrive.UpdateSwerveOdom(); }
@@ -149,9 +149,10 @@ void SwerveSubsystem::LoadChoreoTrajectories() {
   for (const auto &entry : std::filesystem::directory_iterator(
            frc::filesystem::GetDeployDirectory() + "/choreo/")) {
     std::string fileName = entry.path().stem().string();
-    if(fileName != "choreo") {
+    if (fileName != "choreo") {
       pathMap[fileName] = choreolib::Choreo::GetTrajectory(fileName);
-      frc::DataLogManager::Log(fmt::format("Loaded choreo trajectory: {}\n", fileName));
+      frc::DataLogManager::Log(
+          fmt::format("Loaded choreo trajectory: {}\n", fileName));
     }
   }
 }
@@ -177,7 +178,11 @@ bool SwerveSubsystem::IsNearAmp() {
          consts::yearSpecific::closeToAmpDistance;
 }
 
-frc2::CommandPtr SwerveSubsystem::NoteAssist(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radians_per_second_t()> rotOverride, std::function<frc::Pose2d()> notePose) {
+frc2::CommandPtr SwerveSubsystem::NoteAssist(
+    std::function<units::meters_per_second_t()> xVel,
+    std::function<units::meters_per_second_t()> yVel,
+    std::function<units::radians_per_second_t()> rotOverride,
+    std::function<frc::Pose2d()> notePose) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce(
                  [this, notePose] {
@@ -200,15 +205,17 @@ frc2::CommandPtr SwerveSubsystem::NoteAssist(std::function<units::meters_per_sec
                  [this, notePose, xVel, yVel, rotOverride] {
                    frc::Pose2d currentPose = GetRobotPose();
 
-                   frc::Translation2d diff = currentPose.Translation() - notePose().Translation();
-                   thetaController.SetGoal(units::math::atan2(diff.Y(), diff.X()));
+                   frc::Translation2d diff =
+                       currentPose.Translation() - notePose().Translation();
+                   thetaController.SetGoal(
+                       units::math::atan2(diff.Y(), diff.X()));
 
                    units::radians_per_second_t thetaSpeed{
                        thetaController.Calculate(
                            currentPose.Rotation().Radians())};
 
-                   if(rotOverride() != 0_rad_per_s) {
-                    thetaSpeed = rotOverride();
+                   if (rotOverride() != 0_rad_per_s) {
+                     thetaSpeed = rotOverride();
                    }
 
                    swerveDrive.Drive(xVel(), yVel(), thetaSpeed, true);
@@ -218,26 +225,29 @@ frc2::CommandPtr SwerveSubsystem::NoteAssist(std::function<units::meters_per_sec
       .WithName("NoteAssist");
 }
 
-void SwerveSubsystem::CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote, std::optional<units::radian_t> angleToNote) {
+void SwerveSubsystem::CalculateFoundNotePose(
+    std::optional<units::meter_t> distanceToNote,
+    std::optional<units::radian_t> angleToNote) {
   frc::Pose3d robotPose = frc::Pose3d{GetRobotPose()};
-  if(!angleToNote.has_value() || !distanceToNote.has_value()) {
+  if (!angleToNote.has_value() || !distanceToNote.has_value()) {
     latestNotePose = robotPose.ToPose2d();
-  }
-  else {
+  } else {
     units::radian_t yaw = angleToNote.value_or(0_deg);
     noteDistPub.Set(distanceToNote.value().value());
     noteYawPub.Set(yaw.convert<units::degrees>().value());
-    frc::Transform3d camToNote{distanceToNote.value() * units::math::cos(-yaw), distanceToNote.value() * units::math::sin(-yaw), 0_m, frc::Rotation3d{0_rad, 0_rad, 0_rad}};
-    frc::Pose3d notePose = robotPose.TransformBy(consts::vision::ROBOT_TO_NOTE_CAM).TransformBy(camToNote);
-    foundNotePose.Set(frc::Pose3d{notePose.X(), notePose.Y(), 0_m, frc::Rotation3d{}});
+    frc::Transform3d camToNote{distanceToNote.value() * units::math::cos(-yaw),
+                               distanceToNote.value() * units::math::sin(-yaw),
+                               0_m, frc::Rotation3d{0_rad, 0_rad, 0_rad}};
+    frc::Pose3d notePose =
+        robotPose.TransformBy(consts::vision::ROBOT_TO_NOTE_CAM)
+            .TransformBy(camToNote);
+    foundNotePose.Set(
+        frc::Pose3d{notePose.X(), notePose.Y(), 0_m, frc::Rotation3d{}});
     latestNotePose = frc::Pose2d{notePose.X(), notePose.Y(), frc::Rotation2d{}};
   }
 }
 
-frc::Pose2d SwerveSubsystem::GetFoundNotePose() const {
-
-  return latestNotePose;
-}
+frc::Pose2d SwerveSubsystem::GetFoundNotePose() const { return latestNotePose; }
 
 frc2::CommandPtr
 SwerveSubsystem::Drive(std::function<units::meters_per_second_t()> xVel,
@@ -321,8 +331,9 @@ SwerveSubsystem::PIDToPose(std::function<frc::Pose2d()> goalPose) {
 frc2::CommandPtr SwerveSubsystem::AlignToAmp() {
   // If we are close enough to the amp, just pid there
   return PIDToPose([this] {
-        return frc::Pose2d{GetAmpLocation(), frc::Rotation2d{90_deg}};
-  }).WithName("AlignToAmp");
+           return frc::Pose2d{GetAmpLocation(), frc::Rotation2d{90_deg}};
+         })
+      .WithName("AlignToAmp");
 }
 
 frc2::CommandPtr
@@ -484,10 +495,11 @@ frc2::CommandPtr SwerveSubsystem::WheelRadius(frc2::sysid::Direction dir) {
                  },
                  [this] {
                    swerveDrive.Drive(0_mps, 0_mps, 0_rad_per_s, true);
-                   frc::DataLogManager::Log(fmt::format("WHEEL RADIUS: {}\n\n\n\n\n",
-                              wheelRadData.effectiveWheelRadius
-                                  .convert<units::inches>()
-                                  .value()));
+                   frc::DataLogManager::Log(
+                       fmt::format("WHEEL RADIUS: {}\n\n\n\n\n",
+                                   wheelRadData.effectiveWheelRadius
+                                       .convert<units::inches>()
+                                       .value()));
                  },
                  {this}))
       .WithName("Wheel Radius Calculation");
@@ -500,40 +512,58 @@ frc2::CommandPtr SwerveSubsystem::TuneSteerPID(std::function<bool()> isDone) {
           [tablePrefix, this] {
             frc::SmartDashboard::PutNumber(tablePrefix + "setpoint", 0);
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "mmCruiseVel", consts::swerve::gains::MK4I_STEER_CRUISE_VEL.value());
+                tablePrefix + "mmCruiseVel",
+                consts::swerve::gains::MK4I_STEER_CRUISE_VEL.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "mmKA", consts::swerve::gains::MK4I_STEER_MOTION_MAGIC_KA.value());
+                tablePrefix + "mmKA",
+                consts::swerve::gains::MK4I_STEER_MOTION_MAGIC_KA.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "mmKV", consts::swerve::gains::MK4I_STEER_MOTION_MAGIC_KV.value());
+                tablePrefix + "mmKV",
+                consts::swerve::gains::MK4I_STEER_MOTION_MAGIC_KV.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kA", consts::swerve::gains::MK4I_STEER_KA.value());
+                tablePrefix + "kA",
+                consts::swerve::gains::MK4I_STEER_KA.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kV", consts::swerve::gains::MK4I_STEER_KV.value());
+                tablePrefix + "kV",
+                consts::swerve::gains::MK4I_STEER_KV.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kS", consts::swerve::gains::MK4I_STEER_KS.value());
+                tablePrefix + "kS",
+                consts::swerve::gains::MK4I_STEER_KS.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kP", consts::swerve::gains::MK4I_STEER_KP.value());
+                tablePrefix + "kP",
+                consts::swerve::gains::MK4I_STEER_KP.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kI", consts::swerve::gains::MK4I_STEER_KI.value());
+                tablePrefix + "kI",
+                consts::swerve::gains::MK4I_STEER_KI.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kD", consts::swerve::gains::MK4I_STEER_KD.value());
+                tablePrefix + "kD",
+                consts::swerve::gains::MK4I_STEER_KD.value());
             frc::SwerveModuleState zeroState{0_mps, frc::Rotation2d{0_rad}};
-            swerveDrive.SetModuleStates({zeroState,zeroState,zeroState,zeroState});
+            swerveDrive.SetModuleStates(
+                {zeroState, zeroState, zeroState, zeroState});
           },
           {this}),
       frc2::cmd::Run(
           [this, tablePrefix] {
             str::SwerveModuleSteerGains newGains{
-                units::turns_per_second_t{frc::SmartDashboard::GetNumber(tablePrefix + "mmCruiseVel", 0)},
-                str::gains::radial::turn_volt_ka_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "mmKA", 0)},
-                str::gains::radial::turn_volt_kv_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "mmKV", 0)},
-                str::gains::radial::turn_amp_ka_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
-                str::gains::radial::turn_amp_kv_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kV", 0)},
-                units::ampere_t{frc::SmartDashboard::GetNumber(tablePrefix + "kS", 0)},
-                str::gains::radial::turn_amp_kp_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0)},
-                str::gains::radial::turn_amp_ki_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0)},
-                str::gains::radial::turn_amp_kd_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0)}
-            };
+                units::turns_per_second_t{frc::SmartDashboard::GetNumber(
+                    tablePrefix + "mmCruiseVel", 0)},
+                str::gains::radial::turn_volt_ka_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "mmKA", 0)},
+                str::gains::radial::turn_volt_kv_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "mmKV", 0)},
+                str::gains::radial::turn_amp_ka_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
+                str::gains::radial::turn_amp_kv_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kV", 0)},
+                units::ampere_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kS", 0)},
+                str::gains::radial::turn_amp_kp_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0)},
+                str::gains::radial::turn_amp_ki_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0)},
+                str::gains::radial::turn_amp_kd_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0)}};
 
             if (newGains != swerveDrive.GetSteerGains()) {
               for (int i = 0; i < 4; i++) {
@@ -542,7 +572,10 @@ frc2::CommandPtr SwerveSubsystem::TuneSteerPID(std::function<bool()> isDone) {
             }
 
             for (int i = 0; i < 4; i++) {
-              frc::SwerveModuleState state{0_mps, frc::Rotation2d{units::degree_t{frc::SmartDashboard::GetNumber(tablePrefix + "setpoint", 0)}}};
+              frc::SwerveModuleState state{
+                  0_mps, frc::Rotation2d{
+                             units::degree_t{frc::SmartDashboard::GetNumber(
+                                 tablePrefix + "setpoint", 0)}}};
               swerveDrive.SetModuleStates({state, state, state, state});
             }
           },
@@ -569,19 +602,25 @@ frc2::CommandPtr SwerveSubsystem::TuneDrivePID(std::function<bool()> isDone) {
             frc::SmartDashboard::PutNumber(
                 tablePrefix + "kD", consts::swerve::gains::DRIVE_KD.value());
             frc::SwerveModuleState zeroState{0_mps, frc::Rotation2d{0_rad}};
-            swerveDrive.SetModuleStates({zeroState,zeroState,zeroState,zeroState});
+            swerveDrive.SetModuleStates(
+                {zeroState, zeroState, zeroState, zeroState});
           },
           {this}),
       frc2::cmd::Run(
           [this, tablePrefix] {
             str::SwerveModuleDriveGains newGains{
-                str::gains::radial::turn_amp_ka_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
-                str::gains::radial::turn_amp_kv_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kV", 0)},
-                units::ampere_t{frc::SmartDashboard::GetNumber(tablePrefix + "kS", 0)},
-                str::gains::radial::turn_amp_kp_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0)},
-                str::gains::radial::turn_amp_ki_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0)},
-                str::gains::radial::turn_amp_kd_unit_t{frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0)}
-            };
+                str::gains::radial::turn_amp_ka_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
+                str::gains::radial::turn_amp_kv_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kV", 0)},
+                units::ampere_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kS", 0)},
+                str::gains::radial::turn_amp_kp_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0)},
+                str::gains::radial::turn_amp_ki_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0)},
+                str::gains::radial::turn_amp_kd_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0)}};
 
             if (newGains != swerveDrive.GetDriveGains()) {
               for (int i = 0; i < 4; i++) {
@@ -590,7 +629,10 @@ frc2::CommandPtr SwerveSubsystem::TuneDrivePID(std::function<bool()> isDone) {
             }
 
             for (int i = 0; i < 4; i++) {
-              frc::SwerveModuleState state{units::feet_per_second_t{frc::SmartDashboard::GetNumber(tablePrefix + "setpoint", 0)}, frc::Rotation2d{0_deg}};
+              frc::SwerveModuleState state{
+                  units::feet_per_second_t{frc::SmartDashboard::GetNumber(
+                      tablePrefix + "setpoint", 0)},
+                  frc::Rotation2d{0_deg}};
               swerveDrive.SetModuleStates({state, state, state, state});
             }
           },

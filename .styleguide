@@ -28,4 +28,11 @@ modifiableFileExclude {
    ctre_sim/
    .pathplanner/
    choreoproj.chor
+   src/main/cpp/choreo/
+   src/main/cpp/pathplanner/
+   src/main/cpp/photon/
+   src/main/include/choreo/
+   src/main/include/pathplanner/
+   src/main/include/photon/
+   src/main/include/PhotonVersion.h
 }

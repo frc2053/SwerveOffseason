@@ -34,8 +34,9 @@ inline constexpr frc::DCMotor SHOOTER_MOTOR = frc::DCMotor::Falcon500(1);
 
 inline constexpr units::meter_t WHEEL_RADIUS = 2_in;
 
-//From onshape doc
-inline constexpr units::kilogram_square_meter_t FLYWHEEL_MOI = 5.01 * 1_in * 1_in * 1_lb;
+// From onshape doc
+inline constexpr units::kilogram_square_meter_t FLYWHEEL_MOI =
+    5.01 * 1_in * 1_in * 1_lb;
 } // namespace physical
 
 namespace gains {
@@ -49,8 +50,8 @@ inline constexpr str::gains::radial::turn_volt_kd_unit_t SHOOTER_KD{0};
 } // namespace gains
 
 struct ShooterSpeeds {
-    units::turns_per_second_t topSpeed;
-    units::turns_per_second_t bottomSpeed;
+  units::turns_per_second_t topSpeed;
+  units::turns_per_second_t bottomSpeed;
 };
 
 inline constexpr ShooterSpeeds AMP_SPEEDS{3000_rpm, 2000_rpm};
@@ -58,20 +59,16 @@ inline constexpr ShooterSpeeds SUBWOOFER_SPEEDS{5000_rpm, 5000_rpm};
 inline constexpr ShooterSpeeds PASS_SPEEDS{5000_rpm, 5000_rpm};
 
 struct MeterHash {
-  size_t operator()(const units::meter_t& m) const {
+  size_t operator()(const units::meter_t &m) const {
     return std::hash<double>{}(m.value());
   }
 };
 
-inline static wpi::interpolating_map<units::meter_t, units::turns_per_second_t> TOP_SHOOTER_LUT{};
-inline static wpi::interpolating_map<units::meter_t, units::turns_per_second_t> BOTTOM_SHOOTER_LUT{};
+inline static wpi::interpolating_map<units::meter_t, units::turns_per_second_t>
+    TOP_SHOOTER_LUT{};
+inline static wpi::interpolating_map<units::meter_t, units::turns_per_second_t>
+    BOTTOM_SHOOTER_LUT{};
 
-enum class PRESET_SPEEDS {
-    OFF,
-    AMP,
-    SPEAKER_DIST,
-    SUBWOOFER,
-    PASS
-};
+enum class PRESET_SPEEDS { OFF, AMP, SPEAKER_DIST, SUBWOOFER, PASS };
 } // namespace shooter
 } // namespace consts

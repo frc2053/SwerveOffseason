@@ -30,11 +30,15 @@ void RobotContainer::ConfigureBindings() {
       true, true));
 
   driverController.Start().WhileTrue(intakeSubsystem.FakeNote());
-  
+
   driverController.LeftTrigger().OnTrue(IntakeNote());
-  (!driverController.LeftTrigger() && !intakeSubsystem.TouchedNote()).OnTrue(frc2::cmd::Sequence(intakeSubsystem.Stop(), frc2::cmd::Print("Cancelled")));
-  intakeSubsystem.TouchedNote().OnTrue(RumbleDriver([]{ return .1_s; }));
-  feederSubsystem.GotNote().OnTrue(frc2::cmd::Parallel(intakeSubsystem.Stop(), feederSubsystem.Stop(), RumbleDriver([] { return .5_s; }), RumbleOperator([] { return .5_s; })));
+  (!driverController.LeftTrigger() && !intakeSubsystem.TouchedNote())
+      .OnTrue(frc2::cmd::Sequence(intakeSubsystem.Stop(),
+                                  frc2::cmd::Print("Cancelled")));
+  intakeSubsystem.TouchedNote().OnTrue(RumbleDriver([] { return .1_s; }));
+  feederSubsystem.GotNote().OnTrue(frc2::cmd::Parallel(
+      intakeSubsystem.Stop(), feederSubsystem.Stop(),
+      RumbleDriver([] { return .5_s; }), RumbleOperator([] { return .5_s; })));
 
   driverController.A().WhileTrue(swerveSubsystem.AlignToAmp());
 
@@ -68,7 +72,8 @@ void RobotContainer::ConfigureBindings() {
   operatorController.B().OnFalse(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::SUBWOOFER; }));
 
-  operatorController.Back().WhileTrue(frc2::cmd::Parallel(intakeSubsystem.PoopNote(), feederSubsystem.Eject()));
+  operatorController.Back().WhileTrue(
+      frc2::cmd::Parallel(intakeSubsystem.PoopNote(), feederSubsystem.Eject()));
 
   // controller.A().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(shooterSubsystem.TopWheelSysIdQuasistatic(frc2::sysid::Direction::kReverse));
@@ -108,17 +113,14 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::CommandPtr RobotContainer::IntakeNote() {
-  return frc2::cmd::Parallel(
-    frc2::cmd::Print("IntakeNote"),
-    intakeSubsystem.IntakeNote(),
-    feederSubsystem.Feed()
-  ).Until([this] {
-    return feederSubsystem.HasNote();
-  });
+  return frc2::cmd::Parallel(frc2::cmd::Print("IntakeNote"),
+                             intakeSubsystem.IntakeNote(),
+                             feederSubsystem.Feed())
+      .Until([this] { return feederSubsystem.HasNote(); });
 }
 
 frc2::Command *RobotContainer::GetAutonomousCommand() {
-  //return autos.GetSelectedCommand();
+  // return autos.GetSelectedCommand();
   return nullptr;
 }
 
@@ -144,7 +146,8 @@ str::NoteVisualizer &RobotContainer::GetNoteVisualizer() {
   return noteVisualizer;
 }
 
-frc2::CommandPtr RobotContainer::RumbleDriver(std::function<units::second_t()> timeToRumble) {
+frc2::CommandPtr
+RobotContainer::RumbleDriver(std::function<units::second_t()> timeToRumble) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([this] {
                driverController.SetRumble(
@@ -160,7 +163,8 @@ frc2::CommandPtr RobotContainer::RumbleDriver(std::function<units::second_t()> t
       });
 }
 
-frc2::CommandPtr RobotContainer::RumbleOperator(std::function<units::second_t()> timeToRumble) {
+frc2::CommandPtr
+RobotContainer::RumbleOperator(std::function<units::second_t()> timeToRumble) {
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce([this] {
                operatorController.SetRumble(

@@ -4,9 +4,10 @@
 
 #include "str/SwerveDrive.h"
 
+#include <frc/DataLogManager.h>
+
 #include "constants/Constants.h"
 #include "str/Math.h"
-#include <frc/DataLogManager.h>
 
 using namespace str;
 
@@ -47,7 +48,8 @@ SwerveDrive::SwerveDrive() {
 
   for (auto &mod : modules) {
     if (!mod.OptimizeBusSignals()) {
-      frc::DataLogManager::Log(fmt::format("Failed to optimize bus signals for {}\n", mod.GetName()));
+      frc::DataLogManager::Log(fmt::format(
+          "Failed to optimize bus signals for {}\n", mod.GetName()));
     }
   }
 
@@ -85,7 +87,8 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel,
     speedsToSend.omega = omega;
   }
 
-  speedsToSend = frc::ChassisSpeeds::Discretize(speedsToSend, consts::LOOP_PERIOD);
+  speedsToSend =
+      frc::ChassisSpeeds::Discretize(speedsToSend, consts::LOOP_PERIOD);
 
   SetModuleStates(
       consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend),
@@ -159,8 +162,8 @@ void SwerveDrive::UpdateSwerveOdom() {
           2.0 / (1 / consts::SWERVE_ODOM_LOOP_PERIOD), allSignals);
 
   // if(!status.IsOK()) {
-  //   frc::DataLogManager::Log(fmt::format("Error updating swerve odom! Error was: {}\n",
-  //   status.GetName()));
+  //   frc::DataLogManager::Log(fmt::format("Error updating swerve odom! Error
+  //   was: {}\n", status.GetName()));
   // }
 
   int i = 0;
@@ -177,7 +180,7 @@ void SwerveDrive::UpdateSwerveOdom() {
   odom.Update(frc::Rotation2d{yawLatencyComped}, modulePositions);
 
   units::second_t now = frc::Timer::GetFPGATimestamp();
-  odomUpdateRate =  1.0 / (now - lastOdomUpdateTime);
+  odomUpdateRate = 1.0 / (now - lastOdomUpdateTime);
   lastOdomUpdateTime = now;
 }
 
@@ -349,7 +352,7 @@ str::SwerveModuleSteerGains SwerveDrive::GetSteerGains() const {
 }
 
 void SwerveDrive::SetSteerGains(str::SwerveModuleSteerGains newGains) {
-  for(int i = 0; i < 4; i++) {
+  for (int i = 0; i < 4; i++) {
     modules[i].SetSteerGains(newGains);
   }
 }
@@ -359,7 +362,7 @@ str::SwerveModuleDriveGains SwerveDrive::GetDriveGains() const {
 }
 
 void SwerveDrive::SetDriveGains(str::SwerveModuleDriveGains newGains) {
-  for(int i = 0; i < 4; i++) {
+  for (int i = 0; i < 4; i++) {
     modules[i].SetDriveGains(newGains);
   }
 }

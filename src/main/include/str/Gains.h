@@ -37,8 +37,7 @@ using turn_volt_ki_unit = units::compound_unit<
 using turn_volt_ki_unit_t = units::unit_t<turn_volt_ki_unit>;
 
 using turn_volt_kd_unit =
-    units::compound_unit<units::volts,
-                         units::inverse<units::turns_per_second>>;
+    units::compound_unit<units::volts, units::inverse<units::turns_per_second>>;
 using turn_volt_kd_unit_t = units::unit_t<turn_volt_kd_unit>;
 
 using turn_amp_ka_unit =
