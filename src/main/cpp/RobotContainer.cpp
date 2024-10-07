@@ -5,6 +5,7 @@
 #include "RobotContainer.h"
 
 #include <frc/MathUtil.h>
+#include <frc/RobotBase.h>
 #include <frc2/command/Commands.h>
 #include <str/DriverstationUtils.h>
 
@@ -31,7 +32,10 @@ void RobotContainer::ConfigureBindings() {
       },
       true, true));
 
-  driverController.Start().WhileTrue(intakeSubsystem.FakeNote());
+  // FAKE NOTE INTAKE
+  if(frc::RobotBase::IsSimulation()) {
+    driverController.Start().WhileTrue(intakeSubsystem.FakeNote());
+  }
 
   driverController.LeftTrigger().OnTrue(IntakeNote());
   (!driverController.LeftTrigger() && !intakeSubsystem.TouchedNote())
