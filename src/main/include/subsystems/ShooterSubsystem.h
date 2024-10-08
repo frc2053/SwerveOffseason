@@ -46,10 +46,12 @@ class ShooterSubsystem : public frc2::SubsystemBase {
       frc2::sysid::Direction direction);
   frc2::CommandPtr BottomWheelSysIdDynamic(frc2::sysid::Direction direction);
 
-  const frc2::Trigger& UpToSpeed() const { return upToSpeedTrigger; }
+  frc2::Trigger UpToSpeed() const { return upToSpeedTrigger; }
 
  private:
   void UpdateNTEntries();
+
+  bool neutralState{true};
 
   bool IsUpToSpeed() {
     return (units::math::abs(topWheelVelocitySetpoint -
@@ -57,7 +59,7 @@ class ShooterSubsystem : public frc2::SubsystemBase {
             consts::shooter::gains::VEL_TOLERANCE) &&
            (units::math::abs(bottomWheelVelocitySetpoint -
                              currentBottomWheelVelocity) <
-            consts::shooter::gains::VEL_TOLERANCE);
+            consts::shooter::gains::VEL_TOLERANCE) && !neutralState;
   }
   frc2::Trigger upToSpeedTrigger{[this] { return IsUpToSpeed(); }};
 

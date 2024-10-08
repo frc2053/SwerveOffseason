@@ -41,6 +41,9 @@ void RobotContainer::ConfigureBindings() {
   (!driverController.LeftTrigger() && !intakeSubsystem.TouchedNote())
       .OnTrue(frc2::cmd::Sequence(intakeSubsystem.Stop(),
                                   frc2::cmd::Print("Cancelled")));
+
+  (shooterSubsystem.UpToSpeed() && driverController.RightTrigger()).OnTrue(feederSubsystem.Feed()).OnFalse(feederSubsystem.Stop());
+  
   intakeSubsystem.TouchedNote().OnTrue(RumbleDriver([] { return .1_s; }));
   feederSubsystem.GotNote().OnTrue(frc2::cmd::Parallel(
       intakeSubsystem.Stop(), feederSubsystem.Stop(),

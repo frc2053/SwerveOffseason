@@ -39,32 +39,38 @@ frc2::CommandPtr ShooterSubsystem::RunShooter(
                        consts::shooter::AMP_SPEEDS.topSpeed;
                    bottomWheelVelocitySetpoint =
                        consts::shooter::AMP_SPEEDS.bottomSpeed;
+                   neutralState = false;
                    break;
                  case consts::shooter::PRESET_SPEEDS::SUBWOOFER:
                    topWheelVelocitySetpoint =
                        consts::shooter::SUBWOOFER_SPEEDS.topSpeed;
                    bottomWheelVelocitySetpoint =
                        consts::shooter::SUBWOOFER_SPEEDS.bottomSpeed;
+                   neutralState = false;
                    break;
                  case consts::shooter::PRESET_SPEEDS::PASS:
                    topWheelVelocitySetpoint =
                        consts::shooter::PASS_SPEEDS.topSpeed;
                    bottomWheelVelocitySetpoint =
                        consts::shooter::PASS_SPEEDS.bottomSpeed;
+                   neutralState = false;
                    break;
                  case consts::shooter::PRESET_SPEEDS::SPEAKER_DIST:
                    topWheelVelocitySetpoint =
                        consts::shooter::TOP_SHOOTER_LUT[distance()];
                    bottomWheelVelocitySetpoint =
                        consts::shooter::BOTTOM_SHOOTER_LUT[distance()];
+                   neutralState = false;
                    break;
                  case consts::shooter::PRESET_SPEEDS::OFF:
                    topWheelVelocitySetpoint = 0_rpm;
                    bottomWheelVelocitySetpoint = 0_rpm;
+                   neutralState = true;
                    break;
                  default:
                    topWheelVelocitySetpoint = 0_rpm;
                    bottomWheelVelocitySetpoint = 0_rpm;
+                   neutralState = true;
                    break;
                }
              },
