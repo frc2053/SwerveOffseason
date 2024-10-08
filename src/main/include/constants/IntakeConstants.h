@@ -26,7 +26,7 @@ inline constexpr units::ampere_t STATOR_CURRENT_LIMIT = 180_A;
 
 namespace physical {
 
-inline constexpr bool INVERT_MOTOR = false;
+inline constexpr bool INVERT_MOTOR = true;
 
 inline constexpr units::scalar_t INTAKE_RATIO = (24.0 / 16.0);
 
@@ -41,8 +41,8 @@ inline constexpr units::kilogram_square_meter_t INTAKE_MOI =
 
 namespace gains {
 inline constexpr units::ampere_t NOTE_SPIKE_THRESHOLD = 100_A;
-inline constexpr units::volt_t NOTE_INTAKE_VOLTAGE = 10_V;
-inline constexpr units::volt_t NOTE_EJECT_VOLTAGE = -10_V;
+inline constexpr units::volt_t NOTE_INTAKE_VOLTAGE = 5.2053_V;
+inline constexpr units::volt_t NOTE_EJECT_VOLTAGE = -5.2053_V;
 }  // namespace gains
 }  // namespace intake
 }  // namespace consts

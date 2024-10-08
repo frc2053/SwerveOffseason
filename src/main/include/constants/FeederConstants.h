@@ -20,7 +20,7 @@ inline constexpr int FEEDER = 18;
 }  // namespace can_ids
 
 namespace ports {
-inline constexpr int NOTE_SENSOR_PORT = 2;
+inline constexpr int NOTE_SENSOR_PORT = 9;
 }  // namespace ports
 
 namespace current_limits {
@@ -30,7 +30,7 @@ inline constexpr units::ampere_t STATOR_CURRENT_LIMIT = 180_A;
 
 namespace physical {
 
-inline constexpr bool INVERT_MOTOR = false;
+inline constexpr bool INVERT_MOTOR = true;
 
 inline constexpr units::scalar_t FEEDER_RATIO = (60.0 / 16.0);
 
@@ -46,7 +46,7 @@ inline constexpr units::kilogram_square_meter_t FEEDER_MOI =
 namespace gains {
 inline constexpr units::volt_t NOTE_FEED_VOLTAGE = 10_V;
 inline constexpr units::volt_t NOTE_EJECT_VOLTAGE = -10_V;
-inline constexpr units::second_t NOTE_SENSOR_DEBOUNCE_TIME = 0.1_s;
+inline constexpr units::second_t NOTE_SENSOR_DEBOUNCE_TIME = 0_s;
 }  // namespace gains
 }  // namespace feeder
 }  // namespace consts
