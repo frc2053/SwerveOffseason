@@ -40,7 +40,7 @@ inline constexpr units::kilogram_square_meter_t FLYWHEEL_MOI =
 }  // namespace physical
 
 namespace gains {
-inline constexpr units::turns_per_second_t VEL_TOLERANCE = 200_rpm;
+inline constexpr units::turns_per_second_t VEL_TOLERANCE = 60_rpm;
 inline constexpr str::gains::radial::turn_volt_ka_unit_t SHOOTER_KA{0.026523};
 inline constexpr str::gains::radial::turn_volt_kv_unit_t SHOOTER_KV{0.11807};
 inline constexpr units::volt_t SHOOTER_KS{0.069075};
