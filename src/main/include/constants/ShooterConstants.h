@@ -40,11 +40,11 @@ inline constexpr units::kilogram_square_meter_t FLYWHEEL_MOI =
 }  // namespace physical
 
 namespace gains {
-inline constexpr units::turns_per_second_t VEL_TOLERANCE = 10_rpm;
-inline constexpr str::gains::radial::turn_volt_ka_unit_t SHOOTER_KA{0.021356};
-inline constexpr str::gains::radial::turn_volt_kv_unit_t SHOOTER_KV{0.11227};
-inline constexpr units::volt_t SHOOTER_KS{0.02364};
-inline constexpr str::gains::radial::turn_volt_kp_unit_t SHOOTER_KP{0.047275};
+inline constexpr units::turns_per_second_t VEL_TOLERANCE = 200_rpm;
+inline constexpr str::gains::radial::turn_volt_ka_unit_t SHOOTER_KA{0.026523};
+inline constexpr str::gains::radial::turn_volt_kv_unit_t SHOOTER_KV{0.11807};
+inline constexpr units::volt_t SHOOTER_KS{0.069075};
+inline constexpr str::gains::radial::turn_volt_kp_unit_t SHOOTER_KP{0.16309};
 inline constexpr str::gains::radial::turn_volt_ki_unit_t SHOOTER_KI{0};
 inline constexpr str::gains::radial::turn_volt_kd_unit_t SHOOTER_KD{0};
 }  // namespace gains
@@ -54,7 +54,7 @@ struct ShooterSpeeds {
   units::turns_per_second_t bottomSpeed;
 };
 
-inline constexpr ShooterSpeeds AMP_SPEEDS{3000_rpm, 2000_rpm};
+inline constexpr ShooterSpeeds AMP_SPEEDS{800_rpm, 2000_rpm};
 inline constexpr ShooterSpeeds SUBWOOFER_SPEEDS{5000_rpm, 5000_rpm};
 inline constexpr ShooterSpeeds PASS_SPEEDS{5000_rpm, 5000_rpm};
 
