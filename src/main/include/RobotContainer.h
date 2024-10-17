@@ -46,6 +46,6 @@ class RobotContainer {
   // str::Vision vision;
   str::NoteVisualizer noteVisualizer;
 
-  // Autos autos{swerveSubsystem, shooterSubsystem, intakeSubsystem,
-  //             feederSubsystem};
+  Autos autos{swerveSubsystem, shooterSubsystem, intakeSubsystem,
+              feederSubsystem};
 };

@@ -10,6 +10,9 @@
 #include <frc2/command/SubsystemBase.h>
 #include <networktables/StructArrayTopic.h>
 #include <str/SwerveDrive.h>
+#include <frc/trajectory/TrapezoidProfile.h>
+#include <frc/controller/ProfiledPIDController.h>
+#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
 
 #include <functional>
 #include <memory>
@@ -80,6 +83,8 @@ class SwerveSubsystem : public frc2::SubsystemBase {
 
   units::meter_t cachedNoteDist;
   frc::Pose2d latestNotePose;
+
+  std::shared_ptr<pathplanner::PPHolonomicDriveController> ppControllers;
 
   nt::StructPublisher<frc::Pose3d> foundNotePose{
       nt::NetworkTableInstance::GetDefault()

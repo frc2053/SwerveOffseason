@@ -1,16 +1,13 @@
 #include "pathplanner/lib/auto/AutoBuilder.h"
-#include "pathplanner/lib/commands/FollowPathHolonomic.h"
-#include "pathplanner/lib/commands/FollowPathLTV.h"
-#include "pathplanner/lib/commands/PathfindHolonomic.h"
-#include "pathplanner/lib/commands/PathfindThenFollowPathHolonomic.h"
-#include "pathplanner/lib/commands/PathfindLTV.h"
-#include "pathplanner/lib/commands/PathfindThenFollowPathLTV.h"
-#include "pathplanner/lib/commands/PathPlannerAuto.h"
+#include "pathplanner/lib/commands/FollowPathCommand.h"
+#include "pathplanner/lib/commands/PathfindingCommand.h"
+#include "pathplanner/lib/commands/PathfindThenFollowPath.h"
 #include "pathplanner/lib/auto/CommandUtil.h"
+#include "pathplanner/lib/util/FlippingUtil.h"
+#include "pathplanner/lib/commands/PathPlannerAuto.h"
 #include <stdexcept>
 #include <frc2/command/Commands.h>
 #include <frc/Filesystem.h>
-#include <filesystem>
 #include <optional>
 #include <wpi/MemoryBuffer.h>
 
@@ -18,158 +15,71 @@ using namespace pathplanner;
 
 bool AutoBuilder::m_configured = false;
 std::function<frc2::CommandPtr(std::shared_ptr<PathPlannerPath>)> AutoBuilder::m_pathFollowingCommandBuilder;
-std::function<frc::Pose2d()> AutoBuilder::m_getPose;
+std::function<frc::Pose2d()> AutoBuilder::m_poseSupplier;
 std::function<void(frc::Pose2d)> AutoBuilder::m_resetPose;
 std::function<bool()> AutoBuilder::m_shouldFlipPath;
+bool AutoBuilder::m_isHolonomic = false;
 
-std::vector<frc2::CommandPtr> AutoBuilder::m_autoCommands;
+bool AutoBuilder::m_commandRefsGeneratedForSendable = false;
+frc2::CommandPtr AutoBuilder::m_noneCommand = frc2::cmd::None();
+std::map<std::filesystem::path, frc2::CommandPtr> AutoBuilder::m_autoCommands;
 
 bool AutoBuilder::m_pathfindingConfigured = false;
 std::function<
 		frc2::CommandPtr(frc::Pose2d, PathConstraints,
-				units::meters_per_second_t, units::meter_t)> AutoBuilder::m_pathfindToPoseCommandBuilder;
+				units::meters_per_second_t)> AutoBuilder::m_pathfindToPoseCommandBuilder;
 std::function<
-		frc2::CommandPtr(std::shared_ptr<PathPlannerPath>, PathConstraints,
-				units::meter_t)> AutoBuilder::m_pathfindThenFollowPathCommandBuilder;
+		frc2::CommandPtr(std::shared_ptr<PathPlannerPath>, PathConstraints)> AutoBuilder::m_pathfindThenFollowPathCommandBuilder;
 
-void AutoBuilder::configureHolonomic(std::function<frc::Pose2d()> poseSupplier,
+void AutoBuilder::configure(std::function<frc::Pose2d()> poseSupplier,
 		std::function<void(frc::Pose2d)> resetPose,
 		std::function<frc::ChassisSpeeds()> robotRelativeSpeedsSupplier,
-		std::function<void(frc::ChassisSpeeds)> robotRelativeOutput,
-		HolonomicPathFollowerConfig config,
-		std::function<bool()> shouldFlipPath, frc2::Subsystem *driveSubsystem) {
-	if (m_configured) {
-		FRC_ReportError(frc::err::Error,
-				"Auto builder has already been configured. This is likely in error.");
-	}
-
-	AutoBuilder::m_pathFollowingCommandBuilder = [poseSupplier,
-			robotRelativeSpeedsSupplier, robotRelativeOutput, config,
-			shouldFlipPath, driveSubsystem](
-			std::shared_ptr<PathPlannerPath> path) {
-		return FollowPathHolonomic(path, poseSupplier,
-				robotRelativeSpeedsSupplier, robotRelativeOutput, config,
-				shouldFlipPath, { driveSubsystem }).ToPtr();
-	};
-	AutoBuilder::m_getPose = poseSupplier;
-	AutoBuilder::m_resetPose = resetPose;
-	AutoBuilder::m_configured = true;
-	AutoBuilder::m_shouldFlipPath = shouldFlipPath;
-
-	AutoBuilder::m_pathfindToPoseCommandBuilder = [poseSupplier,
-			robotRelativeSpeedsSupplier, robotRelativeOutput, config,
-			driveSubsystem](frc::Pose2d pose, PathConstraints constraints,
-			units::meters_per_second_t goalEndVel,
-			units::meter_t rotationDelayDistance) {
-		return PathfindHolonomic(pose, constraints, goalEndVel, poseSupplier,
-				robotRelativeSpeedsSupplier, robotRelativeOutput, config, {
-						driveSubsystem }, rotationDelayDistance).ToPtr();
-	};
-	AutoBuilder::m_pathfindThenFollowPathCommandBuilder =
-			[poseSupplier, robotRelativeSpeedsSupplier, robotRelativeOutput,
-					config, shouldFlipPath, driveSubsystem](
-					std::shared_ptr<PathPlannerPath> path,
-					PathConstraints constraints,
-					units::meter_t rotationDelayDistance) {
-				return PathfindThenFollowPathHolonomic(path, constraints,
-						poseSupplier, robotRelativeSpeedsSupplier,
-						robotRelativeOutput, config, shouldFlipPath, {
-								driveSubsystem }, rotationDelayDistance).ToPtr();
-			};
-	AutoBuilder::m_pathfindingConfigured = true;
-}
-
-void AutoBuilder::configureLTV(std::function<frc::Pose2d()> poseSupplier,
-		std::function<void(frc::Pose2d)> resetPose,
-		std::function<frc::ChassisSpeeds()> speedsSupplier,
-		std::function<void(frc::ChassisSpeeds)> output,
-		const wpi::array<double, 3> &Qelms, const wpi::array<double, 2> &Relms,
-		units::second_t dt, ReplanningConfig replanningConfig,
-		std::function<bool()> shouldFlipPath, frc2::Subsystem *driveSubsystem) {
-	if (m_configured) {
-		FRC_ReportError(frc::err::Error,
-				"Auto builder has already been configured. This is likely in error.");
-	}
-
-	AutoBuilder::m_pathFollowingCommandBuilder =
-			[poseSupplier, speedsSupplier, output, Qelms, Relms, dt,
-					replanningConfig, shouldFlipPath, driveSubsystem](
-					std::shared_ptr<PathPlannerPath> path) {
-				return FollowPathLTV(path, poseSupplier, speedsSupplier, output,
-						Qelms, Relms, dt, replanningConfig, shouldFlipPath, {
-								driveSubsystem }).ToPtr();
-			};
-	AutoBuilder::m_getPose = poseSupplier;
-	AutoBuilder::m_resetPose = resetPose;
-	AutoBuilder::m_configured = true;
-	AutoBuilder::m_shouldFlipPath = shouldFlipPath;
-
-	AutoBuilder::m_pathfindToPoseCommandBuilder = [poseSupplier, speedsSupplier,
-			output, Qelms, Relms, dt, replanningConfig, driveSubsystem](
-			frc::Pose2d pose, PathConstraints constraints,
-			units::meters_per_second_t goalEndVel,
-			units::meter_t rotationDelayDistance) {
-		return PathfindLTV(pose.Translation(), constraints, goalEndVel,
-				poseSupplier, speedsSupplier, output, Qelms, Relms, dt,
-				replanningConfig, { driveSubsystem }).ToPtr();
-	};
-	AutoBuilder::m_pathfindThenFollowPathCommandBuilder = [poseSupplier,
-			speedsSupplier, output, Qelms, Relms, dt, replanningConfig,
-			shouldFlipPath, driveSubsystem](
-			std::shared_ptr<PathPlannerPath> path, PathConstraints constraints,
-			units::meter_t rotationDelayDistance) {
-		return PathfindThenFollowPathLTV(path, constraints, poseSupplier,
-				speedsSupplier, output, Qelms, Relms, dt, replanningConfig,
-				shouldFlipPath, { driveSubsystem }).ToPtr();
-	};
-	AutoBuilder::m_pathfindingConfigured = true;
-}
-
-void AutoBuilder::configureLTV(std::function<frc::Pose2d()> poseSupplier,
-		std::function<void(frc::Pose2d)> resetPose,
-		std::function<frc::ChassisSpeeds()> speedsSupplier,
-		std::function<void(frc::ChassisSpeeds)> output, units::second_t dt,
-		ReplanningConfig replanningConfig, std::function<bool()> shouldFlipPath,
+		std::function<void(frc::ChassisSpeeds, std::vector<DriveFeedforward>)> output,
+		std::shared_ptr<PathFollowingController> controller,
+		RobotConfig robotConfig, std::function<bool()> shouldFlipPath,
 		frc2::Subsystem *driveSubsystem) {
 	if (m_configured) {
 		FRC_ReportError(frc::err::Error,
 				"Auto builder has already been configured. This is likely in error.");
 	}
 
-	AutoBuilder::m_pathFollowingCommandBuilder = [poseSupplier, speedsSupplier,
-			output, dt, replanningConfig, shouldFlipPath, driveSubsystem](
+	AutoBuilder::m_pathFollowingCommandBuilder = [poseSupplier,
+			robotRelativeSpeedsSupplier, output, controller, robotConfig,
+			shouldFlipPath, driveSubsystem](
 			std::shared_ptr<PathPlannerPath> path) {
-		return FollowPathLTV(path, poseSupplier, speedsSupplier, output, dt,
-				replanningConfig, shouldFlipPath, { driveSubsystem }).ToPtr();
+		return FollowPathCommand(path, poseSupplier,
+				robotRelativeSpeedsSupplier, output, controller, robotConfig,
+				shouldFlipPath, { driveSubsystem }).ToPtr();
 	};
-	AutoBuilder::m_getPose = poseSupplier;
+	AutoBuilder::m_poseSupplier = poseSupplier;
 	AutoBuilder::m_resetPose = resetPose;
 	AutoBuilder::m_configured = true;
 	AutoBuilder::m_shouldFlipPath = shouldFlipPath;
+	AutoBuilder::m_isHolonomic = robotConfig.isHolonomic;
 
-	AutoBuilder::m_pathfindToPoseCommandBuilder = [poseSupplier, speedsSupplier,
-			output, dt, replanningConfig, driveSubsystem](frc::Pose2d pose,
-			PathConstraints constraints, units::meters_per_second_t goalEndVel,
-			units::meter_t rotationDelayDistance) {
-		return PathfindLTV(pose.Translation(), constraints, goalEndVel,
-				poseSupplier, speedsSupplier, output, dt, replanningConfig, {
+	AutoBuilder::m_pathfindToPoseCommandBuilder = [poseSupplier,
+			robotRelativeSpeedsSupplier, output, controller, robotConfig,
+			driveSubsystem](frc::Pose2d pose, PathConstraints constraints,
+			units::meters_per_second_t goalEndVel) {
+		return PathfindingCommand(pose, constraints, goalEndVel, poseSupplier,
+				robotRelativeSpeedsSupplier, output, controller, robotConfig, {
 						driveSubsystem }).ToPtr();
 	};
 	AutoBuilder::m_pathfindThenFollowPathCommandBuilder = [poseSupplier,
-			speedsSupplier, output, dt, replanningConfig, shouldFlipPath,
-			driveSubsystem](std::shared_ptr<PathPlannerPath> path,
-			PathConstraints constraints, units::meter_t rotationDelayDistance) {
-		return PathfindThenFollowPathLTV(path, constraints, poseSupplier,
-				speedsSupplier, output, dt, replanningConfig, shouldFlipPath, {
-						driveSubsystem }).ToPtr();
+			robotRelativeSpeedsSupplier, output, controller, robotConfig,
+			shouldFlipPath, driveSubsystem](
+			std::shared_ptr<PathPlannerPath> path,
+			PathConstraints constraints) {
+		return PathfindThenFollowPath(path, constraints, poseSupplier,
+				robotRelativeSpeedsSupplier, output, controller, robotConfig,
+				shouldFlipPath, { driveSubsystem }).ToPtr();
 	};
 	AutoBuilder::m_pathfindingConfigured = true;
 }
 
-void AutoBuilder::configureCustom(
+void AutoBuilder::configureCustom(std::function<frc::Pose2d()> poseSupplier,
 		std::function<frc2::CommandPtr(std::shared_ptr<PathPlannerPath>)> pathFollowingCommandBuilder,
-		std::function<frc::Pose2d()> poseSupplier,
-		std::function<void(frc::Pose2d)> resetPose,
+		std::function<void(frc::Pose2d)> resetPose, bool isHolonomic,
 		std::function<bool()> shouldFlipPose) {
 	if (m_configured) {
 		FRC_ReportError(frc::err::Error,
@@ -177,10 +87,11 @@ void AutoBuilder::configureCustom(
 	}
 
 	AutoBuilder::m_pathFollowingCommandBuilder = pathFollowingCommandBuilder;
-	AutoBuilder::m_getPose = poseSupplier;
+	AutoBuilder::m_poseSupplier = poseSupplier;
 	AutoBuilder::m_resetPose = resetPose;
 	AutoBuilder::m_configured = true;
 	AutoBuilder::m_shouldFlipPath = shouldFlipPose;
+	AutoBuilder::m_isHolonomic = isHolonomic;
 
 	AutoBuilder::m_pathfindingConfigured = false;
 }
@@ -196,107 +107,127 @@ frc2::CommandPtr AutoBuilder::followPath(
 }
 
 frc2::CommandPtr AutoBuilder::buildAuto(std::string autoName) {
-	const std::string filePath = frc::filesystem::GetDeployDirectory()
-			+ "/pathplanner/autos/" + autoName + ".auto";
-
-	wpi::expected<std::unique_ptr<wpi::MemoryBuffer>, std::error_code> fileBuffer =
-			wpi::MemoryBuffer::GetFile(filePath);
-
-	if (!fileBuffer.has_value()) {
-		throw std::runtime_error("Cannot open file: " + filePath);
-	}
-
-	wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
-
-	return getAutoCommandFromJson(json);
+	return PathPlannerAuto(autoName).ToPtr();
 }
 
-frc2::CommandPtr AutoBuilder::getAutoCommandFromJson(const wpi::json &json) {
-	wpi::json::const_reference commandJson = json.at("command");
-	bool choreoAuto = json.contains("choreoAuto")
-			&& json.at("choreoAuto").get<bool>();
-
-	frc2::CommandPtr autoCommand = CommandUtil::commandFromJson(commandJson,
-			choreoAuto);
-	if (!json.at("startingPose").is_null()) {
-		frc::Pose2d startPose = getStartingPoseFromJson(
-				json.at("startingPose"));
-		return frc2::cmd::Sequence(frc2::cmd::RunOnce([startPose]() {
-			if (m_shouldFlipPath()) {
-				m_resetPose(GeometryUtil::flipFieldPose(startPose));
-			} else {
-				m_resetPose(startPose);
-			}
-		}), std::move(autoCommand));
-	} else {
-		return autoCommand;
+frc2::CommandPtr AutoBuilder::resetOdom(frc::Pose2d bluePose) {
+	if (!m_configured) {
+		throw std::runtime_error(
+				"Auto builder was used to build a command before being configured");
 	}
-}
 
-frc::Pose2d AutoBuilder::getStartingPoseFromJson(const wpi::json &json) {
-	wpi::json::const_reference pos = json.at("position");
-	units::meter_t x = units::meter_t { pos.at("x").get<double>() };
-	units::meter_t y = units::meter_t { pos.at("y").get<double>() };
-	units::degree_t deg = units::degree_t { json.at("rotation").get<double>() };
-
-	return frc::Pose2d(x, y, frc::Rotation2d(deg));
+	return frc2::cmd::RunOnce([bluePose]() {
+		if (m_shouldFlipPath()) {
+			m_resetPose(FlippingUtil::flipFieldPose(bluePose));
+		} else {
+			m_resetPose(bluePose);
+		}
+	});
 }
 
 frc2::CommandPtr AutoBuilder::pathfindToPose(frc::Pose2d pose,
-		PathConstraints constraints, units::meters_per_second_t goalEndVel,
-		units::meter_t rotationDelayDistance) {
+		PathConstraints constraints, units::meters_per_second_t goalEndVel) {
 	if (!m_pathfindingConfigured) {
 		throw std::runtime_error(
 				"Auto builder was used to build a pathfinding command before being configured");
 	}
 
-	return m_pathfindToPoseCommandBuilder(pose, constraints, goalEndVel,
-			rotationDelayDistance);
+	return m_pathfindToPoseCommandBuilder(pose, constraints, goalEndVel);
 }
 
 frc2::CommandPtr AutoBuilder::pathfindThenFollowPath(
 		std::shared_ptr<PathPlannerPath> goalPath,
-		PathConstraints pathfindingConstraints,
-		units::meter_t rotationDelayDistance) {
+		PathConstraints pathfindingConstraints) {
 	if (!m_pathfindingConfigured) {
 		throw std::runtime_error(
 				"Auto builder was used to build a pathfinding command before being configured");
 	}
 
 	return m_pathfindThenFollowPathCommandBuilder(goalPath,
-			pathfindingConstraints, rotationDelayDistance);
+			pathfindingConstraints);
+}
+
+void AutoBuilder::regenerateSendableReferences() {
+	std::vector < std::filesystem::path > autoPathFilepaths = getAllAutoPaths();
+
+	for (std::filesystem::path path : autoPathFilepaths) {
+		// A command which is an auto that come from a path
+		m_autoCommands.insert_or_assign(path,
+				buildAuto(path.replace_extension("").string()));
+	}
 }
 
 frc::SendableChooser<frc2::Command*> AutoBuilder::buildAutoChooser(
+		std::string defaultAutoName) {
+	return buildAutoChooserFilterPath(
+			[](const PathPlannerAuto &autoCommand,
+					std::filesystem::path autoPath) {
+				return true;
+			},defaultAutoName);
+}
+
+frc::SendableChooser<frc2::Command*> AutoBuilder::buildAutoChooserFilter(
+		std::function<bool(const PathPlannerAuto&)> filter,
+		std::string defaultAutoName) {
+	return buildAutoChooserFilterPath(
+			[&filter](const PathPlannerAuto &autoCommand,
+					std::filesystem::path autoPath) {
+				return filter(autoCommand);
+			},defaultAutoName);
+}
+
+frc::SendableChooser<frc2::Command*> AutoBuilder::buildAutoChooserFilterPath(
+		std::function<bool(const PathPlannerAuto&, std::filesystem::path)> filter,
 		std::string defaultAutoName) {
 	if (!m_configured) {
 		throw std::runtime_error(
 				"AutoBuilder was not configured before attempting to build an auto chooser");
 	}
 
-	frc::SendableChooser<frc2::Command*> chooser;
-	bool foundDefaultOption = false;
+	if (!m_commandRefsGeneratedForSendable) {
+		regenerateSendableReferences();
+		m_commandRefsGeneratedForSendable = true;
+	}
 
-	for (std::string const &entry : getAllAutoNames()) {
-		AutoBuilder::m_autoCommands.emplace_back(
-				pathplanner::PathPlannerAuto(entry).ToPtr());
-		if (defaultAutoName != "" && entry == defaultAutoName) {
-			foundDefaultOption = true;
-			chooser.SetDefaultOption(entry, m_autoCommands.back().get());
-		} else {
-			chooser.AddOption(entry, m_autoCommands.back().get());
+	frc::SendableChooser<frc2::Command*> sendableChooser;
+	bool defaultSelected = false;
+
+	for (const std::pair<const std::filesystem::path, frc2::CommandPtr> &entry : m_autoCommands) {
+		std::string autoName = entry.first.stem().string();
+
+		// Found the default for sendableChooser
+		if (defaultAutoName == autoName) {
+			sendableChooser.SetDefaultOption(autoName, entry.second.get());
+			defaultSelected = true;
+		} else if (filter(*static_cast<PathPlannerAuto*>(entry.second.get()),
+				entry.first)) {
+			sendableChooser.AddOption(autoName, entry.second.get());
 		}
 	}
 
-	if (!foundDefaultOption) {
-		AutoBuilder::m_autoCommands.emplace_back(frc2::cmd::None());
-		chooser.SetDefaultOption("None", m_autoCommands.back().get());
+	// None is the default
+	if (!defaultSelected || defaultAutoName == "") {
+		sendableChooser.SetDefaultOption("None", m_noneCommand.get());
+	}
+	// None is just there, extra precaution for programmers
+	else {
+		sendableChooser.AddOption("None", m_noneCommand.get());
 	}
 
-	return chooser;
+	return sendableChooser;
 }
 
 std::vector<std::string> AutoBuilder::getAllAutoNames() {
+	std::vector < std::string > autoNames;
+
+	for (const std::filesystem::path &path : getAllAutoPaths()) {
+		autoNames.push_back(path.stem().string());
+	}
+
+	return autoNames;
+}
+
+std::vector<std::filesystem::path> AutoBuilder::getAllAutoPaths() {
 	std::filesystem::path deployPath = frc::filesystem::GetDeployDirectory();
 	std::filesystem::path autosPath = deployPath / "pathplanner/autos";
 
@@ -307,17 +238,16 @@ std::vector<std::string> AutoBuilder::getAllAutoNames() {
 		return {};
 	}
 
-	std::vector < std::string > autoPathNames;
+	std::vector < std::filesystem::path > autoPathNames;
 
-	for (std::filesystem::directory_entry const &entry : std::filesystem::directory_iterator {
-			autosPath }) {
-		if (!entry.is_regular_file()) {
+	for (std::filesystem::directory_entry const &entry : std::filesystem::recursive_directory_iterator {
+			autosPath,
+			std::filesystem::directory_options::skip_permission_denied }) {
+		if (!entry.is_regular_file()
+				|| entry.path().extension().string() != ".auto") {
 			continue;
 		}
-		if (entry.path().extension().string() != ".auto") {
-			continue;
-		}
-		autoPathNames.emplace_back(entry.path().stem().string());
+		autoPathNames.emplace_back(entry.path().lexically_relative(autosPath));
 	}
 
 	return autoPathNames;

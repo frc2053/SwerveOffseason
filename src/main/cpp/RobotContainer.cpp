@@ -129,8 +129,7 @@ frc2::CommandPtr RobotContainer::IntakeNote() {
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
-  // return autos.GetSelectedCommand();
-  return nullptr;
+  return autos.GetSelectedCommand();
 }
 
 SwerveSubsystem& RobotContainer::GetSwerveSubsystem() {

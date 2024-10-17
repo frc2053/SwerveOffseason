@@ -6,7 +6,7 @@
 
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/system/plant/DCMotor.h>
-#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
+#include <pathplanner/lib/config/RobotConfig.h>
 #include <units/base.h>
 #include <units/velocity.h>
 
@@ -190,17 +190,7 @@ inline constexpr bool DYNAMIC_REPLAN = false;
 inline constexpr units::meter_t DYNAMIC_REPLAN_THRESHOLD_TOTAL = 3_ft;
 inline constexpr units::meter_t DYNAMIC_REPLAN_THRESHOLD_SPIKE = 1_ft;
 
-inline const pathplanner::HolonomicPathFollowerConfig PATH_CONFIG{
-    pathplanner::PIDConstants{POSE_P, POSE_I, POSE_D},
-    pathplanner::PIDConstants{ROTATION_P, ROTATION_I, ROTATION_D},
-    physical::DRIVE_MAX_SPEED, physical::DRIVEBASE_RADIUS,
-    pathplanner::ReplanningConfig{INITIAL_REPLAN, DYNAMIC_REPLAN,
-                                  DYNAMIC_REPLAN_THRESHOLD_TOTAL,
-                                  DYNAMIC_REPLAN_THRESHOLD_SPIKE}};
-
-inline constexpr pathplanner::PathConstraints constraints{
-    physical::DRIVE_MAX_SPEED, physical::DRIVE_MAX_ACCEL,
-    physical::DRIVE_MAX_ROT_SPEED, physical::DRIVE_MAX_ROT_ACCEL};
+inline static pathplanner::RobotConfig config = pathplanner::RobotConfig::fromGUISettings();
 
 inline constexpr units::meter_t translationalPIDTolerance = .5_in;
 inline constexpr units::meters_per_second_t translationalVelPIDTolerance =

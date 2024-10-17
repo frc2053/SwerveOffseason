@@ -13,61 +13,21 @@
 #include <units/math.h>
 #include <units/curvature.h>
 #include <math.h>
+#include <type_traits>
 
 #define PI 3.14159265358979323846
-#define FIELD_LENGTH 16.54_m
 
 namespace pathplanner {
 namespace GeometryUtil {
-constexpr frc::Translation2d flipFieldPosition(const frc::Translation2d &pos) {
-	return frc::Translation2d(FIELD_LENGTH - pos.X(), pos.Y());
-}
-
-constexpr frc::Rotation2d flipFieldRotation(const frc::Rotation2d &rotation) {
-	return frc::Rotation2d(180_deg) - rotation;
-}
-
-constexpr frc::Pose2d flipFieldPose(const frc::Pose2d &pose) {
-	return frc::Pose2d(flipFieldPosition(pose.Translation()),
-			flipFieldRotation(pose.Rotation()));
-}
-
-constexpr units::second_t unitLerp(units::second_t const startVal,
-		units::second_t const endVal, double const t) {
+template<class UnitType, class = std::enable_if_t<
+		units::traits::is_unit_t<UnitType>::value>>
+constexpr UnitType unitLerp(UnitType const startVal, UnitType const endVal,
+		double const t) {
 	return startVal + (endVal - startVal) * t;
 }
 
-constexpr units::meters_per_second_t unitLerp(
-		units::meters_per_second_t const startVal,
-		units::meters_per_second_t const endVal, double const t) {
-	return startVal + (endVal - startVal) * t;
-}
-
-constexpr units::meters_per_second_squared_t unitLerp(
-		units::meters_per_second_squared_t const startVal,
-		units::meters_per_second_squared_t const endVal, double const t) {
-	return startVal + (endVal - startVal) * t;
-}
-
-constexpr units::radians_per_second_t unitLerp(
-		units::radians_per_second_t const startVal,
-		units::radians_per_second_t const endVal, double const t) {
-	return startVal + (endVal - startVal) * t;
-}
-
-constexpr units::radians_per_second_squared_t unitLerp(
-		units::radians_per_second_squared_t const startVal,
-		units::radians_per_second_squared_t const endVal, double const t) {
-	return startVal + (endVal - startVal) * t;
-}
-
-constexpr units::meter_t unitLerp(units::meter_t const startVal,
-		units::meter_t const endVal, double const t) {
-	return startVal + (endVal - startVal) * t;
-}
-
-constexpr units::curvature_t unitLerp(units::curvature_t const startVal,
-		units::curvature_t const endVal, double const t) {
+constexpr double doubleLerp(const double startVal, const double endVal,
+		const double t) {
 	return startVal + (endVal - startVal) * t;
 }
 
@@ -107,16 +67,21 @@ constexpr frc::Rotation2d cosineInterpolate(frc::Rotation2d const y1,
 units::meter_t calculateRadius(const frc::Translation2d a,
 		const frc::Translation2d b, const frc::Translation2d c);
 
-inline units::degree_t modulo(units::degree_t const a,
-		units::degree_t const b) {
+template<class UnitType, class = std::enable_if_t<
+		units::traits::is_unit_t<UnitType>::value>>
+inline UnitType modulo(UnitType const a, UnitType const b) {
 	return a - (b * units::math::floor(a / b));
 }
 
-inline bool isFinite(units::meter_t const u) {
+template<class UnitType, class = std::enable_if_t<
+		units::traits::is_unit_t<UnitType>::value>>
+inline bool isFinite(UnitType const u) {
 	return std::isfinite(u());
 }
 
-inline bool isNaN(units::meter_t const u) {
+template<class UnitType, class = std::enable_if_t<
+		units::traits::is_unit_t<UnitType>::value>>
+inline bool isNaN(UnitType const u) {
 	return std::isnan(u());
 }
 }

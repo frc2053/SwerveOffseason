@@ -23,17 +23,20 @@ class Autos {
         intakeSub(intakeSub),
         feederSub(feederSub) {
     pathplanner::NamedCommands::registerCommand(
-        "Shoot", frc2::cmd::Print("Shooting Note"));
+        "Print", frc2::cmd::Print("Test Named Command"));
 
     selectCommand = frc2::cmd::Select<AutoSelector>(
         [this] { return autoChooser.GetSelected(); },
         std::pair{CHOREO_TEST,
                   swerveSub.FollowChoreoTrajectory([] { return "TestPath"; })},
         std::pair{CHOREO_LIME,
-                  swerveSub.FollowChoreoTrajectory([] { return "Lime"; })});
+                  swerveSub.FollowChoreoTrajectory([] { return "Lime"; })},
+        std::pair{PP_TEST,
+                  pathplanner::PathPlannerAuto("PPTest").ToPtr()});
 
     autoChooser.AddOption("Choreo Test", AutoSelector::CHOREO_TEST);
     autoChooser.AddOption("Choreo Lime", AutoSelector::CHOREO_LIME);
+    autoChooser.AddOption("Path Planner Test", AutoSelector::PP_TEST);
 
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
   }
@@ -41,7 +44,7 @@ class Autos {
   frc2::Command* GetSelectedCommand() { return selectCommand.get(); }
 
  private:
-  enum AutoSelector { CHOREO_TEST, CHOREO_LIME };
+  enum AutoSelector { CHOREO_TEST, CHOREO_LIME, PP_TEST };
 
   frc::SendableChooser<AutoSelector> autoChooser;
 

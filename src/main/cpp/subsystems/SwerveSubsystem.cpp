@@ -12,6 +12,7 @@
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <str/ChoreoSwerveCommandWithForce.h>
 #include <str/DriverstationUtils.h>
+#include <pathplanner/lib/util/FlippingUtil.h>
 
 #include <string>
 
@@ -31,7 +32,7 @@ SwerveSubsystem::SwerveSubsystem()
                              consts::swerve::pathplanning::ROTATION_D})) {
   SetName("SwerveSubsystem");
   frc::SmartDashboard::PutData(this);
-  // SetupPathplanner();
+  SetupPathplanner();
   // LoadChoreoTrajectories();
 }
 
@@ -144,17 +145,31 @@ frc2::CommandPtr SwerveSubsystem::XPattern() {
 }
 
 void SwerveSubsystem::SetupPathplanner() {
-  pathplanner::AutoBuilder::configureHolonomic(
-      [this] { return swerveDrive.GetPose(); },
-      [this](frc::Pose2d resetPose) {
-        return swerveDrive.ResetPose(resetPose);
-      },
-      [this] { return swerveDrive.GetRobotRelativeSpeeds(); },
-      [this](frc::ChassisSpeeds robotRelativeOutput) {
-        swerveDrive.DriveRobotRelative(robotRelativeOutput);
-      },
-      consts::swerve::pathplanning::PATH_CONFIG, [] { return str::IsOnRed(); },
-      this);
+
+  ppControllers = std::make_shared<pathplanner::PPHolonomicDriveController>(
+    pathplanner::PIDConstants{consts::swerve::pathplanning::POSE_P, consts::swerve::pathplanning::POSE_I, consts::swerve::pathplanning::POSE_D},
+    pathplanner::PIDConstants{consts::swerve::pathplanning::ROTATION_P, consts::swerve::pathplanning::ROTATION_I, consts::swerve::pathplanning::ROTATION_D}
+  );
+
+  pathplanner::AutoBuilder::configure(
+    [this]() { return GetRobotPose(); },
+    [this](frc::Pose2d pose) { swerveDrive.ResetPose(pose); },
+    [this]() { return GetRobotRelativeSpeed(); },
+    [this](frc::ChassisSpeeds speeds, std::vector<pathplanner::DriveFeedforward> ff) { 
+      frc::ChassisSpeeds speedsToSend =
+          frc::ChassisSpeeds::Discretize(speeds, consts::LOOP_PERIOD);
+
+      swerveDrive.SetModuleStates(
+          consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend),
+          true, false, {ff[0].torqueCurrent, ff[1].torqueCurrent, ff[2].torqueCurrent, ff[3].torqueCurrent});
+    },
+    ppControllers,
+    consts::swerve::pathplanning::config,
+    []() {
+      return str::IsOnRed();
+    },
+    this
+  );
 }
 
 void SwerveSubsystem::LoadChoreoTrajectories() {
@@ -172,7 +187,7 @@ void SwerveSubsystem::LoadChoreoTrajectories() {
 frc::Translation2d SwerveSubsystem::GetAmpLocation() {
   frc::Translation2d ampToGoTo = consts::yearSpecific::ampLocation;
   if (str::IsOnRed()) {
-    ampToGoTo = pathplanner::GeometryUtil::flipFieldPosition(ampToGoTo);
+    ampToGoTo = pathplanner::FlippingUtil::flipFieldPosition(ampToGoTo);
   }
   return ampToGoTo;
 }
@@ -180,7 +195,7 @@ frc::Translation2d SwerveSubsystem::GetAmpLocation() {
 frc::Translation2d SwerveSubsystem::GetFrontAmpLocation() {
   frc::Translation2d ampToGoTo = consts::yearSpecific::inFrontOfAmpLocation;
   if (str::IsOnRed()) {
-    ampToGoTo = pathplanner::GeometryUtil::flipFieldPosition(ampToGoTo);
+    ampToGoTo = pathplanner::FlippingUtil::flipFieldPosition(ampToGoTo);
   }
   return ampToGoTo;
 }

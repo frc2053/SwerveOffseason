@@ -13,11 +13,13 @@
 #include <units/length.h>
 #include <units/time.h>
 #include "pathplanner/lib/path/PathPlannerPath.h"
-#include "pathplanner/lib/path/PathPlannerTrajectory.h"
+#include "pathplanner/lib/trajectory/PathPlannerTrajectory.h"
 #include "pathplanner/lib/controllers/PathFollowingController.h"
-#include "pathplanner/lib/config/ReplanningConfig.h"
+#include "pathplanner/lib/config/RobotConfig.h"
 #include "pathplanner/lib/util/PathPlannerLogging.h"
 #include "pathplanner/lib/util/PPLibTelemetry.h"
+#include "pathplanner/lib/events/EventScheduler.h"
+#include "pathplanner/lib/util/DriveFeedforward.h"
 
 namespace pathplanner {
 class FollowPathCommand: public frc2::CommandHelper<frc2::Command,
@@ -29,10 +31,13 @@ public:
 	 * @param path The path to follow
 	 * @param poseSupplier Function that supplies the current field-relative pose of the robot
 	 * @param speedsSupplier Function that supplies the current robot-relative chassis speeds
-	 * @param output Function that will apply the robot-relative output speeds of this
-	 *     command
+	 * @param output Output function that accepts robot-relative ChassisSpeeds and feedforwards for
+	 *     each drive motor. If using swerve, these feedforwards will be in FL, FR, BL, BR order. If
+	 *     using a differential drive, they will be in L, R order.
+	 *     <p>NOTE: These feedforwards are assuming unoptimized module states. When you optimize your
+	 *     module states, you will need to reverse the feedforwards for modules that have been flipped
 	 * @param controller Path following controller that will be used to follow the path
-	 * @param replanningConfig Path replanning configuration
+	 * @param robotConfig The robot configuration
 	 * @param shouldFlipPath Should the path be flipped to the other side of the field? This will
 	 *     maintain a global blue alliance origin.
 	 * @param requirements Subsystems required by this command, usually just the drive subsystem
@@ -40,10 +45,10 @@ public:
 	FollowPathCommand(std::shared_ptr<PathPlannerPath> path,
 			std::function<frc::Pose2d()> poseSupplier,
 			std::function<frc::ChassisSpeeds()> speedsSupplier,
-			std::function<void(frc::ChassisSpeeds)> output,
-			std::unique_ptr<PathFollowingController> controller,
-			ReplanningConfig replanningConfig,
-			std::function<bool()> shouldFlipPath,
+			std::function<
+					void(frc::ChassisSpeeds, std::vector<DriveFeedforward>)> output,
+			std::shared_ptr<PathFollowingController> controller,
+			RobotConfig robotConfig, std::function<bool()> shouldFlipPath,
 			frc2::Requirements requirements);
 
 	void Initialize() override;
@@ -59,25 +64,14 @@ private:
 	std::shared_ptr<PathPlannerPath> m_originalPath;
 	std::function<frc::Pose2d()> m_poseSupplier;
 	std::function<frc::ChassisSpeeds()> m_speedsSupplier;
-	std::function<void(frc::ChassisSpeeds)> m_output;
-	std::unique_ptr<PathFollowingController> m_controller;
-	ReplanningConfig m_replanningConfig;
+	std::function<void(frc::ChassisSpeeds, std::vector<DriveFeedforward>)> m_output;
+	std::shared_ptr<PathFollowingController> m_controller;
+	RobotConfig m_robotConfig;
 	std::function<bool()> m_shouldFlipPath;
 
-	// For event markers
-	std::vector<std::pair<std::shared_ptr<frc2::Command>, bool>> m_currentEventCommands;
-	std::deque<std::pair<units::second_t, std::shared_ptr<frc2::Command>>> m_untriggeredEvents;
+	EventScheduler m_eventScheduler;
 
 	std::shared_ptr<PathPlannerPath> m_path;
-	PathPlannerTrajectory m_generatedTrajectory;
-
-	inline void replanPath(const frc::Pose2d &currentPose,
-			const frc::ChassisSpeeds &currentSpeeds) {
-		auto replanned = m_path->replan(currentPose, currentSpeeds);
-		m_generatedTrajectory = replanned->getTrajectory(currentSpeeds,
-				currentPose.Rotation());
-		PathPlannerLogging::logActivePath(replanned);
-		PPLibTelemetry::setCurrentPath(replanned);
-	}
+	PathPlannerTrajectory m_trajectory;
 };
 }
