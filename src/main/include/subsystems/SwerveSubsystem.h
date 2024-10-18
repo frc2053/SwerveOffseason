@@ -4,15 +4,16 @@
 
 #pragma once
 
-#include <choreo/lib/Choreo.h>
-#include <choreo/lib/ChoreoSwerveCommand.h>
-#include <choreo/lib/ChoreoTrajectory.h>
+#include <choreo/auto/AutoFactory.h>
+#include <choreo/trajectory/SwerveSample.h>
+#include <choreo/trajectory/Trajectory.h>
 #include <frc2/command/SubsystemBase.h>
 #include <networktables/StructArrayTopic.h>
 #include <str/SwerveDrive.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
+#include <str/DriverstationUtils.h>
 
 #include <functional>
 #include <memory>
@@ -35,12 +36,13 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   frc::Pose2d GetRobotPose();
   frc::ChassisSpeeds GetFieldRelativeSpeed();
   frc::ChassisSpeeds GetRobotRelativeSpeed() const;
+  void ResetPose(frc::Pose2d resetPose) {
+    swerveDrive.ResetPose(resetPose);
+  }
   void UpdateSwerveOdom();
   void AddVisionMeasurement(const frc::Pose2d& visionMeasurement,
                             units::second_t timestamp,
                             const Eigen::Vector3d& stdDevs);
-  frc2::CommandPtr FollowChoreoTrajectory(
-      std::function<std::string()> pathName);
   frc2::CommandPtr PointWheelsToAngle(
       std::function<units::radian_t()> wheelAngle);
   frc2::CommandPtr XPattern();
@@ -73,10 +75,12 @@ class SwerveSubsystem : public frc2::SubsystemBase {
       std::function<units::meters_per_second_t()> yVel,
       std::function<units::radians_per_second_t()> rotOverride,
       std::function<frc::Pose2d()> notePose);
+  choreo::AutoFactory<choreo::SwerveSample>& GetFactory() {
+    return autoFactory;
+  }
 
  private:
   void SetupPathplanner();
-  void LoadChoreoTrajectories();
   frc::Translation2d GetAmpLocation();
   frc::Translation2d GetFrontAmpLocation();
   bool IsNearAmp();
@@ -136,11 +140,48 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   nt::StructPublisher<frc::Pose2d> pidPoseSetpointPub{
       nt->GetStructTopic<frc::Pose2d>("PIDToPoseSetpoint").Publish()};
 
-  choreolib::ChoreoControllerFunction choreoController;
-  std::unordered_map<std::string, choreolib::ChoreoTrajectory> pathMap;
   nt::StructArrayPublisher<frc::Pose2d> choreoTrajectoryPub{
       nt->GetStructArrayTopic<frc::Pose2d>("CurrentChoreoTrajectory")
           .Publish()};
+
+  frc::PIDController xController{consts::swerve::pathplanning::POSE_P, consts::swerve::pathplanning::POSE_I, consts::swerve::pathplanning::POSE_D};
+  frc::PIDController yController{consts::swerve::pathplanning::POSE_P, consts::swerve::pathplanning::POSE_I, consts::swerve::pathplanning::POSE_D};
+  frc::PIDController rotationController{consts::swerve::pathplanning::ROTATION_P, consts::swerve::pathplanning::ROTATION_I, consts::swerve::pathplanning::ROTATION_D};
+
+  choreo::AutoFactory<choreo::SwerveSample> autoFactory{
+    [this] { return GetRobotPose(); },
+    [this](frc::Pose2d refPose, choreo::SwerveSample currentSample) {
+      units::meters_per_second_t xFF = currentSample.vx;
+      units::meters_per_second_t yFF = currentSample.vy;
+      units::radians_per_second_t rotationFF = currentSample.omega;
+
+      units::meters_per_second_t xFeedback{xController.Calculate(
+          refPose.X().value(), currentSample.x.value())};
+      units::meters_per_second_t yFeedback{yController.Calculate(
+          refPose.Y().value(), currentSample.y.value())};
+      units::radians_per_second_t rotationFeedback{
+          rotationController.Calculate(refPose.Rotation().Radians().value(),
+                                          currentSample.heading.value())};
+
+      auto speeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+          xFF + xFeedback, yFF + yFeedback, rotationFF + rotationFeedback,
+          refPose.Rotation());
+      swerveDrive.SetXModuleForces(currentSample.moduleForcesX);
+      swerveDrive.SetYModuleForces(currentSample.moduleForcesY);
+      swerveDrive.DriveRobotRelative(speeds);
+    },
+    [] {
+      return str::IsOnRed();
+    },
+    {this},
+    [this](choreo::Trajectory<choreo::SwerveSample> trajectory,
+            bool starting) {
+    if (!starting) {
+        choreoTrajectoryPub.Set({});
+    } else {
+        choreoTrajectoryPub.Set(trajectory.GetPoses());
+    }
+  }};
 
   // It says volts, because sysid only supports volts for now. But we are using
   // current anyway

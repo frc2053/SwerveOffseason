@@ -312,6 +312,9 @@ void SwerveDrive::LogDriveVoltage(frc::sysid::SysIdRoutineLog* log) {
 std::array<units::ampere_t, 4> SwerveDrive::ConvertModuleForcesToTorqueCurrent(
     const std::array<units::newton_t, 4>& xForce,
     const std::array<units::newton_t, 4>& yForce) {
+
+  std::array<frc::SwerveModuleState, 4> forces;
+
   std::array<units::ampere_t, 4> retVal;
   for (int i = 0; i < 4; i++) {
     frc::Translation2d moduleForceFieldRef{units::meter_t{xForce[i].value()},
@@ -325,7 +328,10 @@ std::array<units::ampere_t, 4> SwerveDrive::ConvertModuleForcesToTorqueCurrent(
     units::ampere_t expectedTorqueCurrent =
         totalTorqueAtMotor / consts::swerve::physical::DRIVE_MOTOR.Kt;
     retVal[i] = expectedTorqueCurrent;
+    forces[i].angle = moduleForceRobotRef.Angle();
+    forces[i].speed = units::feet_per_second_t{expectedTorqueCurrent.value()};
   }
+  forcesPub.Set(forces);
 
   return retVal;
 }
