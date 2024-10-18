@@ -1,0 +1,68 @@
+{
+  "version": 1.0,
+  "grid_size": 128,
+  "tabs": [
+    {
+      "name": "Teleoperated",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "BottomWheelTuningSetpoint",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "Number Slider",
+            "properties": {
+              "topic": "/Shooter/BottomWheelTuningSetpoint",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": -7000.0,
+              "max_value": 7000.0,
+              "divisions": 3,
+              "update_continuously": true
+            }
+          },
+          {
+            "title": "Auto Chooser",
+            "x": 512.0,
+            "y": 384.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "TopWheelTuningSetpoint",
+            "x": 512.0,
+            "y": 128.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "Number Slider",
+            "properties": {
+              "topic": "/Shooter/TopWheelTuningSetpoint",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": -7000.0,
+              "max_value": 7000.0,
+              "divisions": 3,
+              "update_continuously": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Autonomous",
+      "grid_layout": {
+        "layouts": [],
+        "containers": []
+      }
+    }
+  ]
+}

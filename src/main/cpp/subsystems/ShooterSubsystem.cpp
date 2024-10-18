@@ -21,6 +21,8 @@ ShooterSubsystem::ShooterSubsystem() {
   ConfigureMotorSignals();
   SetName("ShooterSubsystem");
   frc::SmartDashboard::PutData(this);
+  topWheelTuningSetpoint.Set(0);
+  bottomWheelTuningSetpoint.Set(0);
 }
 
 frc2::CommandPtr ShooterSubsystem::RunShooter(
