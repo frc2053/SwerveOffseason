@@ -312,7 +312,6 @@ void SwerveDrive::LogDriveVoltage(frc::sysid::SysIdRoutineLog* log) {
 std::array<units::ampere_t, 4> SwerveDrive::ConvertModuleForcesToTorqueCurrent(
     const std::array<units::newton_t, 4>& xForce,
     const std::array<units::newton_t, 4>& yForce) {
-
   std::array<frc::SwerveModuleState, 4> forces;
 
   std::array<units::ampere_t, 4> retVal;

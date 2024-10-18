@@ -13,6 +13,7 @@
 #include <subsystems/IntakeSubsystem.h>
 #include <subsystems/ShooterSubsystem.h>
 #include <subsystems/SwerveSubsystem.h>
+
 #include "choreo/auto/AutoFactory.h"
 #include "choreo/auto/AutoLoop.h"
 #include "choreo/auto/AutoTrajectory.h"
@@ -24,14 +25,13 @@ class Autos {
     straightTraj = factory.Trajectory("ChoreoTest", loop);
 
     loop.Enabled().OnTrue(frc2::cmd::RunOnce([this] {
-                      swerveSub.ResetPose(
-                          straightTraj.GetInitialPose().value());
-                    })
-                    .AndThen(straightTraj.Cmd())
-                    .WithName("Straight Traj Name"));
+                            swerveSub.ResetPose(
+                                straightTraj.GetInitialPose().value());
+                          })
+                              .AndThen(straightTraj.Cmd())
+                              .WithName("Straight Traj Name"));
     return loop.Cmd().WithName("Test Auto Loop Cmd");
   }
-
 
   explicit Autos(SwerveSubsystem& swerveSub, ShooterSubsystem& shooterSub,
                  IntakeSubsystem& intakeSub, FeederSubsystem& feederSub)

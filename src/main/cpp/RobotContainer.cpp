@@ -33,7 +33,7 @@ void RobotContainer::ConfigureBindings() {
       true, true));
 
   // FAKE NOTE INTAKE
-  if(frc::RobotBase::IsSimulation()) {
+  if (frc::RobotBase::IsSimulation()) {
     driverController.Start().WhileTrue(intakeSubsystem.FakeNote());
   }
 
@@ -42,8 +42,10 @@ void RobotContainer::ConfigureBindings() {
       .OnTrue(frc2::cmd::Sequence(intakeSubsystem.Stop(),
                                   frc2::cmd::Print("Cancelled")));
 
-  (shooterSubsystem.UpToSpeed() && driverController.RightTrigger()).OnTrue(feederSubsystem.Feed()).OnFalse(feederSubsystem.Stop());
-  
+  (shooterSubsystem.UpToSpeed() && driverController.RightTrigger())
+      .OnTrue(feederSubsystem.Feed())
+      .OnFalse(feederSubsystem.Stop());
+
   intakeSubsystem.TouchedNote().OnTrue(RumbleDriver([] { return .1_s; }));
   feederSubsystem.GotNote().OnTrue(frc2::cmd::Parallel(
       intakeSubsystem.Stop(), feederSubsystem.Stop(),

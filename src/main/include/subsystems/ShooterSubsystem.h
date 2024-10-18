@@ -59,7 +59,8 @@ class ShooterSubsystem : public frc2::SubsystemBase {
             consts::shooter::gains::VEL_TOLERANCE) &&
            (units::math::abs(bottomWheelVelocitySetpoint -
                              currentBottomWheelVelocity) <
-            consts::shooter::gains::VEL_TOLERANCE) && !neutralState;
+            consts::shooter::gains::VEL_TOLERANCE) &&
+           !neutralState;
   }
   frc2::Trigger upToSpeedTrigger{[this] { return IsUpToSpeed(); }};
 

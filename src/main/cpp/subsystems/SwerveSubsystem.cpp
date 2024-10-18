@@ -11,20 +11,19 @@
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <pathplanner/lib/util/FlippingUtil.h>
 
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "constants/Constants.h"
 #include "constants/VisionConstants.h"
 
-SwerveSubsystem::SwerveSubsystem()
-{
+SwerveSubsystem::SwerveSubsystem() {
   SetName("SwerveSubsystem");
   frc::SmartDashboard::PutData(this);
   SetupPathplanner();
 
-  rotationController.EnableContinuousInput(
-      -std::numbers::pi,
-      std::numbers::pi);
+  rotationController.EnableContinuousInput(-std::numbers::pi, std::numbers::pi);
 }
 
 void SwerveSubsystem::UpdateSwerveOdom() {
@@ -100,31 +99,32 @@ frc2::CommandPtr SwerveSubsystem::XPattern() {
 }
 
 void SwerveSubsystem::SetupPathplanner() {
-
   ppControllers = std::make_shared<pathplanner::PPHolonomicDriveController>(
-    pathplanner::PIDConstants{consts::swerve::pathplanning::POSE_P, consts::swerve::pathplanning::POSE_I, consts::swerve::pathplanning::POSE_D},
-    pathplanner::PIDConstants{consts::swerve::pathplanning::ROTATION_P, consts::swerve::pathplanning::ROTATION_I, consts::swerve::pathplanning::ROTATION_D}
-  );
+      pathplanner::PIDConstants{consts::swerve::pathplanning::POSE_P,
+                                consts::swerve::pathplanning::POSE_I,
+                                consts::swerve::pathplanning::POSE_D},
+      pathplanner::PIDConstants{consts::swerve::pathplanning::ROTATION_P,
+                                consts::swerve::pathplanning::ROTATION_I,
+                                consts::swerve::pathplanning::ROTATION_D});
 
   pathplanner::AutoBuilder::configure(
-    [this]() { return GetRobotPose(); },
-    [this](frc::Pose2d pose) { swerveDrive.ResetPose(pose); },
-    [this]() { return GetRobotRelativeSpeed(); },
-    [this](frc::ChassisSpeeds speeds, std::vector<pathplanner::DriveFeedforward> ff) { 
-      frc::ChassisSpeeds speedsToSend =
-          frc::ChassisSpeeds::Discretize(speeds, consts::LOOP_PERIOD);
+      [this]() { return GetRobotPose(); },
+      [this](frc::Pose2d pose) { swerveDrive.ResetPose(pose); },
+      [this]() { return GetRobotRelativeSpeed(); },
+      [this](frc::ChassisSpeeds speeds,
+             std::vector<pathplanner::DriveFeedforward> ff) {
+        frc::ChassisSpeeds speedsToSend =
+            frc::ChassisSpeeds::Discretize(speeds, consts::LOOP_PERIOD);
 
-      swerveDrive.SetModuleStates(
-          consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend),
-          true, false, {ff[0].torqueCurrent, ff[1].torqueCurrent, ff[2].torqueCurrent, ff[3].torqueCurrent});
-    },
-    ppControllers,
-    consts::swerve::pathplanning::config,
-    []() {
-      return str::IsOnRed();
-    },
-    this
-  );
+        swerveDrive.SetModuleStates(
+            consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(
+                speedsToSend),
+            true, false,
+            {ff[0].torqueCurrent, ff[1].torqueCurrent, ff[2].torqueCurrent,
+             ff[3].torqueCurrent});
+      },
+      ppControllers, consts::swerve::pathplanning::config,
+      []() { return str::IsOnRed(); }, this);
 }
 
 frc::Translation2d SwerveSubsystem::GetAmpLocation() {

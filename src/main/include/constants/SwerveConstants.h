@@ -190,7 +190,8 @@ inline constexpr bool DYNAMIC_REPLAN = false;
 inline constexpr units::meter_t DYNAMIC_REPLAN_THRESHOLD_TOTAL = 3_ft;
 inline constexpr units::meter_t DYNAMIC_REPLAN_THRESHOLD_SPIKE = 1_ft;
 
-inline static pathplanner::RobotConfig config = pathplanner::RobotConfig::fromGUISettings();
+inline static pathplanner::RobotConfig config =
+    pathplanner::RobotConfig::fromGUISettings();
 
 inline constexpr units::meter_t translationalPIDTolerance = .5_in;
 inline constexpr units::meters_per_second_t translationalVelPIDTolerance =
