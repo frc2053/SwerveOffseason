@@ -166,6 +166,8 @@ class ShooterSubsystem : public frc2::SubsystemBase {
       nt->GetDoubleTopic("BottomWheelSetpointRPM").Publish()};
   nt::BooleanPublisher isUpToSpeedPub{
       nt->GetBooleanTopic("IsUpToSpeed").Publish()};
+  nt::DoubleEntry topWheelTuningSetpoint{nt->GetDoubleTopic("TopWheelTuningSetpoint").GetEntry(0)};
+  nt::DoubleEntry bottomWheelTuningSetpoint{nt->GetDoubleTopic("BottomWheelTuningSetpoint").GetEntry(0)};
 
   units::turns_per_second_t topWheelVelocitySetpoint{0_rpm};
   units::turns_per_second_t bottomWheelVelocitySetpoint{0_rpm};

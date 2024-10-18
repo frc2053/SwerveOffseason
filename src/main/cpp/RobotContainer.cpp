@@ -83,6 +83,9 @@ void RobotContainer::ConfigureBindings() {
   operatorController.B().OnFalse(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
+  operatorController.Start().WhileTrue(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::TUNING; }));
+  operatorController.Start().OnFalse(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+
   operatorController.Back().WhileTrue(
       frc2::cmd::Parallel(intakeSubsystem.PoopNote(), feederSubsystem.Eject()));
 

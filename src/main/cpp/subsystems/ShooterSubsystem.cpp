@@ -62,6 +62,11 @@ frc2::CommandPtr ShooterSubsystem::RunShooter(
                        consts::shooter::BOTTOM_SHOOTER_LUT[distance()];
                    neutralState = false;
                    break;
+                 case consts::shooter::PRESET_SPEEDS::TUNING:
+                   topWheelVelocitySetpoint = units::revolutions_per_minute_t{topWheelTuningSetpoint.Get()};
+                   bottomWheelVelocitySetpoint = units::revolutions_per_minute_t{bottomWheelTuningSetpoint.Get()};
+                   neutralState = false;
+                   break;
                  case consts::shooter::PRESET_SPEEDS::OFF:
                    topWheelVelocitySetpoint = 0_rpm;
                    bottomWheelVelocitySetpoint = 0_rpm;

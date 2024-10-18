@@ -69,6 +69,6 @@ inline static wpi::interpolating_map<units::meter_t, units::turns_per_second_t>
 inline static wpi::interpolating_map<units::meter_t, units::turns_per_second_t>
     BOTTOM_SHOOTER_LUT{};
 
-enum class PRESET_SPEEDS { OFF, AMP, SPEAKER_DIST, SUBWOOFER, PASS };
+enum class PRESET_SPEEDS { OFF, AMP, SPEAKER_DIST, SUBWOOFER, PASS, TUNING };
 }  // namespace shooter
 }  // namespace consts
