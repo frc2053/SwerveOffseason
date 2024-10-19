@@ -4,6 +4,7 @@
 
 #include "str/SwerveDrive.h"
 
+#include <str/DriverstationUtils.h>
 #include <frc/DataLogManager.h>
 
 #include "constants/Constants.h"
@@ -225,6 +226,17 @@ units::ampere_t SwerveDrive::GetSimulatedCurrentDraw() const {
   return totalCurrent;
 }
 
+void SwerveDrive::ZeroYaw() {
+  units::radian_t targetAngle = 0_rad;
+  if(str::IsOnRed()) {
+    targetAngle = 180_deg;
+  }
+  else {
+    targetAngle = 0_deg;
+  }
+  imu.SetYaw(targetAngle);
+}
+
 void SwerveDrive::SetXModuleForces(
     const std::array<units::newton_t, 4>& xForce) {
   xModuleForce = xForce;
@@ -316,6 +328,9 @@ std::array<units::ampere_t, 4> SwerveDrive::ConvertModuleForcesToTorqueCurrent(
 
   std::array<units::ampere_t, 4> retVal;
   for (int i = 0; i < 4; i++) {
+    if(xForce[i] == 0_N && yForce[0] == 0_N) {
+      break;
+    }
     frc::Translation2d moduleForceFieldRef{units::meter_t{xForce[i].value()},
                                            units::meter_t{yForce[i].value()}};
     frc::Translation2d moduleForceRobotRef =

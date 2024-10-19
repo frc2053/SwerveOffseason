@@ -217,6 +217,12 @@ void SwerveSubsystem::CalculateFoundNotePose(
   }
 }
 
+frc2::CommandPtr SwerveSubsystem::ZeroYaw() {
+  return frc2::cmd::RunOnce([this] {
+    swerveDrive.ZeroYaw();
+  });
+}
+
 frc::Pose2d SwerveSubsystem::GetFoundNotePose() const {
   return latestNotePose;
 }

@@ -31,6 +31,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
    */
   void Periodic() override;
   void SimulationPeriodic() override;
+  frc2::CommandPtr ZeroYaw();
   units::ampere_t GetSimulatedCurrentDraw() const;
   frc::Pose2d GetOdomPose();
   frc::Pose2d GetRobotPose();

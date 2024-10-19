@@ -67,6 +67,8 @@ class SwerveDrive {
   str::SwerveModuleDriveGains GetDriveGains() const;
   void SetDriveGains(str::SwerveModuleDriveGains newGains);
 
+  void ZeroYaw();
+
  private:
   std::array<units::ampere_t, 4> ConvertModuleForcesToTorqueCurrent(
       const std::array<units::newton_t, 4>& xForce,
