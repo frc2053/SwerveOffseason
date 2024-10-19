@@ -114,6 +114,7 @@
     "xlocmon": "cpp",
     "xlocnum": "cpp",
     "xloctime": "cpp",
-    "expected": "cpp"
+    "expected": "cpp",
+    "text_encoding": "cpp"
   }
 }

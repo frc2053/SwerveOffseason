@@ -38,14 +38,14 @@ Vision::GetCameraEstimatedPoses() {
 void Vision::SimulationPeriodic(frc::Pose2d simRobotPose) {
   for (auto& cam : cameras) {
     cam.SimPeriodic(simRobotPose);
-    noteCamera.SimPeriodic(simRobotPose);
+    //noteCamera.SimPeriodic(simRobotPose);
   }
 }
 
 std::optional<units::meter_t> Vision::GetDistanceToNote() {
-  return noteCamera.GetDistanceToNote();
+  return {};//noteCamera.GetDistanceToNote();
 }
 
 std::optional<units::radian_t> Vision::GetAngleToNote() {
-  return noteCamera.GetAngleToNote();
+  return {};//noteCamera.GetAngleToNote();
 }

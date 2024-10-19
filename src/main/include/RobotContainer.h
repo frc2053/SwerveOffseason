@@ -27,7 +27,7 @@ class RobotContainer {
   ShooterSubsystem& GetShooterSubsystem();
   IntakeSubsystem& GetIntakeSubsystem();
   FeederSubsystem& GetFeederSubsystem();
-  // str::Vision &GetVision();
+  str::Vision &GetVision();
   str::NoteVisualizer& GetNoteVisualizer();
 
  private:
@@ -43,7 +43,7 @@ class RobotContainer {
   ShooterSubsystem shooterSubsystem;
   IntakeSubsystem intakeSubsystem;
   FeederSubsystem feederSubsystem;
-  // str::Vision vision;
+  str::Vision vision;
   str::NoteVisualizer noteVisualizer;
 
   Autos autos{swerveSubsystem, shooterSubsystem, intakeSubsystem,

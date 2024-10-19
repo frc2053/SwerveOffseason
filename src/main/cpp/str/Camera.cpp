@@ -40,7 +40,7 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
       consts::yearSpecific::aprilTagLayout,
       photon::PoseStrategy::MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamera);
   camera = std::make_unique<photon::PhotonCamera>(cameraName);
-  camera->SetVersionCheckEnabled(false);
+  camera->SetVersionCheckEnabled(true);
   photonEstimator->SetMultiTagFallbackStrategy(
       photon::PoseStrategy::LOWEST_AMBIGUITY);
 
@@ -139,18 +139,16 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
 
   std::optional<photon::EstimatedRobotPose> visionEst;
 
-  for (const auto& result : camera->GetAllUnreadResults()) {
-    visionEst = photonEstimator->Update(result);
+  auto result = camera->GetLatestResult();
+  visionEst = photonEstimator->Update(result);
 
-    if (visionEst.has_value()) {
-      posePub.Set(visionEst.value().estimatedPose.ToPose2d());
-    } else {
-      posePub.Set({});
-    }
-
-    latestResult = result;
+  if (visionEst.has_value()) {
+    posePub.Set(visionEst.value().estimatedPose.ToPose2d());
+  } else {
+    posePub.Set({});
   }
 
+  latestResult = result;
   return visionEst;
 }
 
