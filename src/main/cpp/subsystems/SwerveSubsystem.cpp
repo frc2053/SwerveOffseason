@@ -148,6 +148,25 @@ bool SwerveSubsystem::IsNearAmp() {
          consts::yearSpecific::closeToAmpDistance;
 }
 
+units::meter_t SwerveSubsystem::GetDistanceToSpeaker(const SpeakerSide& side) {
+  frc::Translation2d sideToAimAt{};
+
+  if(side == SpeakerSide::AMP_SIDE) {
+    sideToAimAt = consts::yearSpecific::speakerLocationAmpSide;
+  }
+  if(side == SpeakerSide::SOURCE) {
+    sideToAimAt = consts::yearSpecific::speakerLocationSourceSide;
+  }
+  if(side == SpeakerSide::CENTER) {
+    sideToAimAt = consts::yearSpecific::speakerLocationCenter;
+  }
+
+  if (str::IsOnRed()) {
+    sideToAimAt = pathplanner::FlippingUtil::flipFieldPosition(sideToAimAt);
+  }
+  return GetRobotPose().Translation().Distance(sideToAimAt);
+}
+
 frc2::CommandPtr SwerveSubsystem::NoteAssist(
     std::function<units::meters_per_second_t()> xVel,
     std::function<units::meters_per_second_t()> yVel,

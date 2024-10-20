@@ -19,5 +19,8 @@ inline const frc::AprilTagFieldLayout aprilTagLayout =
 inline constexpr frc::Translation2d inFrontOfAmpLocation{1.838_m, 7.172_m};
 inline constexpr frc::Translation2d ampLocation{1.838_m, 7.782_m};
 inline constexpr units::meter_t closeToAmpDistance{5_ft};
+inline constexpr frc::Translation2d speakerLocationCenter{0_ft, 5.57_m};
+inline constexpr frc::Translation2d speakerLocationAmpSide{0_ft, 5.9_m};
+inline constexpr frc::Translation2d speakerLocationSourceSide{0_ft, 5.31_m};
 }  // namespace yearSpecific
 }  // namespace consts

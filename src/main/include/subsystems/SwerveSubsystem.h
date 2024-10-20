@@ -22,6 +22,12 @@
 
 #include "constants/Constants.h"
 
+enum class SpeakerSide {
+    AMP_SIDE,
+    CENTER,
+    SOURCE
+};
+
 class SwerveSubsystem : public frc2::SubsystemBase {
  public:
   SwerveSubsystem();
@@ -35,6 +41,7 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   units::ampere_t GetSimulatedCurrentDraw() const;
   frc::Pose2d GetOdomPose();
   frc::Pose2d GetRobotPose();
+  units::meter_t GetDistanceToSpeaker(const SpeakerSide& side);
   frc::ChassisSpeeds GetFieldRelativeSpeed();
   frc::ChassisSpeeds GetRobotRelativeSpeed() const;
   void ResetPose(frc::Pose2d resetPose) { swerveDrive.ResetPose(resetPose); }
