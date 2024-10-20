@@ -85,6 +85,8 @@ class SwerveSubsystem : public frc2::SubsystemBase {
     return autoFactory;
   }
 
+  frc2::CommandPtr Stop();
+
  private:
   void SetupPathplanner();
   frc::Translation2d GetAmpLocation();

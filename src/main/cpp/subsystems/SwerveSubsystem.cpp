@@ -119,9 +119,7 @@ void SwerveSubsystem::SetupPathplanner() {
         swerveDrive.SetModuleStates(
             consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(
                 speedsToSend),
-            true, false,
-            {ff[0].torqueCurrent, ff[1].torqueCurrent, ff[2].torqueCurrent,
-             ff[3].torqueCurrent});
+            true, false);
       },
       ppControllers, consts::swerve::pathplanning::config,
       []() { return str::IsOnRed(); }, this);
@@ -141,6 +139,12 @@ frc::Translation2d SwerveSubsystem::GetFrontAmpLocation() {
     ampToGoTo = pathplanner::FlippingUtil::flipFieldPosition(ampToGoTo);
   }
   return ampToGoTo;
+}
+
+frc2::CommandPtr SwerveSubsystem::Stop() {
+  return frc2::cmd::RunOnce([this] {
+    swerveDrive.Drive(0_fps, 0_fps, 0_rad_per_s, false, false);
+  }, {this});
 }
 
 bool SwerveSubsystem::IsNearAmp() {
