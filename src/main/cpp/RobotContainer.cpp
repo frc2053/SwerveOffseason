@@ -8,6 +8,7 @@
 #include <frc/RobotBase.h>
 #include <frc2/command/Commands.h>
 #include <str/DriverstationUtils.h>
+#include <frc2/command/button/RobotModeTriggers.h>
 
 RobotContainer::RobotContainer() {
   ConfigureBindings();
@@ -37,19 +38,19 @@ void RobotContainer::ConfigureBindings() {
     driverController.Start().WhileTrue(intakeSubsystem.FakeNote());
   }
 
-  driverController.LeftTrigger().OnTrue(IntakeNote());
-  (!driverController.LeftTrigger() && !intakeSubsystem.TouchedNote())
+  (driverController.LeftTrigger() && frc2::RobotModeTriggers::Teleop()).OnTrue(IntakeNote());
+  (!driverController.LeftTrigger() && !intakeSubsystem.TouchedNote() && frc2::RobotModeTriggers::Teleop())
       .OnTrue(frc2::cmd::Sequence(intakeSubsystem.Stop(),
                                   frc2::cmd::Print("Cancelled")));
 
-  (shooterSubsystem.UpToSpeed() && driverController.RightTrigger())
+  (shooterSubsystem.UpToSpeed() && driverController.RightTrigger() && frc2::RobotModeTriggers::Teleop())
       .OnTrue(feederSubsystem.Feed())
       .OnFalse(feederSubsystem.Stop());
 
-  intakeSubsystem.TouchedNote().OnTrue(RumbleDriver([] { return .1_s; }));
-  feederSubsystem.GotNote().OnTrue(frc2::cmd::Parallel(
-      intakeSubsystem.Stop(), feederSubsystem.Stop(),
-      RumbleDriver([] { return .5_s; }), RumbleOperator([] { return .5_s; })));
+  // intakeSubsystem.TouchedNote().OnTrue(RumbleDriver([] { return .1_s; }));
+  // feederSubsystem.GotNote().OnTrue(frc2::cmd::Parallel(
+  //     intakeSubsystem.Stop(), feederSubsystem.Stop(),
+  //     RumbleDriver([] { return .5_s; }), RumbleOperator([] { return .5_s; })));
 
   driverController.A().WhileTrue(swerveSubsystem.AlignToAmp());
 
