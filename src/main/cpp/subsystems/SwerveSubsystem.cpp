@@ -67,6 +67,45 @@ units::ampere_t SwerveSubsystem::GetSimulatedCurrentDraw() const {
   return swerveDrive.GetSimulatedCurrentDraw();
 }
 
+SpeakerSide SwerveSubsystem::GetSpeakerSideFromPosition() {
+    frc::Translation2d speakerLocation = consts::yearSpecific::speakerLocationCenter;
+
+    frc::Pose2d robotPose = GetRobotPose();
+    frc::Translation2d robotPosition = robotPose.Translation();
+    frc::Translation2d line1Point{0_m, 5.38_m};
+    frc::Rotation2d line1Dir{30_deg};
+    frc::Translation2d line2Point{0_m, 5.70_m};
+    frc::Rotation2d line2Dir{-30_deg};
+
+    bool isInCenter = false;
+    bool isAmpSide = false;
+    bool isSourceSide = false;
+    if (str::IsOnRed()) {
+      speakerLocation = pathplanner::FlippingUtil::flipFieldPosition(speakerLocation);
+      line1Point = pathplanner::FlippingUtil::flipFieldPosition(line1Point);
+      line2Point = pathplanner::FlippingUtil::flipFieldPosition(line2Point);
+      isInCenter = str::math::LineBetweenChecker::IsBetweenLines(robotPosition, line1Point, -line1Dir, line2Point, -line2Dir);
+      isAmpSide = str::math::LineBetweenChecker::IsPastLine(robotPosition, line2Point, -line2Dir, true);
+      isSourceSide = str::math::LineBetweenChecker::IsPastLine(robotPosition, line1Point, -line1Dir, false);
+    }
+    else {
+      isInCenter = str::math::LineBetweenChecker::IsBetweenLines(robotPosition, line1Point, line1Dir, line2Point, line2Dir);
+      isAmpSide = str::math::LineBetweenChecker::IsPastLine(robotPosition, line2Point, line2Dir, true);
+      isSourceSide = str::math::LineBetweenChecker::IsPastLine(robotPosition, line1Point, line1Dir, false);
+    }
+
+    if(!isInCenter) {
+      if(isAmpSide) {
+        return SpeakerSide::SOURCE;
+      } else if (isSourceSide) {
+        return SpeakerSide::AMP_SIDE;
+      }
+    }
+    else {
+      return SpeakerSide::CENTER;
+    }
+}
+
 frc2::CommandPtr SwerveSubsystem::FaceSpeaker(
   std::function<units::meters_per_second_t()> xVel,
   std::function<units::meters_per_second_t()> yVel) {
@@ -113,8 +152,6 @@ frc2::CommandPtr SwerveSubsystem::FaceSpeaker(
         speakerLocation = consts::yearSpecific::speakerLocationAmpSide;
       }
     }
-
-    fmt::print("Is source side: {} Is amp side: {}, Is center: {}\n", isSourceSide, isAmpSide, isInCenter);
 
     if(str::IsOnRed()) {
       speakerLocation = pathplanner::FlippingUtil::flipFieldPosition(speakerLocation);

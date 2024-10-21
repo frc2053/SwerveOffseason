@@ -60,10 +60,10 @@ void RobotContainer::ConfigureBindings() {
       .OnTrue(feederSubsystem.Feed())
       .OnFalse(feederSubsystem.Stop());
 
-  // intakeSubsystem.TouchedNote().OnTrue(RumbleDriver([] { return .1_s; }));
-  // feederSubsystem.GotNote().OnTrue(frc2::cmd::Parallel(
-  //     intakeSubsystem.Stop(), feederSubsystem.Stop(),
-  //     RumbleDriver([] { return .5_s; }), RumbleOperator([] { return .5_s; })));
+  (intakeSubsystem.TouchedNote() && frc2::RobotModeTriggers::Teleop()).OnTrue(RumbleDriver([] { return .1_s; }));
+  (feederSubsystem.GotNote() && frc2::RobotModeTriggers::Teleop()).OnTrue(frc2::cmd::Parallel(
+      intakeSubsystem.Stop(), feederSubsystem.Stop(),
+      RumbleDriver([] { return .5_s; }), RumbleOperator([] { return .5_s; })));
 
   driverController.A().WhileTrue(swerveSubsystem.AlignToAmp());
 
@@ -85,20 +85,25 @@ void RobotContainer::ConfigureBindings() {
   // controller.Start().WhileTrue(
   //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kForward));
 
-  // operatorController.A().WhileTrue(shooterSubsystem.RunShooter(
-  //     [] { return consts::shooter::PRESET_SPEEDS::AMP; }));
-  // operatorController.A().OnFalse(shooterSubsystem.RunShooter(
-  //     [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+  operatorController.A().WhileTrue(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::AMP; }));
+  operatorController.A().OnFalse(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
-  // operatorController.Y().WhileTrue(shooterSubsystem.RunShooter(
-  //     [] { return consts::shooter::PRESET_SPEEDS::PASS; }));
-  // operatorController.Y().OnFalse(shooterSubsystem.RunShooter(
-  //     [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+  operatorController.Y().WhileTrue(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::PASS; }));
+  operatorController.Y().OnFalse(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
-  // operatorController.B().WhileTrue(shooterSubsystem.RunShooter(
-  //     [] { return consts::shooter::PRESET_SPEEDS::SUBWOOFER; }));
-  // operatorController.B().OnFalse(shooterSubsystem.RunShooter(
-  //     [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+  operatorController.B().WhileTrue(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::SUBWOOFER; }));
+  operatorController.B().OnFalse(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
+
+  operatorController.X().WhileTrue(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::SPEAKER_DIST; }, [this] { return swerveSubsystem.GetDistanceToSpeaker(swerveSubsystem.GetSpeakerSideFromPosition()); }));
+  operatorController.X().OnFalse(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
   operatorController.Start().WhileTrue(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::TUNING; }));
   operatorController.Start().OnFalse(shooterSubsystem.RunShooter([] { return consts::shooter::PRESET_SPEEDS::OFF; }));
@@ -120,10 +125,10 @@ void RobotContainer::ConfigureBindings() {
   // (operatorController.Y() &&
   // operatorController.Back()).WhileTrue(shooterSubsystem.BottomWheelSysIdDynamic(frc2::sysid::Direction::kReverse));
 
-  operatorController.A().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kForward));
-  operatorController.B().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kReverse));
-  operatorController.X().WhileTrue(swerveSubsystem.SysIdSteerMk4iDynamicTorque(frc2::sysid::Direction::kForward));
-  operatorController.Y().WhileTrue(swerveSubsystem.SysIdSteerMk4iDynamicTorque(frc2::sysid::Direction::kReverse));
+  // operatorController.A().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kForward));
+  // operatorController.B().WhileTrue(swerveSubsystem.SysIdSteerMk4iQuasistaticTorque(frc2::sysid::Direction::kReverse));
+  // operatorController.X().WhileTrue(swerveSubsystem.SysIdSteerMk4iDynamicTorque(frc2::sysid::Direction::kForward));
+  // operatorController.Y().WhileTrue(swerveSubsystem.SysIdSteerMk4iDynamicTorque(frc2::sysid::Direction::kReverse));
 
   // controller.A().WhileTrue(swerveSubsystem.SysIdSteerQuasistaticVoltage(frc2::sysid::Direction::kForward));
   // controller.B().WhileTrue(swerveSubsystem.SysIdSteerQuasistaticVoltage(frc2::sysid::Direction::kReverse));
