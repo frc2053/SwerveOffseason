@@ -10,6 +10,7 @@
 #include <frc2/command/Commands.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <pathplanner/lib/util/FlippingUtil.h>
+#include <str/Math.h>
 
 #include <memory>
 #include <string>
@@ -64,6 +65,83 @@ frc::ChassisSpeeds SwerveSubsystem::GetRobotRelativeSpeed() const {
 
 units::ampere_t SwerveSubsystem::GetSimulatedCurrentDraw() const {
   return swerveDrive.GetSimulatedCurrentDraw();
+}
+
+frc2::CommandPtr SwerveSubsystem::FaceSpeaker(
+  std::function<units::meters_per_second_t()> xVel,
+  std::function<units::meters_per_second_t()> yVel) {
+  return frc2::cmd::Sequence(
+  frc2::cmd::RunOnce([this] {
+    thetaController.EnableContinuousInput(
+        units::radian_t{-std::numbers::pi},
+        units::radian_t{std::numbers::pi});
+    thetaController.SetTolerance(
+        consts::swerve::pathplanning::rotationalPIDTolerance,
+        consts::swerve::pathplanning::rotationalVelPIDTolerance);
+  }, {this}),
+  frc2::cmd::Run([this, xVel, yVel] {
+    frc::Translation2d speakerLocation = consts::yearSpecific::speakerLocationCenter;
+
+    frc::Pose2d robotPose = GetRobotPose();
+    frc::Translation2d robotPosition = robotPose.Translation();
+    frc::Translation2d line1Point{0_m, 5.38_m};
+    frc::Rotation2d line1Dir{30_deg};
+    frc::Translation2d line2Point{0_m, 5.70_m};
+    frc::Rotation2d line2Dir{-30_deg};
+
+    bool isInCenter = false;
+    bool isAmpSide = false;
+    bool isSourceSide = false;
+    if (str::IsOnRed()) {
+      speakerLocation = pathplanner::FlippingUtil::flipFieldPosition(speakerLocation);
+      line1Point = pathplanner::FlippingUtil::flipFieldPosition(line1Point);
+      line2Point = pathplanner::FlippingUtil::flipFieldPosition(line2Point);
+      isInCenter = str::math::LineBetweenChecker::IsBetweenLines(robotPosition, line1Point, -line1Dir, line2Point, -line2Dir);
+      isAmpSide = str::math::LineBetweenChecker::IsPastLine(robotPosition, line2Point, -line2Dir, true);
+      isSourceSide = str::math::LineBetweenChecker::IsPastLine(robotPosition, line1Point, -line1Dir, false);
+    }
+    else {
+      isInCenter = str::math::LineBetweenChecker::IsBetweenLines(robotPosition, line1Point, line1Dir, line2Point, line2Dir);
+      isAmpSide = str::math::LineBetweenChecker::IsPastLine(robotPosition, line2Point, line2Dir, true);
+      isSourceSide = str::math::LineBetweenChecker::IsPastLine(robotPosition, line1Point, line1Dir, false);
+    }
+
+    if(!isInCenter) {
+      if(isAmpSide) {
+        speakerLocation = consts::yearSpecific::speakerLocationSourceSide;
+      } else if (isSourceSide) {
+        speakerLocation = consts::yearSpecific::speakerLocationAmpSide;
+      }
+    }
+
+    fmt::print("Is source side: {} Is amp side: {}, Is center: {}\n", isSourceSide, isAmpSide, isInCenter);
+
+    if(str::IsOnRed()) {
+      speakerLocation = pathplanner::FlippingUtil::flipFieldPosition(speakerLocation);
+    }
+
+    frc::Translation2d diff = robotPosition - speakerLocation;
+
+    units::radian_t angleToSpeaker = units::math::atan2(diff.Y(), diff.X());
+
+
+    if(!str::IsOnRed()) {
+      angleToSpeaker = angleToSpeaker + 180_deg;
+    }
+    else {
+      if(!isInCenter && (isSourceSide || isAmpSide)) {
+        angleToSpeaker = angleToSpeaker + 180_deg;
+      }
+    }
+
+    thetaController.SetGoal(angleToSpeaker);
+
+    units::radians_per_second_t thetaSpeed{
+        thetaController.Calculate(
+            robotPose.Rotation().Radians())};
+
+    swerveDrive.Drive(xVel(), yVel(), thetaSpeed, true);
+  }, {this}));
 }
 
 frc2::CommandPtr SwerveSubsystem::PointWheelsToAngle(

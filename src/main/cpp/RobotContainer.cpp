@@ -38,6 +38,19 @@ void RobotContainer::ConfigureBindings() {
     driverController.Start().WhileTrue(intakeSubsystem.FakeNote());
   }
 
+  driverController.LeftBumper().WhileTrue(swerveSubsystem.FaceSpeaker(
+    [this] {
+      return str::NegateIfRed(
+          frc::ApplyDeadband<double>(-driverController.GetLeftY(), .1) *
+          consts::swerve::physical::DRIVE_MAX_SPEED);
+    },
+    [this] {
+      return str::NegateIfRed(
+          frc::ApplyDeadband<double>(-driverController.GetLeftX(), .1) *
+          consts::swerve::physical::DRIVE_MAX_SPEED);
+    }
+  ));
+
   (driverController.LeftTrigger() && frc2::RobotModeTriggers::Teleop()).OnTrue(IntakeNote());
   (!driverController.LeftTrigger() && !intakeSubsystem.TouchedNote() && frc2::RobotModeTriggers::Teleop())
       .OnTrue(frc2::cmd::Sequence(intakeSubsystem.Stop(),
