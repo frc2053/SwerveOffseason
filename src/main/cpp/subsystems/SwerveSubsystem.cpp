@@ -40,6 +40,9 @@ void SwerveSubsystem::AddVisionMeasurement(const frc::Pose2d& visionMeasurement,
 // This method will be called once per scheduler run
 void SwerveSubsystem::Periodic() {
   swerveDrive.UpdateNTEntries();
+  frc::SmartDashboard::PutNumber("Distance to Speaker Center", GetDistanceToSpeaker(SpeakerSide::CENTER).convert<units::inches>().value());
+  frc::SmartDashboard::PutNumber("Distance to Speaker Amp", GetDistanceToSpeaker(SpeakerSide::AMP_SIDE).convert<units::inches>().value());
+  frc::SmartDashboard::PutNumber("Distance to Speaker Center", GetDistanceToSpeaker(SpeakerSide::SOURCE).convert<units::inches>().value());
 }
 
 void SwerveSubsystem::SimulationPeriodic() {

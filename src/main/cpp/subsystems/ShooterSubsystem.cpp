@@ -58,6 +58,7 @@ frc2::CommandPtr ShooterSubsystem::RunShooter(
                    neutralState = false;
                    break;
                  case consts::shooter::PRESET_SPEEDS::SPEAKER_DIST:
+                   fmt::print("dist: {}\n", distance());
                    topWheelVelocitySetpoint =
                        consts::shooter::TOP_SHOOTER_LUT[distance()];
                    bottomWheelVelocitySetpoint =

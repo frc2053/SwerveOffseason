@@ -100,8 +100,8 @@ void RobotContainer::ConfigureBindings() {
   operatorController.B().OnFalse(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 
-  operatorController.X().WhileTrue(shooterSubsystem.RunShooter(
-      [] { return consts::shooter::PRESET_SPEEDS::SPEAKER_DIST; }, [this] { return swerveSubsystem.GetDistanceToSpeaker(swerveSubsystem.GetSpeakerSideFromPosition()); }));
+  operatorController.X().OnTrue(shooterSubsystem.RunShooter(
+      [] { return consts::shooter::PRESET_SPEEDS::SPEAKER_DIST; }, [this] { return swerveSubsystem.GetDistanceToSpeaker(swerveSubsystem.GetSpeakerSideFromPosition()); }).Repeatedly());
   operatorController.X().OnFalse(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::OFF; }));
 

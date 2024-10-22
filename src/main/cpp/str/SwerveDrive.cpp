@@ -79,9 +79,16 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel,
                         units::radians_per_second_t omega, bool fieldRelative,
                         bool openLoop) {
   frc::ChassisSpeeds speedsToSend;
+
+  frc::Rotation2d rot = poseEstimator.GetEstimatedPosition().Rotation();
+
+  if(frc::DriverStation::IsTeleop()) {
+    rot = frc::Rotation2d{GetYawFromImu()};
+  }
+  
   if (fieldRelative) {
     speedsToSend = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-        xVel, yVel, omega, poseEstimator.GetEstimatedPosition().Rotation());
+        xVel, yVel, omega, rot);
   } else {
     speedsToSend.vx = xVel;
     speedsToSend.vy = yVel;
