@@ -109,6 +109,40 @@ SpeakerSide SwerveSubsystem::GetSpeakerSideFromPosition() {
     }
 }
 
+frc2::CommandPtr SwerveSubsystem::RotateToAngle(
+  std::function<units::meters_per_second_t()> xVel, 
+  std::function<units::meters_per_second_t()> yVel, 
+  std::function<units::radian_t()> goalAngle, 
+  std::function<bool()> override) {
+  return frc2::cmd::Sequence(
+  frc2::cmd::RunOnce([this] {
+    thetaController.EnableContinuousInput(
+        units::radian_t{-std::numbers::pi},
+        units::radian_t{std::numbers::pi});
+    thetaController.SetTolerance(
+        consts::swerve::pathplanning::rotationalPIDTolerance,
+        consts::swerve::pathplanning::rotationalVelPIDTolerance);
+  }, {this}),
+  frc2::cmd::Run([this, xVel, yVel, goalAngle] {
+
+    units::radian_t goal = goalAngle();
+    frc::Pose2d robotPose = GetRobotPose();
+
+    if(str::IsOnRed()) {
+      goal = goal + 180_deg;
+    }
+    thetaController.SetGoal(goal);
+
+    units::radians_per_second_t thetaSpeed{
+        thetaController.Calculate(
+            robotPose.Rotation().Radians())};
+
+    swerveDrive.Drive(xVel(), yVel(), thetaSpeed, true);
+  }, {this})).Until([override] {
+    return override();
+  });
+}
+
 frc2::CommandPtr SwerveSubsystem::FaceSpeaker(
   std::function<units::meters_per_second_t()> xVel,
   std::function<units::meters_per_second_t()> yVel) {
