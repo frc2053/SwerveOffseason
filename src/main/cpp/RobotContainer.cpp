@@ -19,44 +19,104 @@ void RobotContainer::ConfigureBindings() {
   swerveSubsystem.SetDefaultCommand(swerveSubsystem.Drive(
       [this] {
         return str::NegateIfRed(
-            frc::ApplyDeadband<double>(-driverController.GetLeftY(), .1) *
+            frc::ApplyDeadband<double>(-sylaceController.GetY(), .1) *
             consts::swerve::physical::DRIVE_MAX_SPEED);
       },
       [this] {
         return str::NegateIfRed(
-            frc::ApplyDeadband<double>(-driverController.GetLeftX(), .1) *
+            frc::ApplyDeadband<double>(-sylaceController.GetX(), .1) *
             consts::swerve::physical::DRIVE_MAX_SPEED);
       },
       [this] {
-        return frc::ApplyDeadband<double>(-driverController.GetRightX(), .1) *
+        return frc::ApplyDeadband<double>(-sylaceController.GetZ(), .1) *
                consts::swerve::physical::DRIVE_MAX_ROT_SPEED;
       },
       true, true));
 
   // FAKE NOTE INTAKE
   if (frc::RobotBase::IsSimulation()) {
-    driverController.Start().WhileTrue(intakeSubsystem.FakeNote());
+    sylaceController.Twelve().WhileTrue(intakeSubsystem.FakeNote());
   }
 
-  driverController.LeftBumper().WhileTrue(swerveSubsystem.FaceSpeaker(
+  sylaceController.Five().WhileTrue(swerveSubsystem.FaceSpeaker(
     [this] {
       return str::NegateIfRed(
-          frc::ApplyDeadband<double>(-driverController.GetLeftY(), .1) *
+          frc::ApplyDeadband<double>(-sylaceController.GetY(), .1) *
           consts::swerve::physical::DRIVE_MAX_SPEED);
     },
     [this] {
       return str::NegateIfRed(
-          frc::ApplyDeadband<double>(-driverController.GetLeftX(), .1) *
+          frc::ApplyDeadband<double>(-sylaceController.GetX(), .1) *
           consts::swerve::physical::DRIVE_MAX_SPEED);
     }
   ));
 
-  (driverController.LeftTrigger() && frc2::RobotModeTriggers::Teleop()).OnTrue(IntakeNote());
-  (!driverController.LeftTrigger() && !intakeSubsystem.TouchedNote() && frc2::RobotModeTriggers::Teleop())
+  sylaceController.POVUp().OnTrue(swerveSubsystem.RotateToAngle(
+    [this] {
+      return str::NegateIfRed(
+          frc::ApplyDeadband<double>(-sylaceController.GetY(), .1) *
+          consts::swerve::physical::DRIVE_MAX_SPEED);
+    },
+    [this] {
+      return str::NegateIfRed(
+          frc::ApplyDeadband<double>(-sylaceController.GetX(), .1) *
+          consts::swerve::physical::DRIVE_MAX_SPEED);
+    },
+    [] { return 0_deg; },
+    [this] { return std::abs(frc::ApplyDeadband<double>(-sylaceController.GetZ(), .1)) >= .1; }
+  ));
+
+  sylaceController.POVLeft().OnTrue(swerveSubsystem.RotateToAngle(
+    [this] {
+      return str::NegateIfRed(
+          frc::ApplyDeadband<double>(-sylaceController.GetY(), .1) *
+          consts::swerve::physical::DRIVE_MAX_SPEED);
+    },
+    [this] {
+      return str::NegateIfRed(
+          frc::ApplyDeadband<double>(-sylaceController.GetX(), .1) *
+          consts::swerve::physical::DRIVE_MAX_SPEED);
+    },
+    [] { return 90_deg; },
+    [this] { return std::abs(frc::ApplyDeadband<double>(-sylaceController.GetZ(), .1)) >= .1; }
+  ));
+
+  sylaceController.POVRight().OnTrue(swerveSubsystem.RotateToAngle(
+    [this] {
+      return str::NegateIfRed(
+          frc::ApplyDeadband<double>(-sylaceController.GetY(), .1) *
+          consts::swerve::physical::DRIVE_MAX_SPEED);
+    },
+    [this] {
+      return str::NegateIfRed(
+          frc::ApplyDeadband<double>(-sylaceController.GetX(), .1) *
+          consts::swerve::physical::DRIVE_MAX_SPEED);
+    },
+    [] { return -90_deg; },
+    [this] { return std::abs(frc::ApplyDeadband<double>(-sylaceController.GetZ(), .1)) >= .1; }
+  ));
+
+  sylaceController.POVDown().OnTrue(swerveSubsystem.RotateToAngle(
+    [this] {
+      return str::NegateIfRed(
+          frc::ApplyDeadband<double>(-sylaceController.GetY(), .1) *
+          consts::swerve::physical::DRIVE_MAX_SPEED);
+    },
+    [this] {
+      return str::NegateIfRed(
+          frc::ApplyDeadband<double>(-sylaceController.GetX(), .1) *
+          consts::swerve::physical::DRIVE_MAX_SPEED);
+    },
+    [] { return 180_deg; },
+    [this] { return std::abs(frc::ApplyDeadband<double>(-sylaceController.GetZ(), .1)) >= .1; }
+  ));
+
+  (sylaceController.Thumb() && frc2::RobotModeTriggers::Teleop()).OnTrue(IntakeNote());
+  (!sylaceController.Thumb() && !intakeSubsystem.TouchedNote() && frc2::RobotModeTriggers::Teleop())
       .OnTrue(frc2::cmd::Sequence(intakeSubsystem.Stop(),
                                   frc2::cmd::Print("Cancelled")));
 
-  (shooterSubsystem.UpToSpeed() && driverController.RightTrigger() && frc2::RobotModeTriggers::Teleop())
+  (shooterSubsystem.UpToSpeed() && sylaceController.TriggerBtn() && frc2::RobotModeTriggers::Teleop())
       .OnTrue(feederSubsystem.Feed())
       .OnFalse(feederSubsystem.Stop());
 
@@ -65,9 +125,9 @@ void RobotContainer::ConfigureBindings() {
       intakeSubsystem.Stop(), feederSubsystem.Stop(),
       RumbleDriver([] { return .5_s; }), RumbleOperator([] { return .5_s; })));
 
-  driverController.A().WhileTrue(swerveSubsystem.AlignToAmp());
+  sylaceController.Three().WhileTrue(swerveSubsystem.AlignToAmp());
 
-  driverController.Start().OnTrue(swerveSubsystem.ZeroYaw());
+  sylaceController.Seven().OnTrue(swerveSubsystem.ZeroYaw());
 
 
   // controller.A().WhileTrue(swerveSubsystem.SysIdDriveQuasistaticTorque(frc2::sysid::Direction::kForward));
