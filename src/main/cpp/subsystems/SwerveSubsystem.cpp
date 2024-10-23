@@ -42,7 +42,7 @@ void SwerveSubsystem::Periodic() {
   swerveDrive.UpdateNTEntries();
   frc::SmartDashboard::PutNumber("Distance to Speaker Center", GetDistanceToSpeaker(SpeakerSide::CENTER).convert<units::inches>().value());
   frc::SmartDashboard::PutNumber("Distance to Speaker Amp", GetDistanceToSpeaker(SpeakerSide::AMP_SIDE).convert<units::inches>().value());
-  frc::SmartDashboard::PutNumber("Distance to Speaker Center", GetDistanceToSpeaker(SpeakerSide::SOURCE).convert<units::inches>().value());
+  frc::SmartDashboard::PutNumber("Distance to Speaker Source", GetDistanceToSpeaker(SpeakerSide::SOURCE).convert<units::inches>().value());
 }
 
 void SwerveSubsystem::SimulationPeriodic() {
@@ -193,16 +193,12 @@ frc2::CommandPtr SwerveSubsystem::FaceSpeaker(
       }
     }
 
-    fmt::print("speaker location: {}, {}\n", speakerLocation.X(), speakerLocation.Y());
 
     frc::Translation2d diff = robotPosition - speakerLocation;
 
     units::radian_t angleToSpeaker = units::math::atan2(diff.Y(), diff.X());
 
-
     angleToSpeaker = angleToSpeaker + 180_deg;
-
-    fmt::print("speaker goal: {}\n", angleToSpeaker.convert<units::degrees>());
 
     thetaController.SetGoal(angleToSpeaker);
 

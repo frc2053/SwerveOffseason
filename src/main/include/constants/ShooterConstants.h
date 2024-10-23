@@ -55,7 +55,7 @@ struct ShooterSpeeds {
 };
 
 inline constexpr ShooterSpeeds AMP_SPEEDS{850_rpm, 2000_rpm};
-inline constexpr ShooterSpeeds SUBWOOFER_SPEEDS{5000_rpm, 5000_rpm};
+inline constexpr ShooterSpeeds SUBWOOFER_SPEEDS{1200_rpm, 3200_rpm};
 inline constexpr ShooterSpeeds PASS_SPEEDS{5000_rpm, 5000_rpm};
 
 struct MeterHash {
