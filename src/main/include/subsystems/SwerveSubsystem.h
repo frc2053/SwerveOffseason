@@ -74,6 +74,8 @@ class SwerveSubsystem : public frc2::SubsystemBase {
   frc2::CommandPtr SysIdDriveQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdDriveDynamicVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr WheelRadius(frc2::sysid::Direction dir);
+  frc2::CommandPtr TuneAnglePID(std::function<bool()> isDone);
+  frc2::CommandPtr TunePosePID(std::function<bool()> isDone);
   frc2::CommandPtr TuneSteerPID(std::function<bool()> isDone);
   frc2::CommandPtr TuneDrivePID(std::function<bool()> isDone);
   void CalculateFoundNotePose(std::optional<units::meter_t> distanceToNote,

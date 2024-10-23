@@ -77,10 +77,14 @@ void RobotContainer::ConfigureBindings() {
   // controller.X().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kForward));
   // controller.Y().WhileTrue(swerveSubsystem.SysIdDriveDynamicTorque(frc2::sysid::Direction::kReverse));
 
-  // controller.POVDown().OnTrue(swerveSubsystem.TuneSteerPID([this] { return
-  // controller.Start().Get(); }));
-  // controller.POVUp().OnTrue(swerveSubsystem.TuneDrivePID([this] { return
-  // controller.Start().Get(); }));
+  driverController.POVDown().OnTrue(swerveSubsystem.TuneSteerPID([this] { return
+  driverController.Start().Get(); }));
+  driverController.POVUp().OnTrue(swerveSubsystem.TuneDrivePID([this] { return
+  driverController.Start().Get(); }));
+  driverController.POVLeft().OnTrue(swerveSubsystem.TuneAnglePID([this] { return
+  driverController.Start().Get(); }));
+  driverController.POVRight().OnTrue(swerveSubsystem.TunePosePID([this] { return
+  driverController.Start().Get(); }));
 
   // controller.Back().WhileTrue(
   //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));

@@ -412,6 +412,148 @@ frc2::CommandPtr SwerveSubsystem::Drive(
       .WithName("Drive Command");
 }
 
+frc2::CommandPtr SwerveSubsystem::TunePosePID(std::function<bool()> isDone) {
+  std::string tablePrefix = "SwerveDrive/robotPoseGains/";
+  return frc2::cmd::Sequence(
+      frc2::cmd::RunOnce(
+          [tablePrefix, this] {
+            frc::ChassisSpeeds currentSpeeds = GetFieldRelativeSpeed();
+            frc::Pose2d currentPose = GetRobotPose();
+
+            frc::SmartDashboard::PutNumber(tablePrefix + "setpointX", 0);
+            frc::SmartDashboard::PutNumber(tablePrefix + "setpointY", 0);
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "maxSpeed",
+                consts::swerve::physical::DRIVE_MAX_SPEED.convert<units::feet_per_second>().value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "maxAccel",
+                consts::swerve::physical::DRIVE_MAX_ACCEL.convert<units::feet_per_second_squared>().value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kP",
+                consts::swerve::pathplanning::POSE_P.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kI",
+                consts::swerve::pathplanning::POSE_I.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kD",
+                consts::swerve::pathplanning::POSE_D.value());
+
+            xPoseController.Reset(currentPose.X(), currentSpeeds.vx);
+            xPoseController.SetTolerance(
+                consts::swerve::pathplanning::translationalPIDTolerance,
+                consts::swerve::pathplanning::translationalVelPIDTolerance);
+
+            yPoseController.Reset(currentPose.Y(), currentSpeeds.vy);
+            yPoseController.SetTolerance(
+                consts::swerve::pathplanning::translationalPIDTolerance,
+                consts::swerve::pathplanning::translationalVelPIDTolerance);
+          },
+          {this}),
+      frc2::cmd::Run(
+          [this, tablePrefix] {
+              frc::Pose2d currentPose = GetRobotPose();
+              units::feet_per_second_t newSpeed = units::feet_per_second_t{frc::SmartDashboard::GetNumber(tablePrefix + "maxSpeed", 0)};
+              units::feet_per_second_squared_t newAccel = units::feet_per_second_squared_t{frc::SmartDashboard::GetNumber(tablePrefix + "maxAccel", 0)};
+              double newP = frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0);
+              double newI = frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0);
+              double newD = frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0);
+              double newGoalX = frc::SmartDashboard::GetNumber(tablePrefix + "setpointX", 0);
+              double newGoalY = frc::SmartDashboard::GetNumber(tablePrefix + "setpointY", 0);
+              frc::SmartDashboard::PutNumber(tablePrefix + "currentX", currentPose.X().convert<units::feet>().value());
+              frc::SmartDashboard::PutNumber(tablePrefix + "currentY", currentPose.Y().convert<units::feet>().value());
+
+
+              bool vEq = units::essentiallyEqual(xPoseController.GetConstraints().maxVelocity.convert<units::feet_per_second>(), newSpeed, 1e-6);
+              bool aEq = units::essentiallyEqual(xPoseController.GetConstraints().maxAcceleration.convert<units::feet_per_second_squared>(), newAccel, 1e-6);
+              bool pEq = units::essentiallyEqual(units::scalar_t{xPoseController.GetP()}, units::scalar_t{newP}, 1e-6);
+              bool iEq = units::essentiallyEqual(units::scalar_t{xPoseController.GetI()}, units::scalar_t{newI}, 1e-6);
+              bool dEq = units::essentiallyEqual(units::scalar_t{xPoseController.GetD()}, units::scalar_t{newD}, 1e-6);
+              
+              xPoseController.SetGoal(units::foot_t{newGoalX});
+              yPoseController.SetGoal(units::foot_t{newGoalY});
+
+              units::meters_per_second_t xSpeed{xPoseController.Calculate(currentPose.X())};
+              units::meters_per_second_t ySpeed{yPoseController.Calculate(currentPose.Y())};
+
+              if (!(pEq && iEq && dEq && vEq && aEq)) {
+                xPoseController.SetPID(newP, newI, newD);
+                xPoseController.SetConstraints(frc::TrapezoidProfile<units::meters>::Constraints{newSpeed, newAccel});
+                yPoseController.SetPID(newP, newI, newD);
+                yPoseController.SetConstraints(frc::TrapezoidProfile<units::meters>::Constraints{newSpeed, newAccel});
+              }
+
+              swerveDrive.Drive(xSpeed, ySpeed, 0_deg_per_s, true, true);
+          },
+          {this})
+          .Until(isDone));
+}
+
+frc2::CommandPtr SwerveSubsystem::TuneAnglePID(std::function<bool()> isDone) {
+  std::string tablePrefix = "SwerveDrive/robotAngleGains/";
+  return frc2::cmd::Sequence(
+      frc2::cmd::RunOnce(
+          [tablePrefix, this] {
+            frc::ChassisSpeeds currentSpeeds = GetFieldRelativeSpeed();
+            frc::Pose2d currentPose = GetRobotPose();
+
+            frc::SmartDashboard::PutNumber(tablePrefix + "setpoint", 0);
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "maxSpeed",
+                consts::swerve::physical::DRIVE_MAX_ROT_SPEED.convert<units::degrees_per_second>().value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "maxAccel",
+                consts::swerve::physical::DRIVE_MAX_ROT_ACCEL.convert<units::degrees_per_second_squared>().value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kP",
+                consts::swerve::pathplanning::ROTATION_P.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kI",
+                consts::swerve::pathplanning::ROTATION_I.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kD",
+                consts::swerve::pathplanning::ROTATION_D.value());
+
+            thetaController.Reset(currentPose.Rotation().Radians(), currentSpeeds.omega);
+            thetaController.SetTolerance(
+                consts::swerve::pathplanning::rotationalPIDTolerance,
+                consts::swerve::pathplanning::rotationalVelPIDTolerance);
+            thetaController.EnableContinuousInput(
+                units::radian_t{-std::numbers::pi},
+                units::radian_t{std::numbers::pi});
+          },
+          {this}),
+      frc2::cmd::Run(
+          [this, tablePrefix] {
+              frc::Pose2d currentPose = GetRobotPose();
+              units::degrees_per_second_t newSpeed = units::degrees_per_second_t{frc::SmartDashboard::GetNumber(tablePrefix + "maxSpeed", 0)};
+              units::degrees_per_second_squared_t newAccel = units::degrees_per_second_squared_t{frc::SmartDashboard::GetNumber(tablePrefix + "maxAccel", 0)};
+              double newP = frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0);
+              double newI = frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0);
+              double newD = frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0);
+              double newGoal = frc::SmartDashboard::GetNumber(tablePrefix + "setpoint", 0);
+              frc::SmartDashboard::PutNumber(tablePrefix + "current", currentPose.Rotation().Degrees().value());
+
+              bool vEq = units::essentiallyEqual(thetaController.GetConstraints().maxVelocity.convert<units::degrees_per_second>(), newSpeed, 1e-6);
+              bool aEq = units::essentiallyEqual(thetaController.GetConstraints().maxAcceleration.convert<units::degrees_per_second_squared>(), newAccel, 1e-6);
+              bool pEq = units::essentiallyEqual(units::scalar_t{thetaController.GetP()}, units::scalar_t{newP}, 1e-6);
+              bool iEq = units::essentiallyEqual(units::scalar_t{thetaController.GetI()}, units::scalar_t{newI}, 1e-6);
+              bool dEq = units::essentiallyEqual(units::scalar_t{thetaController.GetD()}, units::scalar_t{newD}, 1e-6);
+              
+              thetaController.SetGoal(units::degree_t{newGoal});
+
+              units::radians_per_second_t thetaSpeed{thetaController.Calculate(currentPose.Rotation().Radians())};
+
+              if (!(pEq && iEq && dEq && vEq && aEq)) {
+                thetaController.SetPID(newP, newI, newD);
+                thetaController.SetConstraints(frc::TrapezoidProfile<units::radians>::Constraints{newSpeed, newAccel});
+              }
+
+              swerveDrive.Drive(0_mps, 0_mps, thetaSpeed, true, true);
+          },
+          {this})
+          .Until(isDone));
+}
+
 frc2::CommandPtr SwerveSubsystem::PIDToPose(
     std::function<frc::Pose2d()> goalPose) {
   return frc2::cmd::Sequence(
