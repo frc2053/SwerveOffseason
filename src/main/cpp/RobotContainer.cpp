@@ -111,8 +111,6 @@ void RobotContainer::ConfigureBindings() {
     [this] { return std::abs(frc::ApplyDeadband<double>(-sylaceController.GetZ(), .1)) >= .1; }
   ));
 
-  //driverController.POVDown().WhileTrue(climberSubsystem.ManualControl([] { return 1; }, [] { return -1; }));
-
   (sylaceController.Thumb() && frc2::RobotModeTriggers::Teleop()).OnTrue(IntakeNote());
   (!sylaceController.Thumb() && !intakeSubsystem.TouchedNote() && frc2::RobotModeTriggers::Teleop())
       .OnTrue(frc2::cmd::Sequence(intakeSubsystem.Stop(),
