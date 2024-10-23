@@ -14,6 +14,7 @@
 #include "str/Vision.h"
 #include "subsystems/FeederSubsystem.h"
 #include "subsystems/SwerveSubsystem.h"
+#include "subsystems/ClimberSubsystem.h"
 
 class RobotContainer {
  public:
@@ -43,6 +44,7 @@ class RobotContainer {
   ShooterSubsystem shooterSubsystem;
   IntakeSubsystem intakeSubsystem;
   FeederSubsystem feederSubsystem;
+  //ClimberSubsystem climberSubsystem;
   str::Vision vision;
   str::NoteVisualizer noteVisualizer;
 
