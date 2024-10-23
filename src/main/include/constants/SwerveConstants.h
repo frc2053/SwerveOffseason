@@ -143,13 +143,13 @@ inline constexpr str::gains::radial::turn_volt_ka_unit_t
     MK4I_STEER_MOTION_MAGIC_KA{.1};
 inline constexpr str::gains::radial::turn_volt_kv_unit_t
     MK4I_STEER_MOTION_MAGIC_KV{.12 * physical::STEER_GEARING_MK4I.value()};
-inline constexpr str::gains::radial::turn_amp_ka_unit_t MK4I_STEER_KA{0};
-inline constexpr str::gains::radial::turn_amp_kv_unit_t MK4I_STEER_KV{0};
-inline constexpr units::ampere_t MK4I_STEER_KS{0};
+inline constexpr str::gains::radial::turn_amp_ka_unit_t MK4I_STEER_KA{.82395};
+inline constexpr str::gains::radial::turn_amp_kv_unit_t MK4I_STEER_KV{2.40};
+inline constexpr units::ampere_t MK4I_STEER_KS{4.7145};
 inline constexpr units::volt_t MK4I_STEER_KS_V{.1};
-inline constexpr str::gains::radial::turn_amp_kp_unit_t MK4I_STEER_KP{300};
+inline constexpr str::gains::radial::turn_amp_kp_unit_t MK4I_STEER_KP{500};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t MK4I_STEER_KI{0};
-inline constexpr str::gains::radial::turn_amp_kd_unit_t MK4I_STEER_KD{20.654};
+inline constexpr str::gains::radial::turn_amp_kd_unit_t MK4I_STEER_KD{39.663};
 
 inline constexpr units::radians_per_second_t MK4N_STEER_CRUISE_VEL =
     physical::STEER_MOTOR.freeSpeed / physical::STEER_GEARING_MK4N;
@@ -165,9 +165,9 @@ inline constexpr str::gains::radial::turn_amp_kp_unit_t MK4N_STEER_KP{1000};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t MK4N_STEER_KI{0};
 inline constexpr str::gains::radial::turn_amp_kd_unit_t MK4N_STEER_KD{50};
 
-inline constexpr str::gains::radial::turn_amp_ka_unit_t DRIVE_KA{51.54};
+inline constexpr str::gains::radial::turn_amp_ka_unit_t DRIVE_KA{0};
 inline constexpr str::gains::radial::turn_amp_kv_unit_t DRIVE_KV{0};
-inline constexpr units::ampere_t DRIVE_KS{25.247};
+inline constexpr units::ampere_t DRIVE_KS{9};
 inline constexpr units::volt_t DRIVE_KS_V{1};
 inline constexpr str::gains::radial::turn_amp_kp_unit_t DRIVE_KP{9};
 inline constexpr str::gains::radial::turn_amp_ki_unit_t DRIVE_KI{0};

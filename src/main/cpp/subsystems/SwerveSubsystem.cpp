@@ -827,7 +827,7 @@ frc2::CommandPtr SwerveSubsystem::TuneSteerPID(std::function<bool()> isDone) {
                 consts::swerve::gains::MK4I_STEER_KD.value());
             frc::SwerveModuleState zeroState{0_mps, frc::Rotation2d{0_rad}};
             swerveDrive.SetModuleStates(
-                {zeroState, zeroState, zeroState, zeroState});
+                {zeroState, zeroState, zeroState, zeroState}, true, true);
           },
           {this}),
       frc2::cmd::Run(
@@ -863,7 +863,7 @@ frc2::CommandPtr SwerveSubsystem::TuneSteerPID(std::function<bool()> isDone) {
                   0_mps, frc::Rotation2d{
                              units::degree_t{frc::SmartDashboard::GetNumber(
                                  tablePrefix + "setpoint", 0)}}};
-              swerveDrive.SetModuleStates({state, state, state, state});
+              swerveDrive.SetModuleStates({state, state, state, state}, true, true);
             }
           },
           {this})

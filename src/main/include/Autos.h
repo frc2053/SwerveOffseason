@@ -68,7 +68,7 @@ class Autos {
 
   frc2::CommandPtr TestChoreoAuto() {
     factory.Bind("test", [] { return frc2::cmd::Print("Hello from marker"); });
-    straightTraj = factory.Trajectory("ChoreoTest", loop);
+    straightTraj = factory.Trajectory("Straight", loop);
 
     loop.Enabled().OnTrue(frc2::cmd::RunOnce([this] {
                             m_swerveSub.ResetPose(

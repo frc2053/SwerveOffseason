@@ -27,15 +27,12 @@ void Robot::RobotInit() {
               consts::SWERVE_ODOM_LOOP_PERIOD, 2_ms);
 
   m_container.GetShooterSubsystem().SetupLUTs({
-    {48.13379_in, {1200_rpm, 3200_rpm}},
-    {59.13379_in, {1500_rpm, 1333.333_rpm}},
-    {71.73379_in, {2200_rpm, 1294.118_rpm}},
-    {84.43379_in, {2700_rpm, 1538.86_rpm}},
-    {95.73379_in, {3000_rpm, 1344.916_rpm}},
-    {107.9338_in, {2900_rpm, 1359.704_rpm}},
-    {120.3338_in, {2800_rpm, 1268.679_rpm}},
-    {133.1338_in, {2800_rpm, 1155.414_rpm}},
-    {144.2338_in, {2700_rpm, 1231.622_rpm}},
+    {65_in, {1200_rpm, 3500_rpm}},
+    {78_in, {2500_rpm, 2500_rpm}},
+    {102_in, {3000_rpm, 1900_rpm}},
+    {114_in, {3400_rpm, 1900_rpm}},
+    {127_in, {5000_rpm, 1600_rpm}},
+    {143_in, {5000_rpm, 1200_rpm}},
   });
 }
 
