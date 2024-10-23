@@ -188,25 +188,21 @@ frc2::CommandPtr SwerveSubsystem::FaceSpeaker(
       } else if (isSourceSide) {
         speakerLocation = consts::yearSpecific::speakerLocationAmpSide;
       }
+      if(str::IsOnRed()) {
+        speakerLocation = pathplanner::FlippingUtil::flipFieldPosition(speakerLocation);
+      }
     }
 
-    if(str::IsOnRed()) {
-      speakerLocation = pathplanner::FlippingUtil::flipFieldPosition(speakerLocation);
-    }
+    fmt::print("speaker location: {}, {}\n", speakerLocation.X(), speakerLocation.Y());
 
     frc::Translation2d diff = robotPosition - speakerLocation;
 
     units::radian_t angleToSpeaker = units::math::atan2(diff.Y(), diff.X());
 
 
-    if(!str::IsOnRed()) {
-      angleToSpeaker = angleToSpeaker + 180_deg;
-    }
-    else {
-      if(!isInCenter && (isSourceSide || isAmpSide)) {
-        angleToSpeaker = angleToSpeaker + 180_deg;
-      }
-    }
+    angleToSpeaker = angleToSpeaker + 180_deg;
+
+    fmt::print("speaker goal: {}\n", angleToSpeaker.convert<units::degrees>());
 
     thetaController.SetGoal(angleToSpeaker);
 
