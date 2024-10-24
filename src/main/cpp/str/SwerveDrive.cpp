@@ -207,7 +207,7 @@ void SwerveDrive::UpdateNTEntries() {
   odomPosePub.Set(GetOdomPose());
   //lookaheadPub.Set(GetPredictedPose(1_s, 1_s));
   estimatorPub.Set(GetPose());
-  isSlippingPub.Set(IsSlipping());
+  //isSlippingPub.Set(IsSlipping());
   odomUpdateRatePub.Set(odomUpdateRate.value());
 }
 
