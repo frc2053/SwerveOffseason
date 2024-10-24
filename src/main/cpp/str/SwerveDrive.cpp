@@ -98,8 +98,13 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel,
   speedsToSend =
       frc::ChassisSpeeds::Discretize(speedsToSend, consts::LOOP_PERIOD);
 
-  SetModuleStates(
-      consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend),
+  fmt::print("x: {}, y: {}, rot: {}\n", speedsToSend.vx, speedsToSend.vy, speedsToSend.omega);
+
+  std::array<frc::SwerveModuleState, 4> states = consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend);
+
+  fmt::print("fl speed: {} | fl angle: {}\n", states[0].speed, states[0].angle.Degrees());
+
+  SetModuleStates(states,
       true, openLoop,
       ConvertModuleForcesToTorqueCurrent(xModuleForce, yModuleForce));
 }
@@ -163,8 +168,8 @@ void SwerveDrive::AddVisionMeasurement(const frc::Pose2d& visionMeasurement,
     poseEstimator.AddVisionMeasurement(visionMeasurement, timestamp,
                                        newStdDevs);
   } else {
-    frc::DataLogManager::Log(
-        "WARNING: Vision pose was outside of field! Not adding to estimator!");
+    // frc::DataLogManager::Log(
+    //     "WARNING: Vision pose was outside of field! Not adding to estimator!");
   }
 }
 
@@ -200,7 +205,7 @@ void SwerveDrive::UpdateNTEntries() {
   currentStatesPub.Set(moduleStates);
   currentPositionsPub.Set(modulePositions);
   odomPosePub.Set(GetOdomPose());
-  lookaheadPub.Set(GetPredictedPose(1_s, 1_s));
+  //lookaheadPub.Set(GetPredictedPose(1_s, 1_s));
   estimatorPub.Set(GetPose());
   isSlippingPub.Set(IsSlipping());
   odomUpdateRatePub.Set(odomUpdateRate.value());

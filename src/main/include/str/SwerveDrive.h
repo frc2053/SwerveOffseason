@@ -149,8 +149,8 @@ class SwerveDrive {
 
   std::array<frc::SwerveModulePosition, 4> modulePositions;
   std::array<frc::SwerveModuleState, 4> moduleStates;
-  std::array<units::newton_t, 4> xModuleForce;
-  std::array<units::newton_t, 4> yModuleForce;
+  std::array<units::newton_t, 4> xModuleForce{};
+  std::array<units::newton_t, 4> yModuleForce{};
 
   frc::SwerveDriveOdometry<4> odom{consts::swerve::physical::KINEMATICS,
                                    frc::Rotation2d{0_deg}, modulePositions};

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <frc2/command/CommandPtr.h>
+//#include <str/CommandLogitechController.h>
 #include <frc2/command/button/CommandXboxController.h>
 
 #include <functional>
@@ -35,6 +36,7 @@ class RobotContainer {
   void ConfigureBindings();
   frc2::CommandXboxController driverController{0};
   frc2::CommandXboxController operatorController{1};
+  //frc2::CommandLogitechController sylaceController{2};
 
   frc2::CommandPtr RumbleDriver(std::function<units::second_t()> timeToRumble);
   frc2::CommandPtr RumbleOperator(
