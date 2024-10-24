@@ -27,45 +27,6 @@ class Autos {
     ).WithName("Intake Note Command Auto");
   }
 
-  frc2::CommandPtr CloseFourSafe() {
-    mtocenter = factory.Trajectory("CloseFourSafe", 0, safefourloop);
-    ctoamp = factory.Trajectory("CloseFourSafe", 1, safefourloop);
-    atosource = factory.Trajectory("CloseFourSafe", 2, safefourloop);
-
-    safefourloop.Enabled().OnTrue(
-      frc2::cmd::Sequence(
-      frc2::cmd::Print("RESET POSE"),
-      frc2::cmd::RunOnce([this] { m_swerveSub.ResetPose(mtocenter.GetInitialPose().value()); }).WithName("ResetPoseCmd"),
-      frc2::cmd::Print("SPIN UP SUB SHOT"),
-      m_shooterSub.RunShooter([] { return consts::shooter::PRESET_SPEEDS::SUBWOOFER; }),
-      m_feederSub.Feed().Until([this] { return !m_feederSub.HasNote(); }),
-      frc2::cmd::Print("SHOOT"),
-      frc2::cmd::Print("CENTER NOTE AND INTAKE"),
-      IntakeNote().DeadlineFor(mtocenter.Cmd()),
-      m_swerveSub.Stop(),
-      frc2::cmd::Print("SPIN UP SHOT"),
-      m_shooterSub.RunShooter([] { return consts::shooter::PRESET_SPEEDS::SPEAKER_DIST; }, [this] { return m_swerveSub.GetDistanceToSpeaker(SpeakerSide::CENTER); }),
-      m_feederSub.Feed().Until([this] { return !m_feederSub.HasNote(); }),
-      frc2::cmd::Print("SHOOT"),
-      frc2::cmd::Print("AMP NOTE AND INTAKE"),
-      IntakeNote().DeadlineFor(ctoamp.Cmd()),
-      m_swerveSub.Stop(),
-      frc2::cmd::Print("SPIN UP SHOT"),
-      m_shooterSub.RunShooter([] { return consts::shooter::PRESET_SPEEDS::SPEAKER_DIST; }, [this] { return m_swerveSub.GetDistanceToSpeaker(SpeakerSide::AMP_SIDE); }),
-      m_feederSub.Feed().Until([this] { return !m_feederSub.HasNote(); }),
-      frc2::cmd::Print("SHOOT"),
-      frc2::cmd::Print("SOURCE NOTE AND INTAKE"),
-      IntakeNote().DeadlineFor(atosource.Cmd()),
-      m_swerveSub.Stop(),
-      frc2::cmd::Print("SPIN UP SHOT"),
-      m_shooterSub.RunShooter([] { return consts::shooter::PRESET_SPEEDS::SPEAKER_DIST; }, [this] { return m_swerveSub.GetDistanceToSpeaker(SpeakerSide::SOURCE); }),
-      m_feederSub.Feed().Until([this] { return !m_feederSub.HasNote(); }),
-      frc2::cmd::Print("SHOOT")
-    ).WithName("WHOLE AUTO COMMAND"));
-
-    return safefourloop.Cmd();
-  }
-
   frc2::CommandPtr TestChoreoAuto() {
     factory.Bind("test", [] { return frc2::cmd::Print("Hello from marker"); });
     straightTraj = factory.Trajectory("Straight", loop);
@@ -94,11 +55,9 @@ class Autos {
     selectCommand = frc2::cmd::Select<AutoSelector>(
         [this] { return autoChooser.GetSelected(); },
         std::pair{CHOREO_TEST, TestChoreoAuto()},
-        std::pair{PP_TEST, pathplanner::PathPlannerAuto("PPTest").ToPtr()},
-        std::pair{CLOSE_FOUR_SAFE, CloseFourSafe()});
+        std::pair{CLOSE_FOUR_SAFE, pathplanner::PathPlannerAuto("SafeCloseFour").ToPtr()});
 
     autoChooser.AddOption("Choreo Test", AutoSelector::CHOREO_TEST);
-    autoChooser.AddOption("Path Planner Test", AutoSelector::PP_TEST);
     autoChooser.AddOption("Close Four Safe", AutoSelector::CLOSE_FOUR_SAFE);
 
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
@@ -108,6 +67,12 @@ class Autos {
 
  private:
   void BindCommandsAndTriggers() {
+
+    pathplanner::NamedCommands::registerCommand("SubwooferSpinUp", m_shooterSub.RunShooter([] { return consts::shooter::PRESET_SPEEDS::SUBWOOFER; }));
+    pathplanner::NamedCommands::registerCommand("DistanceSpinUp", m_shooterSub.RunShooter([] { return consts::shooter::PRESET_SPEEDS::SPEAKER_DIST; }, [this] { return m_swerveSub.GetDistanceToSpeaker(SpeakerSide::CENTER); }));
+    pathplanner::NamedCommands::registerCommand("Shoot", m_feederSub.Feed().Until([this] { return !m_feederSub.HasNote(); }));
+    pathplanner::NamedCommands::registerCommand("Intake", IntakeNote());
+
     factory.Bind("SpinUpShooterCenter", [this] { return m_shooterSub.RunShooter(
       [] { 
         return consts::shooter::PRESET_SPEEDS::SPEAKER_DIST; 
