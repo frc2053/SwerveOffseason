@@ -27,6 +27,13 @@ class Autos {
     ).WithName("Intake Note Command Auto");
   }
 
+  frc2::CommandPtr SpitNote() {
+    return frc2::cmd::Sequence(
+      m_shooterSub.RunShooter([this] { return consts::shooter::PRESET_SPEEDS::SPIT; }),
+      m_feederSub.Feed().Until([this] { return !m_feederSub.HasNote(); })
+    );
+  }
+
   frc2::CommandPtr TestChoreoAuto() {
     factory.Bind("test", [] { return frc2::cmd::Print("Hello from marker"); });
     straightTraj = factory.Trajectory("Straight", loop);
@@ -55,10 +62,29 @@ class Autos {
     selectCommand = frc2::cmd::Select<AutoSelector>(
         [this] { return autoChooser.GetSelected(); },
         std::pair{CHOREO_TEST, TestChoreoAuto()},
-        std::pair{CLOSE_FOUR_SAFE, pathplanner::PathPlannerAuto("SafeCloseFour").ToPtr()});
+        std::pair{CLOSE_FOUR_SAFE, pathplanner::PathPlannerAuto("SafeCloseFour").ToPtr()},
+        std::pair{SOURCE_SIDE, frc2::cmd::Sequence(
+          pathplanner::PathPlannerAuto("Source").ToPtr(),
+          frc2::cmd::Wait(.5_s),
+          frc2::cmd::Either(
+            pathplanner::PathPlannerAuto("SourceGotNote").ToPtr(), 
+            pathplanner::PathPlannerAuto("SourceNoNote").ToPtr(),
+            [this] { return m_feederSub.HasNote(); })
+        )},
+        std::pair{AMP_SIDE, frc2::cmd::Sequence(
+          pathplanner::PathPlannerAuto("Amp").ToPtr(),
+          frc2::cmd::Wait(.5_s),
+          frc2::cmd::Either(
+            pathplanner::PathPlannerAuto("AmpGotNote").ToPtr(), 
+            pathplanner::PathPlannerAuto("AmpNoNote").ToPtr(),
+            [this] { return m_feederSub.HasNote(); }),
+          pathplanner::PathPlannerAuto("AmpClose").ToPtr()
+        )});
 
     autoChooser.AddOption("Choreo Test", AutoSelector::CHOREO_TEST);
     autoChooser.AddOption("Close Four Safe", AutoSelector::CLOSE_FOUR_SAFE);
+    autoChooser.AddOption("Source", AutoSelector::SOURCE_SIDE);
+    autoChooser.AddOption("Amp", AutoSelector::AMP_SIDE);
 
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
   }
@@ -72,6 +98,7 @@ class Autos {
     pathplanner::NamedCommands::registerCommand("DistanceSpinUp", m_shooterSub.RunShooter([] { return consts::shooter::PRESET_SPEEDS::SPEAKER_DIST; }, [this] { return m_swerveSub.GetDistanceToSpeaker(SpeakerSide::CENTER); }));
     pathplanner::NamedCommands::registerCommand("Shoot", m_feederSub.Feed().Until([this] { return !m_feederSub.HasNote(); }));
     pathplanner::NamedCommands::registerCommand("Intake", IntakeNote());
+    pathplanner::NamedCommands::registerCommand("Spit", SpitNote());
 
     factory.Bind("SpinUpShooterCenter", [this] { return m_shooterSub.RunShooter(
       [] { 
@@ -104,7 +131,7 @@ class Autos {
     );
   }
 
-  enum AutoSelector { CHOREO_TEST, PP_TEST, CLOSE_FOUR_SAFE };
+  enum AutoSelector { CHOREO_TEST, PP_TEST, CLOSE_FOUR_SAFE, SOURCE_SIDE, AMP_SIDE };
 
   frc::SendableChooser<AutoSelector> autoChooser;
 

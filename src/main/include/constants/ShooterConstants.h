@@ -54,6 +54,7 @@ struct ShooterSpeeds {
   units::turns_per_second_t bottomSpeed;
 };
 
+inline constexpr ShooterSpeeds SPIT_SPEEDS{850_rpm, 850_rpm};
 inline constexpr ShooterSpeeds AMP_SPEEDS{850_rpm, 2000_rpm};
 inline constexpr ShooterSpeeds SUBWOOFER_SPEEDS{1200_rpm, 3200_rpm};
 inline constexpr ShooterSpeeds PASS_SPEEDS{5000_rpm, 5000_rpm};
@@ -69,6 +70,6 @@ inline static wpi::interpolating_map<units::meter_t, units::turns_per_second_t>
 inline static wpi::interpolating_map<units::meter_t, units::turns_per_second_t>
     BOTTOM_SHOOTER_LUT{};
 
-enum class PRESET_SPEEDS { OFF, AMP, SPEAKER_DIST, SUBWOOFER, PASS, TUNING };
+enum class PRESET_SPEEDS { OFF, AMP, SPEAKER_DIST, SUBWOOFER, PASS, TUNING, SPIT };
 }  // namespace shooter
 }  // namespace consts
