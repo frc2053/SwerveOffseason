@@ -46,7 +46,7 @@ class RobotContainer {
   ShooterSubsystem shooterSubsystem;
   IntakeSubsystem intakeSubsystem;
   FeederSubsystem feederSubsystem;
-  //ClimberSubsystem climberSubsystem;
+  ClimberSubsystem climberSubsystem;
   str::Vision vision;
   str::NoteVisualizer noteVisualizer;
 
