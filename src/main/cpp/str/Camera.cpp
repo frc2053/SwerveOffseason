@@ -30,7 +30,7 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
     : simulate(simulate),
       posePub(nt->GetStructTopic<frc::Pose2d>(cameraName + "PoseEstimation")
                   .Publish()),
-      singleTagDevs(singleTagDevs),
+      singleTagDevs(singleTagStdDev),
       multiTagDevs(multiTagDevs),
       stdDevXPosePub(nt->GetDoubleTopic(cameraName + "StdDevsX").Publish()),
       stdDevYPosePub(nt->GetDoubleTopic(cameraName + "StdDevsY").Publish()),
@@ -133,10 +133,6 @@ photon::PhotonPipelineResult Camera::GetLatestResult() {
 }
 
 std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
-  if (!simulate) {
-    return std::nullopt;
-  }
-
   std::optional<photon::EstimatedRobotPose> visionEst;
 
   auto result = camera->GetLatestResult();
@@ -149,16 +145,19 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
   }
 
   latestResult = result;
+
+  const auto& targetsSpan = result.GetTargets();
+  targetsCopy = std::vector<photon::PhotonTrackedTarget>(targetsSpan.begin(), targetsSpan.end());
+ 
   return visionEst;
 }
 
 Eigen::Matrix<double, 3, 1> Camera::GetEstimationStdDevs(
     frc::Pose2d estimatedPose) {
   Eigen::Matrix<double, 3, 1> estStdDevs = singleTagDevs;
-  auto targets = GetLatestResult().GetTargets();
   int numTags = 0;
   units::meter_t avgDist = 0_m;
-  for (const auto& tgt : targets) {
+  for (const auto& tgt : targetsCopy) {
     auto tagPose =
         photonEstimator->GetFieldLayout().GetTagPose(tgt.GetFiducialId());
     if (tagPose.has_value()) {
@@ -180,14 +179,16 @@ Eigen::Matrix<double, 3, 1> Camera::GetEstimationStdDevs(
          std::numeric_limits<double>::max(), std::numeric_limits<double>::max())
             .finished();
   } else {
-    estStdDevs = estStdDevs * (1 + (avgDist.value() * avgDist.value() / 30));
+    estStdDevs = estStdDevs * (1 + (avgDist.value() * avgDist.value() / 30.0));
   }
 
-  if (!simulate) {
-    stdDevXPosePub.Set(estStdDevs(0));
-    stdDevYPosePub.Set(estStdDevs(1));
-    stdDevRotPosePub.Set(estStdDevs(2));
+  if(estStdDevs(0) == 0 || estStdDevs(1) == 0 || estStdDevs(2) == 0) {
+    fmt::print("ERROR STD DEV IS ZERO!\n");
   }
+
+  stdDevXPosePub.Set(estStdDevs(0));
+  stdDevYPosePub.Set(estStdDevs(1));
+  stdDevRotPosePub.Set(estStdDevs(2));
 
   return estStdDevs;
 }

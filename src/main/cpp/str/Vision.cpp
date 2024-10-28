@@ -16,8 +16,8 @@ std::vector<std::optional<Eigen::Matrix<double, 3, 1>>> Vision::GetPoseStdDevs(
   int i = 0;
   for (auto& cam : cameras) {
     if (poses[i].has_value()) {
-      allStdDevs.push_back(
-          cam.GetEstimationStdDevs(poses[i].value().estimatedPose.ToPose2d()));
+      auto stddev = cam.GetEstimationStdDevs(poses[i].value().estimatedPose.ToPose2d());
+      allStdDevs.push_back(stddev);
     } else {
       allStdDevs.push_back(std::nullopt);
     }

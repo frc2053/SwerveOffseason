@@ -98,11 +98,7 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel,
   speedsToSend =
       frc::ChassisSpeeds::Discretize(speedsToSend, consts::LOOP_PERIOD);
 
-  fmt::print("x: {}, y: {}, rot: {}\n", speedsToSend.vx, speedsToSend.vy, speedsToSend.omega);
-
   std::array<frc::SwerveModuleState, 4> states = consts::swerve::physical::KINEMATICS.ToSwerveModuleStates(speedsToSend);
-
-  fmt::print("fl speed: {} | fl angle: {}\n", states[0].speed, states[0].angle.Degrees());
 
   SetModuleStates(states,
       true, openLoop,

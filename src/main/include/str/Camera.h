@@ -43,6 +43,7 @@ class Camera {
   std::shared_ptr<photon::PhotonCameraSim> cameraSim;
 
   photon::PhotonPipelineResult latestResult;
+  std::vector<photon::PhotonTrackedTarget> targetsCopy;
 
   Eigen::Matrix<double, 3, 1> singleTagDevs;
   Eigen::Matrix<double, 3, 1> multiTagDevs;
