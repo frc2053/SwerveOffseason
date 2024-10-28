@@ -51,7 +51,7 @@ void RobotContainer::ConfigureBindings() {
     }
   ));
 
-  driverController.POVDown().WhileTrue(climberSubsystem.ManualControl([] { return 1; }, [] { return -1; }));
+  driverController.POVDown().WhileTrue(climberSubsystem.ManualControl([] { return .6; }, [] { return -.6; }));
 
   (driverController.LeftTrigger() && frc2::RobotModeTriggers::Teleop()).OnTrue(IntakeNote());
   (!driverController.LeftTrigger() && !intakeSubsystem.TouchedNote() && frc2::RobotModeTriggers::Teleop())
