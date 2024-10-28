@@ -83,7 +83,7 @@ void SwerveDrive::Drive(units::meters_per_second_t xVel,
   frc::Rotation2d rot = poseEstimator.GetEstimatedPosition().Rotation();
 
   if(frc::DriverStation::IsTeleop()) {
-    rot = frc::Rotation2d{GetYawFromImu()};
+    rot = odom.GetPose().Rotation();
   }
   
   if (fieldRelative) {
