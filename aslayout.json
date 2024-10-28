@@ -7,16 +7,22 @@
       "height": 1408,
       "state": {
         "sidebar": {
-          "width": 435,
+          "width": 478,
           "expanded": [
             "/SwerveDrive/OdometryPose/rotation",
             "/NoteVisualizer",
-            "/Vision",
-            "/Vision/fl_camPoseEstimation/translation"
+            "/Vision/fl_camPoseEstimation/translation",
+            "/NT",
+            "/NT/photonvision/str_fr_cam",
+            "/NT/SwerveDrive",
+            "/SwerveDrive",
+            "/Vision/str_fl_camPoseEstimation/translation",
+            "/Vision/str_bl_camPoseEstimation/rotation",
+            "/Vision/str_fl_camPoseEstimation/rotation"
           ]
         },
         "tabs": {
-          "selected": 6,
+          "selected": 7,
           "tabs": [
             {
               "type": 0,
@@ -33,7 +39,31 @@
                 "sources": [
                   {
                     "type": "independent",
-                    "logKey": "NT:/Looptime/RobotPeriodicLoopRate",
+                    "logKey": "NT:/SwerveDrive/OdomUpdateRate",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2"
+                    }
+                  }
+                ],
+                "timeRange": "full",
+                "rangeMin": 0,
+                "rangeMax": 10,
+                "stepSize": 1
+              },
+              "controllerUUID": "1pf3zmar42tcgtx3etsvvndz3qrtlxew",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 6,
+              "title": "FL STD DEVS",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "independent",
+                    "logKey": "NT:/Vision/str_fl_camPoseEstimation/translation/x",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -42,20 +72,29 @@
                   },
                   {
                     "type": "independent",
-                    "logKey": "NT:/SwerveDrive/OdomUpdateRate",
+                    "logKey": "NT:/Vision/str_fl_camPoseEstimation/translation/y",
                     "logType": "Number",
                     "visible": true,
                     "options": {
                       "color": "#e5b31b"
                     }
+                  },
+                  {
+                    "type": "independent",
+                    "logKey": "NT:/Vision/str_fl_camPoseEstimation/rotation/value",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437"
+                    }
                   }
                 ],
-                "timeRange": "visible",
+                "timeRange": "live-30",
                 "rangeMin": 0,
                 "rangeMax": 10,
                 "stepSize": 1
               },
-              "controllerUUID": "1pf3zmar42tcgtx3etsvvndz3qrtlxew",
+              "controllerUUID": "6pjfdtiby71505ho7wa5qxzty118zjj5",
               "renderer": null,
               "controlsHeight": 200
             },
@@ -343,25 +382,7 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/Vision/fl_camPoseEstimation",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "color": "#ff00ff"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Vision/fr_camPoseEstimation",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "color": "#ff0000"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Vision/bl_camPoseEstimation",
+                    "logKey": "NT:/Vision/str_fl_camPoseEstimation",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
@@ -370,11 +391,29 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/Vision/br_camPoseEstimation",
+                    "logKey": "NT:/Vision/str_fr_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/str_bl_camPoseEstimation",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
                       "color": "#ff8c00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/str_br_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ffff00"
                     }
                   }
                 ],
@@ -386,40 +425,7 @@
               },
               "controllerUUID": "6q8070aith5aem4qas9vqibokc53tw2u",
               "renderer": null,
-              "controlsHeight": 765
-            },
-            {
-              "type": 6,
-              "title": "Statistics",
-              "controller": {
-                "sources": [
-                  {
-                    "type": "independent",
-                    "logKey": "NT:/Vision/fl_camPoseEstimation/translation/x",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#2b66a2"
-                    }
-                  },
-                  {
-                    "type": "independent",
-                    "logKey": "NT:/Vision/fl_camPoseEstimation/translation/y",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#e5b31b"
-                    }
-                  }
-                ],
-                "timeRange": "live-30",
-                "rangeMin": 0,
-                "rangeMax": 10,
-                "stepSize": 1
-              },
-              "controllerUUID": "6pjfdtiby71505ho7wa5qxzty118zjj5",
-              "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 370
             },
             {
               "type": 3,
@@ -530,7 +536,7 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/Vision/fl_camPoseEstimation",
+                    "logKey": "NT:/Vision/str_bl_camPoseEstimation",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
@@ -540,7 +546,7 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/Vision/fr_camPoseEstimation",
+                    "logKey": "NT:/Vision/str_br_camPoseEstimation",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
@@ -550,7 +556,7 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/Vision/bl_camPoseEstimation",
+                    "logKey": "NT:/Vision/str_fl_camPoseEstimation",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
@@ -560,7 +566,7 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/Vision/br_camPoseEstimation",
+                    "logKey": "NT:/Vision/str_fr_camPoseEstimation",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
@@ -577,17 +583,17 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  4.034997599180597,
-                  4.701973813172726,
-                  -7.471308492866793
+                  0.2309568906760111,
+                  10.739833477812994,
+                  -6.054105340193688
                 ],
                 "cameraTarget": [
-                  4.176943140826416,
-                  0.4055404314605505,
-                  -0.34845045335340447
+                  -1.5949805694850459,
+                  -5.405350708392064,
+                  -0.3930960781948683
                 ]
               },
-              "controlsHeight": 233
+              "controlsHeight": 305
             },
             {
               "type": 9,
@@ -637,5 +643,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.0.0-beta-1"
+  "version": "4.0.0-beta-2"
 }
