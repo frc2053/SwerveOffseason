@@ -81,17 +81,16 @@ void RobotContainer::ConfigureBindings() {
   // driverController.Start().Get(); }));
   // driverController.POVUp().OnTrue(swerveSubsystem.TuneDrivePID([this] { return
   // driverController.Start().Get(); }));
-  // driverController.POVLeft().OnTrue(swerveSubsystem.TuneAnglePID([this] { return
-  // driverController.Start().Get(); }));
-  // driverController.POVRight().OnTrue(swerveSubsystem.TunePosePID([this] { return
-  // driverController.Start().Get(); }));
 
   tuningTable->PutBoolean("WheelRadiusFwd", false);
   tuningTable->PutBoolean("WheelRadiusRev", false);
-
+  tuningTable->PutBoolean("AnglePIDTuning", false);
+  tuningTable->PutBoolean("PosePIDTuning", false);
 
   wheelRadFwdBtn.WhileTrue(swerveSubsystem.WheelRadius(frc2::sysid::Direction::kForward));
   wheelRadRevBtn.WhileTrue(swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));
+  anglePIDBtn.OnTrue(swerveSubsystem.TuneAnglePID([this] { return !anglePIDBtn.Get(); }));
+  posePIDBtn.OnTrue(swerveSubsystem.TunePosePID([this] { return !posePIDBtn.Get(); }));
 
   operatorController.A().WhileTrue(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::AMP; }));

@@ -43,6 +43,9 @@ class RobotContainer {
 
   frc2::NetworkButton wheelRadFwdBtn{tuningTable, "WheelRadiusFwd"};
   frc2::NetworkButton wheelRadRevBtn{tuningTable, "WheelRadiusRev"};
+  frc2::NetworkButton anglePIDBtn{tuningTable, "AnglePIDTuning"};
+  frc2::NetworkButton posePIDBtn{tuningTable, "PosePIDTuning"};
+
 
   frc2::CommandPtr RumbleDriver(std::function<units::second_t()> timeToRumble);
   frc2::CommandPtr RumbleOperator(
