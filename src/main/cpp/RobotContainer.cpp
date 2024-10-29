@@ -86,10 +86,12 @@ void RobotContainer::ConfigureBindings() {
   // driverController.POVRight().OnTrue(swerveSubsystem.TunePosePID([this] { return
   // driverController.Start().Get(); }));
 
-  // controller.Back().WhileTrue(
-  //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));
-  // controller.Start().WhileTrue(
-  //     swerveSubsystem.WheelRadius(frc2::sysid::Direction::kForward));
+  tuningTable->PutBoolean("WheelRadiusFwd", false);
+  tuningTable->PutBoolean("WheelRadiusRev", false);
+
+
+  wheelRadFwdBtn.WhileTrue(swerveSubsystem.WheelRadius(frc2::sysid::Direction::kForward));
+  wheelRadRevBtn.WhileTrue(swerveSubsystem.WheelRadius(frc2::sysid::Direction::kReverse));
 
   operatorController.A().WhileTrue(shooterSubsystem.RunShooter(
       [] { return consts::shooter::PRESET_SPEEDS::AMP; }));

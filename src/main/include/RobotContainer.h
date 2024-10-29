@@ -7,6 +7,7 @@
 #include <frc2/command/CommandPtr.h>
 //#include <str/CommandLogitechController.h>
 #include <frc2/command/button/CommandXboxController.h>
+#include <frc2/command/button/NetworkButton.h>
 
 #include <functional>
 
@@ -37,6 +38,11 @@ class RobotContainer {
   frc2::CommandXboxController driverController{0};
   frc2::CommandXboxController operatorController{1};
   //frc2::CommandLogitechController sylaceController{2};
+
+  std::shared_ptr<nt::NetworkTable> tuningTable{nt::NetworkTableInstance::GetDefault().GetTable("Tuning")};
+
+  frc2::NetworkButton wheelRadFwdBtn{tuningTable, "WheelRadiusFwd"};
+  frc2::NetworkButton wheelRadRevBtn{tuningTable, "WheelRadiusRev"};
 
   frc2::CommandPtr RumbleDriver(std::function<units::second_t()> timeToRumble);
   frc2::CommandPtr RumbleOperator(
