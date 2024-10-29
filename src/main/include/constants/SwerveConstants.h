@@ -37,7 +37,7 @@ inline constexpr int IMU = 14;
 namespace current_limits {
 inline constexpr units::ampere_t STEER_TORQUE_CURRENT_LIMIT = 40_A;
 inline constexpr units::ampere_t SUPPLY_CURRENT_LIMIT = 60_A;
-    inline constexpr units::ampere_t SLIP_CURRENT_LIMIT = 120_A;
+    inline constexpr units::ampere_t SLIP_CURRENT_LIMIT = 100_A;
 }  // namespace current_limits
 
 namespace physical {
