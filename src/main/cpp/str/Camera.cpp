@@ -21,6 +21,7 @@
 #include "photon/estimation/TargetModel.h"
 #include "photon/simulation/VisionTargetSim.h"
 #include "units/angle.h"
+#include <frc/DataLogManager.h>
 
 using namespace str;
 
@@ -183,7 +184,7 @@ Eigen::Matrix<double, 3, 1> Camera::GetEstimationStdDevs(
   }
 
   if(estStdDevs(0) == 0 || estStdDevs(1) == 0 || estStdDevs(2) == 0) {
-    fmt::print("ERROR STD DEV IS ZERO!\n");
+    frc::DataLogManager::Log("ERROR STD DEV IS ZERO!\n");
   }
 
   stdDevXPosePub.Set(estStdDevs(0));
