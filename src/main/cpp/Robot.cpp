@@ -27,6 +27,7 @@ void Robot::RobotInit() {
               consts::SWERVE_ODOM_LOOP_PERIOD, 2_ms);
 
   m_container.GetShooterSubsystem().SetupLUTs({
+    {45.5_in, {2053_rpm, 3800_rpm}},
     {60.5_in, {1500_rpm, 2500_rpm}},
     {76_in, {2500_rpm, 2053_rpm}},
     {88_in, {3100_rpm, 1900_rpm}},
