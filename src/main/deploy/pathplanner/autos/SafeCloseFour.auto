@@ -38,7 +38,7 @@
         {
           "type": "named",
           "data": {
-            "name": "DistanceSpinUp"
+            "name": "SubwooferSpinUp"
           }
         },
         {
@@ -69,7 +69,7 @@
         {
           "type": "named",
           "data": {
-            "name": "DistanceSpinUp"
+            "name": "SubwooferSpinUp"
           }
         },
         {
@@ -100,7 +100,38 @@
         {
           "type": "named",
           "data": {
-            "name": "DistanceSpinUp"
+            "name": "SubwooferSpinUp"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CloseFourSafe.3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SubwooferSpinUp"
           }
         },
         {
