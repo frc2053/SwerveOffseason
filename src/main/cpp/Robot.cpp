@@ -31,7 +31,7 @@ void Robot::RobotInit() {
     {60.5_in, {1500_rpm, 2500_rpm}},
     {76_in, {2500_rpm, 2053_rpm}},
     {88_in, {3100_rpm, 1900_rpm}},
-    {106_in, {3000_rpm, 1600_rpm}}
+    {106_in, {3000_rpm, 1650_rpm}}
   });
 }
 

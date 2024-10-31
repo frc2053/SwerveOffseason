@@ -94,7 +94,7 @@ inline constexpr units::scalar_t COUPLING_RATIO = (50.0 / 16.0);
 inline constexpr frc::DCMotor DRIVE_MOTOR = frc::DCMotor::Falcon500FOC(1);
 inline constexpr frc::DCMotor STEER_MOTOR = frc::DCMotor::Falcon500FOC(1);
 
-inline constexpr units::meter_t WHEEL_RADIUS = 2_in;
+inline constexpr units::meter_t WHEEL_RADIUS = 1.9154_in;
 
 // Distance between center of drive wheels
 inline constexpr units::meter_t WHEELBASE_WIDTH = 21.75_in;

@@ -55,9 +55,9 @@ struct ShooterSpeeds {
 };
 
 inline constexpr ShooterSpeeds SPIT_SPEEDS{850_rpm, 850_rpm};
-inline constexpr ShooterSpeeds AMP_SPEEDS{850_rpm, 2000_rpm};
+inline constexpr ShooterSpeeds AMP_SPEEDS{750_rpm, 2250_rpm};
 inline constexpr ShooterSpeeds SUBWOOFER_SPEEDS{2053_rpm, 3800_rpm};
-inline constexpr ShooterSpeeds PASS_SPEEDS{5000_rpm, 5000_rpm};
+inline constexpr ShooterSpeeds PASS_SPEEDS{2053_rpm, 3500_rpm};
 
 struct MeterHash {
   size_t operator()(const units::meter_t& m) const {
