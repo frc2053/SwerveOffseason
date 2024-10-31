@@ -57,7 +57,9 @@ class SwerveSubsystem : public frc2::SubsystemBase {
                          std::function<units::radians_per_second_t()> omega,
                          bool fieldRelative, bool openLoop = false);
   frc2::CommandPtr PIDToPose(std::function<frc::Pose2d()> goalPose);
+  frc2::CommandPtr AlignToPass();
   frc2::CommandPtr AlignToAmp();
+  frc::Pose2d GetPassPose();
   SpeakerSide GetSpeakerSideFromPosition();
   frc2::CommandPtr RotateToAngle(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel, std::function<units::radian_t()> goalAngle, std::function<bool()> override);
   frc2::CommandPtr FaceSpeaker(std::function<units::meters_per_second_t()> xVel, std::function<units::meters_per_second_t()> yVel);

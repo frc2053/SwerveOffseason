@@ -154,6 +154,16 @@ frc2::CommandPtr SwerveSubsystem::FaceSpeaker(
     thetaController.SetTolerance(
         consts::swerve::pathplanning::rotationalPIDTolerance,
         consts::swerve::pathplanning::rotationalVelPIDTolerance);
+
+    frc::Translation2d speakerLocation = consts::yearSpecific::speakerLocationCenter;
+    if (str::IsOnRed()) {
+      speakerLocation = pathplanner::FlippingUtil::flipFieldPosition(speakerLocation);
+    }
+    frc::Pose2d robotPose = GetRobotPose();
+    frc::Translation2d diff = robotPose.Translation() - speakerLocation;
+    units::radian_t angleToSpeaker = units::math::atan2(diff.Y(), diff.X());
+    angleToSpeaker = angleToSpeaker + 180_deg;
+    thetaController.SetGoal(angleToSpeaker);
   }, {this}),
   frc2::cmd::Run([this, xVel, yVel] {
     frc::Translation2d speakerLocation = consts::yearSpecific::speakerLocationCenter;
@@ -621,6 +631,28 @@ frc2::CommandPtr SwerveSubsystem::AlignToAmp() {
            return frc::Pose2d{GetAmpLocation(), frc::Rotation2d{90_deg}};
          })
       .WithName("AlignToAmp");
+}
+
+frc::Pose2d SwerveSubsystem::GetPassPose() {
+  frc::Pose2d robotPose = GetRobotPose();
+
+  frc::Translation2d passPosition = consts::yearSpecific::passPosition;
+  frc::Translation2d ampLocation = consts::yearSpecific::ampLocation;
+  if(str::IsOnRed()) {
+    passPosition = pathplanner::FlippingUtil::flipFieldPosition(passPosition);
+    ampLocation = pathplanner::FlippingUtil::flipFieldPosition(ampLocation);
+  }
+
+  frc::Translation2d diff = robotPose.Translation() - ampLocation;
+  units::radian_t angleToAmp = units::math::atan2(diff.Y(), diff.X());
+  return frc::Pose2d{passPosition, frc::Rotation2d{angleToAmp}.RotateBy(180_deg)};
+}
+
+frc2::CommandPtr SwerveSubsystem::AlignToPass() {
+  return PIDToPose([this] {
+           return GetPassPose();
+         })
+      .WithName("AlignToPass");
 }
 
 frc2::CommandPtr SwerveSubsystem::SysIdSteerMk4iQuasistaticTorque(

@@ -68,6 +68,7 @@ void RobotContainer::ConfigureBindings() {
       RumbleDriver([] { return .5_s; }), RumbleOperator([] { return .5_s; })));
 
   driverController.A().WhileTrue(swerveSubsystem.AlignToAmp());
+  driverController.Y().WhileTrue(swerveSubsystem.AlignToPass());
 
   driverController.Start().OnTrue(swerveSubsystem.ZeroYaw());
 
