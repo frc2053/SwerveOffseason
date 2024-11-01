@@ -54,7 +54,7 @@ void Robot::RobotPeriodic() {
 }
 
 void Robot::UpdateVision() {
-  auto visionEstimates = m_container.GetVision().GetCameraEstimatedPoses();
+  auto visionEstimates = m_container.GetVision().GetCameraEstimatedPoses(frc::Pose3d{m_container.GetSwerveSubsystem().GetRobotPose()});
   auto stdDevs = m_container.GetVision().GetPoseStdDevs(visionEstimates);
 
   frc::Pose3d pose =

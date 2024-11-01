@@ -19,7 +19,7 @@ class Vision {
   Vision() = default;
   void SimulationPeriodic(frc::Pose2d simRobotPose);
   std::vector<std::optional<photon::EstimatedRobotPose>>
-  GetCameraEstimatedPoses();
+  GetCameraEstimatedPoses(frc::Pose3d robotPose);
   std::vector<std::optional<Eigen::Matrix<double, 3, 1>>> GetPoseStdDevs(
       const std::vector<std::optional<photon::EstimatedRobotPose>>& poses);
   std::optional<units::meter_t> GetDistanceToNote();

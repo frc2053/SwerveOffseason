@@ -27,10 +27,10 @@ std::vector<std::optional<Eigen::Matrix<double, 3, 1>>> Vision::GetPoseStdDevs(
 }
 
 std::vector<std::optional<photon::EstimatedRobotPose>>
-Vision::GetCameraEstimatedPoses() {
+Vision::GetCameraEstimatedPoses(frc::Pose3d robotPose) {
   std::vector<std::optional<photon::EstimatedRobotPose>> allPoses;
   for (auto& cam : cameras) {
-    allPoses.push_back(cam.GetEstimatedGlobalPose());
+    allPoses.push_back(cam.GetEstimatedGlobalPose(robotPose));
   }
   return allPoses;
 }

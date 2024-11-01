@@ -36,7 +36,9 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
       stdDevXPosePub(nt->GetDoubleTopic(cameraName + "StdDevsX").Publish()),
       stdDevYPosePub(nt->GetDoubleTopic(cameraName + "StdDevsY").Publish()),
       stdDevRotPosePub(
-          nt->GetDoubleTopic(cameraName + "StdDevsRot").Publish()) {
+          nt->GetDoubleTopic(cameraName + "StdDevsRot").Publish()),
+      targetPosesPub(nt->GetStructArrayTopic<frc::Pose3d>(cameraName + "targetPoses").Publish()),
+      cornersPub(nt->GetStructArrayTopic<frc::Translation2d>(cameraName + "targetCorners").Publish()) {
   photonEstimator = std::make_unique<photon::PhotonPoseEstimator>(
       consts::yearSpecific::aprilTagLayout,
       photon::PoseStrategy::MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamera);
@@ -133,7 +135,7 @@ photon::PhotonPipelineResult Camera::GetLatestResult() {
   return latestResult;
 }
 
-std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
+std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose(frc::Pose3d robotPose) {
   std::optional<photon::EstimatedRobotPose> visionEst;
 
   auto result = camera->GetLatestResult();
@@ -149,6 +151,18 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose() {
 
   const auto& targetsSpan = result.GetTargets();
   targetsCopy = std::vector<photon::PhotonTrackedTarget>(targetsSpan.begin(), targetsSpan.end());
+
+  std::vector<frc::Pose3d> targetPoses;
+  std::vector<frc::Translation2d> cornerPxs;
+  for(const auto& target : targetsCopy) {
+    targetPoses.emplace_back(robotPose.TransformBy(photonEstimator->GetRobotToCameraTransform()).TransformBy(target.bestCameraToTarget));
+    for(const auto& corner : target.GetDetectedCorners()) {
+      //YEAH I KNOW ITS NOT A METER ITS PIXELS BUT ASCOPE NEEDS A TRANSLATION TYPE
+      cornerPxs.emplace_back(frc::Translation2d{units::meter_t{corner.x}, units::meter_t{corner.y}});
+    }
+  }
+  targetPosesPub.Set(targetPoses);
+  cornersPub.Set(cornerPxs);
  
   return visionEst;
 }

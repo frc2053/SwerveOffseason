@@ -13,6 +13,7 @@
 #include <photon/simulation/VisionSystemSim.h>
 #include <photon/simulation/VisionTargetSim.h>
 #include <photon/targeting/PhotonPipelineResult.h>
+#include <networktables/StructArrayTopic.h>
 
 #include <memory>
 #include <string>
@@ -29,7 +30,7 @@ class Camera {
          Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate);
   void SimPeriodic(frc::Pose2d robotSimPose);
   photon::PhotonPipelineResult GetLatestResult();
-  std::optional<photon::EstimatedRobotPose> GetEstimatedGlobalPose();
+  std::optional<photon::EstimatedRobotPose> GetEstimatedGlobalPose(frc::Pose3d robotPose);
   Eigen::Matrix<double, 3, 1> GetEstimationStdDevs(frc::Pose2d estimatedPose);
   std::optional<units::meter_t> GetDistanceToNote();
   std::optional<units::radian_t> GetAngleToNote();
@@ -54,6 +55,8 @@ class Camera {
   nt::DoublePublisher stdDevXPosePub;
   nt::DoublePublisher stdDevYPosePub;
   nt::DoublePublisher stdDevRotPosePub;
+  nt::StructArrayPublisher<frc::Pose3d> targetPosesPub;
+  nt::StructArrayPublisher<frc::Translation2d> cornersPub;
 
   std::optional<units::radian_t> angleToNote;
 
