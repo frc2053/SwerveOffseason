@@ -18,6 +18,7 @@
 
 #include "constants/Constants.h"
 #include "constants/VisionConstants.h"
+#include <pathplanner/lib/util/PathPlannerLogging.h>
 
 SwerveSubsystem::SwerveSubsystem() {
   SetName("SwerveSubsystem");
@@ -277,6 +278,10 @@ void SwerveSubsystem::SetupPathplanner() {
       },
       ppControllers, consts::swerve::pathplanning::config,
       []() { return str::IsOnRed(); }, this);
+
+  pathplanner::PathPlannerLogging::setLogActivePathCallback([this](std::vector<frc::Pose2d> poses) {
+    swerveDrive.GetField().GetObject("path")->SetPoses(poses);
+  });
 }
 
 frc::Translation2d SwerveSubsystem::GetAmpLocation() {

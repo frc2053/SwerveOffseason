@@ -45,6 +45,7 @@ class SwerveDrive {
   frc::ChassisSpeeds GetRobotRelativeSpeeds() const;
   frc::Pose2d GetOdomPose() const;
   frc::Pose2d GetPose() const;
+  frc::Field2d& GetField() { return field; };
   frc::Pose2d GetPredictedPose(units::second_t translationLookahead,
                                units::second_t rotationLookahead);
   units::radian_t GetYawFromImu();
