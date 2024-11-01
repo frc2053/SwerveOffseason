@@ -7,13 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "SubwooferSpinUp"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
+            "name": "Spit"
           }
         },
         {
@@ -23,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "SourceSide.0"
+                  "pathName": "AmpSide.0"
                 }
               },
               {

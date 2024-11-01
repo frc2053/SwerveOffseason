@@ -64,27 +64,36 @@ class Autos {
         std::pair{CHOREO_TEST, TestChoreoAuto()},
         std::pair{CLOSE_FOUR_SAFE, pathplanner::PathPlannerAuto("SafeCloseFour").ToPtr()},
         std::pair{SOURCE_SIDE, frc2::cmd::Sequence(
-          pathplanner::PathPlannerAuto("Source").ToPtr()
-          // frc2::cmd::Wait(.5_s),
-          // frc2::cmd::Either(
-          //   pathplanner::PathPlannerAuto("SourceGotNote").ToPtr(), 
-          //   pathplanner::PathPlannerAuto("SourceNoNote").ToPtr(),
-          //   [this] { return m_feederSub.HasNote(); })
+          pathplanner::PathPlannerAuto("Source").ToPtr(),
+          frc2::cmd::Wait(.5_s),
+          frc2::cmd::Either(
+            pathplanner::PathPlannerAuto("SourceGotNote").ToPtr(), 
+            pathplanner::PathPlannerAuto("SourceNoNote").ToPtr(),
+            [this] { return m_feederSub.HasNote(); })
         )},
-        std::pair{AMP_SIDE, frc2::cmd::Sequence(
-          pathplanner::PathPlannerAuto("Amp").ToPtr()
-          // frc2::cmd::Wait(.5_s),
-          // frc2::cmd::Either(
-          //   pathplanner::PathPlannerAuto("AmpGotNote").ToPtr(), 
-          //   pathplanner::PathPlannerAuto("AmpNoNote").ToPtr(),
-          //   [this] { return m_feederSub.HasNote(); }),
-          // pathplanner::PathPlannerAuto("AmpClose").ToPtr()
+        std::pair{AMP_SIDE_SAFE, frc2::cmd::Sequence(
+          pathplanner::PathPlannerAuto("AmpSafe").ToPtr(),
+          frc2::cmd::Wait(.5_s),
+          frc2::cmd::Either(
+            pathplanner::PathPlannerAuto("AmpGotNote").ToPtr(), 
+            pathplanner::PathPlannerAuto("AmpNoNote").ToPtr(),
+            [this] { return m_feederSub.HasNote(); })        
+        )},
+        std::pair{AMP_SIDE_DASH, frc2::cmd::Sequence(
+          pathplanner::PathPlannerAuto("AmpDash").ToPtr(),
+          frc2::cmd::Wait(.5_s),
+          frc2::cmd::Either(
+            pathplanner::PathPlannerAuto("AmpGotNote").ToPtr(), 
+            pathplanner::PathPlannerAuto("AmpNoNote").ToPtr(),
+            [this] { return m_feederSub.HasNote(); }),
+          pathplanner::PathPlannerAuto("AmpClose").ToPtr()
         )});
 
     autoChooser.AddOption("Choreo Test", AutoSelector::CHOREO_TEST);
     autoChooser.AddOption("Close Four Safe", AutoSelector::CLOSE_FOUR_SAFE);
     autoChooser.AddOption("Source", AutoSelector::SOURCE_SIDE);
-    autoChooser.AddOption("Amp", AutoSelector::AMP_SIDE);
+    autoChooser.AddOption("Amp Safe", AutoSelector::AMP_SIDE_SAFE);
+    autoChooser.AddOption("Amp Dash", AutoSelector::AMP_SIDE_DASH);
 
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
   }
@@ -131,7 +140,7 @@ class Autos {
     );
   }
 
-  enum AutoSelector { CHOREO_TEST, PP_TEST, CLOSE_FOUR_SAFE, SOURCE_SIDE, AMP_SIDE };
+  enum AutoSelector { CHOREO_TEST, PP_TEST, CLOSE_FOUR_SAFE, SOURCE_SIDE, AMP_SIDE_SAFE, AMP_SIDE_DASH };
 
   frc::SendableChooser<AutoSelector> autoChooser;
 
