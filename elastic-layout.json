@@ -168,6 +168,25 @@
               "topic": "/CameraPublisher/str_fr_cam-processed",
               "period": 0.06
             }
+          },
+          {
+            "title": "Field",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 896.0,
+            "height": 704.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06,
+              "field_game": "Crescendo",
+              "robot_width": 0.868426,
+              "robot_length": 0.85725,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "robot_color": 4286120191,
+              "trajectory_color": 4294967295
+            }
           }
         ]
       }

@@ -6,6 +6,7 @@
 
 #include <str/DriverstationUtils.h>
 #include <frc/DataLogManager.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "constants/Constants.h"
 #include "str/Math.h"
@@ -59,6 +60,7 @@ SwerveDrive::SwerveDrive() {
   }
 
   lastOdomUpdateTime = frc::Timer::GetFPGATimestamp();
+  frc::SmartDashboard::PutData(&field);
 }
 
 void SwerveDrive::ResetPose(const frc::Pose2d& resetPose) {
@@ -205,6 +207,7 @@ void SwerveDrive::UpdateNTEntries() {
   estimatorPub.Set(GetPose());
   //isSlippingPub.Set(IsSlipping());
   odomUpdateRatePub.Set(odomUpdateRate.value());
+  field.SetRobotPose(GetPose());
 }
 
 void SwerveDrive::SimulationPeriodic() {

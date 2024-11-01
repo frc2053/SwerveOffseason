@@ -19,6 +19,7 @@
 
 #include "constants/SwerveConstants.h"
 #include "str/SwerveModule.h"
+#include <frc/smartdashboard/Field2d.h>
 
 namespace str {
 class SwerveDrive {
@@ -163,6 +164,8 @@ class SwerveDrive {
 
   units::second_t lastOdomUpdateTime;
   units::hertz_t odomUpdateRate;
+
+  frc::Field2d field{};
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("SwerveDrive")};
