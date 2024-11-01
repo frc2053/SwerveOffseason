@@ -51,6 +51,8 @@ void Robot::RobotPeriodic() {
   // m_container.GetVision().GetAngleToNote());
 
   lastTotalLoopTime = now;
+  matchTimePub.Set(frc::DriverStation::GetMatchTime().value());
+  battVoltagePub.Set(frc::RobotController::GetBatteryVoltage().value());
 }
 
 void Robot::UpdateVision() {

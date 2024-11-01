@@ -1,6 +1,6 @@
 {
   "version": 1.0,
-  "grid_size": 128,
+  "grid_size": 64,
   "tabs": [
     {
       "name": "Teleoperated",
@@ -8,28 +8,74 @@
         "layouts": [],
         "containers": [
           {
-            "title": "BottomWheelTuningSetpoint",
-            "x": 512.0,
-            "y": 256.0,
-            "width": 512.0,
+            "title": "FMSInfo",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 384.0,
             "height": 128.0,
-            "type": "Number Slider",
+            "type": "FMSInfo",
             "properties": {
-              "topic": "/Shooter/BottomWheelTuningSetpoint",
+              "topic": "/FMSInfo",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "HasNote",
+            "x": 0.0,
+            "y": 448.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Feeder/HasNote",
               "period": 0.06,
-              "data_type": "double",
-              "min_value": -7000.0,
-              "max_value": 7000.0,
-              "divisions": 3,
-              "update_continuously": true
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "TouchingNote",
+            "x": 0.0,
+            "y": 320.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Intake/TouchingNote",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "IsUpToSpeed",
+            "x": 0.0,
+            "y": 576.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shooter/IsUpToSpeed",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           },
           {
             "title": "Auto Chooser",
-            "x": 512.0,
-            "y": 384.0,
-            "width": 512.0,
-            "height": 128.0,
+            "x": 0.0,
+            "y": 128.0,
+            "width": 384.0,
+            "height": 192.0,
             "type": "ComboBox Chooser",
             "properties": {
               "topic": "/SmartDashboard/Auto Chooser",
@@ -38,20 +84,89 @@
             }
           },
           {
-            "title": "TopWheelTuningSetpoint",
-            "x": 512.0,
-            "y": 128.0,
-            "width": 512.0,
+            "title": "BatteryVoltage",
+            "x": 256.0,
+            "y": 320.0,
+            "width": 448.0,
             "height": 128.0,
-            "type": "Number Slider",
+            "type": "Voltage View",
             "properties": {
-              "topic": "/Shooter/TopWheelTuningSetpoint",
+              "topic": "/Metadata/BatteryVoltage",
               "period": 0.06,
               "data_type": "double",
-              "min_value": -7000.0,
-              "max_value": 7000.0,
-              "divisions": 3,
-              "update_continuously": true
+              "min_value": 4.0,
+              "max_value": 13.0,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "horizontal"
+            }
+          },
+          {
+            "title": "MatchTime",
+            "x": 256.0,
+            "y": 448.0,
+            "width": 448.0,
+            "height": 256.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/Metadata/MatchTime",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 15,
+              "yellow_start_time": 30
+            }
+          },
+          {
+            "title": "str_bl_cam-processed",
+            "x": 1408.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/str_bl_cam-processed",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "str_br_cam-processed",
+            "x": 1664.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/str_br_cam-processed",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "str_fl_cam-processed",
+            "x": 1408.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/str_fl_cam-processed",
+              "period": 0.06,
+              "resolution": [
+                320.0,
+                240.0
+              ]
+            }
+          },
+          {
+            "title": "str_fr_cam-processed",
+            "x": 1664.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/str_fr_cam-processed",
+              "period": 0.06
             }
           }
         ]

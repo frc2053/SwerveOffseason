@@ -48,6 +48,8 @@ class Robot : public frc::TimedRobot {
                                       .GetTable("Looptime")
                                       ->GetDoubleTopic("RobotPeriodicLoopRate")
                                       .Publish()};
+  nt::DoublePublisher matchTimePub{nt::NetworkTableInstance::GetDefault().GetTable("Metadata")->GetDoubleTopic("MatchTime").Publish()};
+  nt::DoublePublisher battVoltagePub{nt::NetworkTableInstance::GetDefault().GetTable("Metadata")->GetDoubleTopic("BatteryVoltage").Publish()};
   std::array<frc::Pose3d, 5> cameraLocations;
   nt::StructArrayPublisher<frc::Pose3d> cameraLocationsPub{
       nt::NetworkTableInstance::GetDefault()
