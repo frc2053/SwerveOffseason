@@ -640,14 +640,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  9.100350427142445,
-                  4.5675411199592855,
-                  1.3340082904527701
+                  9.203674292950591,
+                  7.127610327790741,
+                  -0.8875055134600116
                 ],
                 "cameraTarget": [
-                  4.085426255710795,
-                  2.30744648382586,
-                  0.1795123669845
+                  4.942294744651573,
+                  0.46188567615377124,
+                  -0.9801227285971255
                 ]
               },
               "controlsHeight": 305
@@ -661,7 +661,7 @@
                     "type": "plus",
                     "logKey": "NT:/Vision/str_fl_camtargetCorners",
                     "logType": "Translation2d[]",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "size": "medium",
                       "groupSize": "4"
@@ -681,7 +681,7 @@
                     "type": "circle",
                     "logKey": "NT:/Vision/str_bl_camtargetCorners",
                     "logType": "Translation2d[]",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "size": "medium",
                       "groupSize": "4"
@@ -691,7 +691,7 @@
                     "type": "plus",
                     "logKey": "NT:/Vision/str_br_camtargetCorners",
                     "logType": "Translation2d[]",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "size": "medium",
                       "groupSize": "4"
@@ -754,18 +754,6 @@
       }
     }
   ],
-  "satellites": [
-    {
-      "x": 216,
-      "y": 302,
-      "width": 753,
-      "height": 592,
-      "state": {
-        "type": 11,
-        "visualizer": null
-      },
-      "uuid": "849r4flcp0bwxjq7ctya569cxsppnf44"
-    }
-  ],
+  "satellites": [],
   "version": "4.0.0-beta-2"
 }
